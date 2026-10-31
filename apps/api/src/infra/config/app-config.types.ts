@@ -105,9 +105,8 @@ export interface AppConfig {
    * Redis-backed rate limiting on the authentication surface (issue #28,
    * ADR-0008 § Security requirements).
    *
-   * The OTP budgets are **not** here — they live under {@link sms}.`otp`,
-   * where `.env.example` has grouped them since EPIC 1 and where ADR-0008
-   * describes them. Splitting a concern across two config groups is a wart,
+   * The OTP budgets are **not** here — they live under {@link email}.`otp`,
+   * where `.env.example` groups them and where ADR-0072 describes them. Splitting a concern across two config groups is a wart,
    * accepted over renaming environment variables that are already documented:
    * a renamed variable does not fail, it silently falls back to its default,
    * and the default of a financial control is not a thing to reintroduce by
@@ -118,7 +117,7 @@ export interface AppConfig {
     /**
      * Required by EPIC 2 — `RateLimitModule` fails its own startup without
      * it, the same way `AuthModule` does for the JWT secrets. It is the HMAC
-     * pepper that keeps phone numbers out of the Redis key space; see
+     * pepper that keeps email addresses out of the Redis key space; see
      * `rate-limit.config.ts` for why a bare hash is not enough.
      */
     readonly keySecret: string | undefined;
@@ -212,22 +211,12 @@ export interface AppConfig {
     readonly geocodePerIpHour: number;
   };
 
-  readonly sms: {
-    /** ADR-0059: Plivo primary, Twilio fallback; `stub` for development and tests. */
-    readonly provider: 'stub' | 'plivo' | 'twilio';
-    readonly fallbackProvider: 'plivo' | 'twilio' | undefined;
-    /** The alphanumeric sender, `TezUsta`. Required by a real provider. */
-    readonly senderId: string | undefined;
-    /** One provider call's deadline, in ms; past it the fallback is tried. */
-    readonly timeoutMs: number;
-    readonly plivo: {
-      readonly authId: string | undefined;
-      readonly authToken: string | undefined;
-    };
-    readonly twilio: {
-      readonly accountSid: string | undefined;
-      readonly authToken: string | undefined;
-    };
+  readonly email: {
+    /**
+     * ADR-0072: the delivery provider is not chosen yet, so `stub` — for
+     * development and tests only — is the one value.
+     */
+    readonly provider: 'stub';
     readonly otp: {
       /**
        * Required by EPIC 2 — `OtpModule` fails its own startup without it
@@ -241,20 +230,16 @@ export interface AppConfig {
       readonly length: number;
       readonly ttlSeconds: number;
       readonly maxAttempts: number;
-      readonly rateLimitPerPhoneHour: number;
+      readonly rateLimitPerEmailHour: number;
       readonly rateLimitPerIpHour: number;
       /**
        * Platform-wide ceiling on OTP sends per rolling 24h window (issue
-       * #272) — the aggregate backstop behind the per-phone and per-IP
+       * #272) — the aggregate backstop behind the per-address and per-IP
        * limits above, which bound one caller each but not a distributed one.
        */
       readonly globalDailyCap: number;
       /** Sends per clock hour, platform-wide (#390). */
       readonly globalHourlyCap: number;
-      /** Sends per clock hour to one operator prefix, `+99450`. */
-      readonly prefixHourlyCap: number;
-      /** Sends per clock hour to one range of ten thousand numbers. */
-      readonly rangeHourlyCap: number;
       /** The circuit breaker's sample: sends over the current and previous hour. */
       readonly breakerMinSends: number;
       /** Below this share of codes entered correctly, sending stops. 0 is off. */

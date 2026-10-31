@@ -63,7 +63,7 @@ describe('realtime gateway across two API instances (issue #166)', () => {
 
     const created = await instanceB
       .get(UsersRepository)
-      .create({ phoneE164: '+994509990001', roles: ['customer'] });
+      .create({ email: 'multi-instance@example.com', roles: ['customer'] });
     const pair = await instanceB.get(SessionsService).startSession({ userId: created.user.id });
 
     client = io(await instanceB.getUrl(), {

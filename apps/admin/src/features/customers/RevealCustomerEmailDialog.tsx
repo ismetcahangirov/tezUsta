@@ -9,28 +9,28 @@ import { useAppDispatch } from '../../hooks';
 import { customersApi } from './api';
 import { customerErrorMessage, customersCopy } from './copy';
 
-export interface RevealCustomerPhoneDialogProps {
+export interface RevealCustomerEmailDialogProps {
   customerId: string;
   name: string;
   onClose: () => void;
 }
 
 /**
- * Reveals a customer's full number with a reason (ADR-0043 § 6), the same way
+ * Reveals a customer's full email address with a reason (ADR-0043 § 6), the same way
  * the order screen reveals a party's: dispatched with `track: false`, held in
  * this dialog's state alone, and gone when it closes.
  */
-export function RevealCustomerPhoneDialog({
+export function RevealCustomerEmailDialog({
   customerId,
   name,
   onClose,
-}: RevealCustomerPhoneDialogProps) {
+}: RevealCustomerEmailDialogProps) {
   const dispatch = useAppDispatch();
   const [reason, setReason] = useState('');
   const [touched, setTouched] = useState(false);
   const [busy, setBusy] = useState(false);
   const [failureCode, setFailureCode] = useState<string | null | undefined>(undefined);
-  const [phone, setPhone] = useState<string | null>(null);
+  const [email, setEmail] = useState<string | null>(null);
 
   const problem = reasonProblem(reason);
   const reasonError =
@@ -46,7 +46,7 @@ export function RevealCustomerPhoneDialog({
     setBusy(true);
     setFailureCode(undefined);
     const result = await dispatch(
-      customersApi.endpoints.revealCustomerPhone.initiate(
+      customersApi.endpoints.revealCustomerEmail.initiate(
         { customerId, reason: reason.trim() },
         { track: false },
       ),
@@ -56,12 +56,12 @@ export function RevealCustomerPhoneDialog({
       setFailureCode(describeFailure(result.error)?.code ?? null);
       return;
     }
-    setPhone(result.data.phoneE164);
+    setEmail(result.data.email);
   }
 
   return (
     <Modal title={customersCopy.revealTitle(name)} onClose={onClose} busy={busy}>
-      {phone === null ? (
+      {email === null ? (
         <form
           noValidate
           className="flex flex-col gap-4"
@@ -101,7 +101,7 @@ export function RevealCustomerPhoneDialog({
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
             <span className="text-caption text-text-muted">{customersCopy.revealedLabel}</span>
-            <output className="select-all text-h2 text-text">{phone}</output>
+            <output className="select-all break-all text-h2 text-text">{email}</output>
           </div>
           <div className="flex justify-end">
             <Button label={customersCopy.close} variant="secondary" onClick={onClose} />

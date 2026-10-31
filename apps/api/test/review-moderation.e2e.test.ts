@@ -35,10 +35,10 @@ import { createThrowawayDatabase } from './support/throwaway-database';
  * removal has to undo exactly what that path did.
  */
 
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99456${String(phoneCounter).padStart(7, '0')}`;
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
 interface Party {
@@ -75,7 +75,7 @@ describe('an admin removing a review (issue #224)', () => {
   }
 
   async function party(role: 'customers' | 'masters'): Promise<Party> {
-    const created = await app.get(UsersRepository).create({ phoneE164: nextPhone(), roles: [] });
+    const created = await app.get(UsersRepository).create({ email: nextEmail(), roles: [] });
     const pair = await app.get(SessionsService).startSession({ userId: created.user.id });
     const profile = await http('post', `/${role}`, pair.accessToken).send({ displayName: 'Ad' });
     expect(profile.status).toBe(201);

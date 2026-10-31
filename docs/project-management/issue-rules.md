@@ -106,28 +106,28 @@ Unreviewable, unestimable, unfinishable. There is no way to tell when it is done
 ### Good
 
 ```markdown
-# Implement customer phone authentication with refresh-token rotation
+# Implement customer email authentication with refresh-token rotation
 
 ## Objective
 
-Let a customer sign in with a phone number and OTP, receiving an access/refresh
-token pair with rotation and reuse detection.
+Let a customer sign in with an email address and OTP, receiving an
+access/refresh token pair with rotation and reuse detection.
 
 ## Context
 
 Blocks all customer-facing work. Design: docs/architecture/authentication.md.
-OTP delivery provider is still open (ADR-0008) — this issue uses a stub sender
+OTP delivery provider is still open (ADR-0072) — this issue uses a stub sender
 behind the provider interface.
 
 ## Requirements
 
-- [ ] POST /auth/otp/request — accepts a phone number, sends a code via the sender interface
+- [ ] POST /auth/otp/request — accepts an email address, sends a code via the sender interface
 - [ ] POST /auth/otp/verify — verifies and returns an access + refresh pair
 - [ ] POST /auth/refresh — rotates the refresh token
 - [ ] POST /auth/logout — revokes the current session
 - [ ] Refresh tokens stored hashed, one row per device session
 - [ ] Reuse of a spent refresh token revokes the whole session family
-- [ ] Rate limiting per phone and per IP
+- [ ] Rate limiting per email address and per IP
 
 ## Technical considerations
 
@@ -135,26 +135,26 @@ behind the provider interface.
   decision — never trusted from the token
 - Refresh tokens are stored hashed; the plaintext exists only in the response
 - Tokens live in `expo-secure-store` on the client, never `AsyncStorage`
-- The OTP request and verify responses must not reveal whether a number is
+- The OTP request and verify responses must not reveal whether an address is
   already registered
-- The sender is an interface with a stub implementation (`SMS_PROVIDER=stub`)
+- The sender is an interface with a stub implementation (`EMAIL_PROVIDER=stub`)
   until a provider is chosen; swapping it must not touch a call site
 
 ## Acceptance criteria
 
-- [ ] A new phone number can complete sign-up and receives a valid token pair
+- [ ] A new email address can complete sign-up and receives a valid token pair
 - [ ] An expired access token is rejected with 401
 - [ ] Refreshing returns a new refresh token and invalidates the previous one
 - [ ] Replaying a spent refresh token revokes every session for that user
 - [ ] Exceeding the OTP request limit returns 429
-- [ ] The response is identical for a known and an unknown phone number
+- [ ] The response is identical for a known and an unknown email address
 
 ## Testing requirements
 
 - [ ] Integration tests for each endpoint
 - [ ] Refresh reuse detection test
 - [ ] Rate limit trigger and reset
-- [ ] No token, OTP code, or full phone number appears in logs
+- [ ] No token, OTP code, or full email address appears in logs
 
 ## Dependencies
 
@@ -215,6 +215,6 @@ Every implementation issue is assigned to **`ismetcahangirov`**.
 The repository is **public**.
 
 - Credentials, tokens, connection strings
-- Real personal data — phone numbers, addresses, customer names
+- Real personal data — email addresses, home addresses, customer names
 - Unreported security vulnerability detail — an issue is a public disclosure.
   Contact the owner directly ([`../engineering/security.md`](../engineering/security.md)).

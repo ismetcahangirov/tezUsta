@@ -55,9 +55,9 @@ describe('collectArrivalMetrics (issue #410)', () => {
     masterCount += 1;
     const userId = randomUUID();
     const masterId = randomUUID();
-    await pool.query(`insert into users (id, phone_e164) values ($1, $2)`, [
+    await pool.query(`insert into users (id, email) values ($1, $2)`, [
       userId,
-      `+99452${String(masterCount).padStart(7, '0')}`,
+      `master-${String(masterCount)}@example.com`,
     ]);
     await pool.query(
       `insert into masters (id, user_id, display_name, verification_status)
@@ -128,7 +128,7 @@ describe('collectArrivalMetrics (issue #410)', () => {
     const userId = randomUUID();
     customerId = randomUUID();
     addressId = randomUUID();
-    await pool.query(`insert into users (id, phone_e164) values ($1, '+994509999999')`, [userId]);
+    await pool.query(`insert into users (id, email) values ($1, 'customer@example.com')`, [userId]);
     await pool.query(
       `insert into customers (id, user_id, display_name) values ($1, $2, 'Fixture')`,
       [customerId, userId],

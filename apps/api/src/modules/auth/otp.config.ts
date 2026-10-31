@@ -4,7 +4,7 @@ import type { AppConfig } from '../../infra/config/app-config.types';
  * The OTP flow's own configuration, with the pepper **proven present** rather
  * than typed `string | undefined`.
  *
- * `AppConfig.sms.otp.codePepper` is optional because EPIC 1 shipped before
+ * `AppConfig.email.otp.codePepper` is optional because EPIC 1 shipped before
  * anything issued a code, and `app-config.types.ts` states the rule that
  * follows: "the module that first needs the value is responsible for failing
  * its own startup with a clear error if it is still missing." This is that
@@ -20,7 +20,7 @@ import type { AppConfig } from '../../infra/config/app-config.types';
 export interface OtpConfig {
   /** HMAC key for the stored code digest. See {@link MissingOtpCodePepperError}. */
   readonly codePepper: string;
-  /** Digits per code. 6 by ADR-0008; `env.schema.ts` refuses anything below it. */
+  /** Digits per code. 6 by ADR-0072; `env.schema.ts` refuses anything below it. */
   readonly length: number;
   /** Milliseconds, because that is what `Date` arithmetic wants. */
   readonly ttlMs: number;
@@ -34,8 +34,6 @@ export interface OtpConfig {
   readonly globalDailyCap: number;
   /** The fraud controls behind the daily cap (#390); see `env.schema.ts`. */
   readonly globalHourlyCap: number;
-  readonly prefixHourlyCap: number;
-  readonly rangeHourlyCap: number;
   readonly breakerMinSends: number;
   /** 0 turns the circuit breaker off. */
   readonly breakerMinSuccessPercent: number;
@@ -78,11 +76,9 @@ export function createOtpConfig(config: AppConfig): OtpConfig {
     maxAttempts,
     globalDailyCap,
     globalHourlyCap,
-    prefixHourlyCap,
-    rangeHourlyCap,
     breakerMinSends,
     breakerMinSuccessPercent,
-  } = config.sms.otp;
+  } = config.email.otp;
 
   if (codePepper === undefined) {
     throw new MissingOtpCodePepperError();
@@ -98,8 +94,6 @@ export function createOtpConfig(config: AppConfig): OtpConfig {
     maxAttempts,
     globalDailyCap,
     globalHourlyCap,
-    prefixHourlyCap,
-    rangeHourlyCap,
     breakerMinSends,
     breakerMinSuccessPercent,
   });

@@ -53,8 +53,8 @@ function detail(overrides: Partial<AdminOrderDetail> = {}): AdminOrderDetail {
       apartment: '12',
       landmarkNote: null,
     },
-    customer: { id: 'c1', displayName: 'Leyla Hasanova', phoneMasked: '+994 •• ••• •• 67' },
-    master: { id: 'm1', displayName: 'Rashad Aliyev', phoneMasked: '+994 •• ••• •• 21' },
+    customer: { id: 'c1', displayName: 'Leyla Hasanova', emailMasked: 'l•••@example.com' },
+    master: { id: 'm1', displayName: 'Rashad Aliyev', emailMasked: 'r•••@example.com' },
     history: [
       {
         fromStatus: 'SEARCHING',
@@ -200,7 +200,7 @@ describe('dispute queue', () => {
 });
 
 describe('order detail', () => {
-  it('shows the summary, the address, the parties with masked numbers, and the history oldest first', async () => {
+  it('shows the summary, the address, the parties with masked email addresses, and the history oldest first', async () => {
     installFakeServer()
       .on('GET', '/api/admin/me', me())
       .on('GET', DETAIL, { status: 200, body: detail() });
@@ -210,8 +210,8 @@ describe('order detail', () => {
     expect(screen.getByText('The kitchen tap leaks under the sink.')).toBeInTheDocument();
     expect(screen.getByText(money(4550))).toBeInTheDocument();
     expect(screen.getByText('Nizami küç. 10, Bakı')).toBeInTheDocument();
-    expect(screen.getByText('+994 •• ••• •• 67')).toBeInTheDocument();
-    expect(screen.getByText('+994 •• ••• •• 21')).toBeInTheDocument();
+    expect(screen.getByText('l•••@example.com')).toBeInTheDocument();
+    expect(screen.getByText('r•••@example.com')).toBeInTheDocument();
 
     const history = within(screen.getByRole('list', { name: 'Status history' })).getAllByRole(
       'listitem',
@@ -406,7 +406,7 @@ describe('order detail', () => {
 
     await screen.findByRole('heading', { name: 'Order 3f2a9c1e' });
     expect(screen.queryByRole('button', { name: 'Change status' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /Reveal number/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Reveal email/ })).not.toBeInTheDocument();
   });
 
   it('shows the message for the error code the server returns', async () => {
@@ -451,50 +451,50 @@ describe('order detail', () => {
     );
   });
 
-  it('reveals a number once, for a reason, and forgets it when the dialog closes', async () => {
-    const reveal = `${DETAIL}/parties/customer/phone`;
+  it('reveals an email address once, for a reason, and forgets it when the dialog closes', async () => {
+    const reveal = `${DETAIL}/parties/customer/email`;
     const server = installFakeServer()
       .on('GET', '/api/admin/me', me())
       .on('GET', DETAIL, { status: 200, body: detail() })
-      .on('POST', reveal, { status: 200, body: { phoneE164: '+994501234567' } });
+      .on('POST', reveal, { status: 200, body: { email: 'leyla@example.com' } });
     const { user } = renderApp(`/orders/${ORDER_ID}`);
 
-    await user.click(await screen.findByRole('button', { name: 'Reveal number: Customer' }));
-    const dialog = screen.getByRole('dialog', { name: 'Reveal Leyla Hasanova’s number' });
+    await user.click(await screen.findByRole('button', { name: 'Reveal email: Customer' }));
+    const dialog = screen.getByRole('dialog', { name: 'Reveal Leyla Hasanova’s email address' });
     await user.click(within(dialog).getByRole('button', { name: 'Reveal' }));
     expect(within(dialog).getByText('Write a reason.')).toBeInTheDocument();
     expect(server.calls('POST', reveal)).toHaveLength(0);
 
     await user.type(
       within(dialog).getByRole('textbox', { name: 'Reason' }),
-      'Customer asked to be called back.',
+      'Customer asked to be contacted.',
     );
     await user.click(within(dialog).getByRole('button', { name: 'Reveal' }));
 
-    expect(await within(dialog).findByText('+994501234567')).toBeInTheDocument();
+    expect(await within(dialog).findByText('leyla@example.com')).toBeInTheDocument();
     expect(server.calls('POST', reveal)[0]?.body).toEqual({
-      reason: 'Customer asked to be called back.',
+      reason: 'Customer asked to be contacted.',
     });
 
     await user.click(within(dialog).getByRole('button', { name: 'Close' }));
-    expect(screen.queryByText('+994501234567')).not.toBeInTheDocument();
+    expect(screen.queryByText('leyla@example.com')).not.toBeInTheDocument();
 
-    // Opening it again is a new reveal: the form, not the number.
-    await user.click(screen.getByRole('button', { name: 'Reveal number: Customer' }));
+    // Opening it again is a new reveal: the form, not the address.
+    await user.click(screen.getByRole('button', { name: 'Reveal email: Customer' }));
     expect(within(screen.getByRole('dialog')).getByRole('textbox', { name: 'Reason' })).toHaveValue(
       '',
     );
-    expect(screen.queryByText('+994501234567')).not.toBeInTheDocument();
+    expect(screen.queryByText('leyla@example.com')).not.toBeInTheDocument();
   });
 
   it('explains a refused reveal', async () => {
     installFakeServer()
       .on('GET', '/api/admin/me', me())
       .on('GET', DETAIL, { status: 200, body: detail() })
-      .on('POST', `${DETAIL}/parties/master/phone`, apiError(403, 'FORBIDDEN'));
+      .on('POST', `${DETAIL}/parties/master/email`, apiError(403, 'FORBIDDEN'));
     const { user } = renderApp(`/orders/${ORDER_ID}`);
 
-    await user.click(await screen.findByRole('button', { name: 'Reveal number: Master' }));
+    await user.click(await screen.findByRole('button', { name: 'Reveal email: Master' }));
     const dialog = screen.getByRole('dialog');
     await user.type(within(dialog).getByRole('textbox', { name: 'Reason' }), 'Dispute call.');
     await user.click(within(dialog).getByRole('button', { name: 'Reveal' }));

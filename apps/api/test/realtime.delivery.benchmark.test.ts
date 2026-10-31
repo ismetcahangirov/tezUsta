@@ -366,16 +366,14 @@ describe.runIf(process.env.REALTIME_DELIVERY_BENCHMARK === '1')(
       const orderIds = Array.from({ length: count }, () => randomUUID());
       const idempotencyKeys = Array.from({ length: count }, () => randomUUID());
 
-      const masterPhones = masterUserIds.map((_, i) => `+99450${String(i + 1).padStart(7, '0')}`);
-      const customerPhones = customerUserIds.map(
-        (_, i) => `+99451${String(i + 1).padStart(7, '0')}`,
-      );
+      const masterEmails = masterUserIds.map((_, i) => `master-${String(i + 1)}@example.com`);
+      const customerEmails = customerUserIds.map((_, i) => `customer-${String(i + 1)}@example.com`);
 
       await pool.query(
-        `insert into users (id, phone_e164) select * from unnest($1::uuid[], $2::text[])`,
+        `insert into users (id, email) select * from unnest($1::uuid[], $2::text[])`,
         [
           [...masterUserIds, ...customerUserIds],
-          [...masterPhones, ...customerPhones],
+          [...masterEmails, ...customerEmails],
         ],
       );
       await pool.query(

@@ -22,7 +22,7 @@ describe('createRateLimitConfig', () => {
     expect(config.rateLimit.keySecret).toBeUndefined();
 
     // The alternative to failing here is hashing unkeyed, which silently
-    // downgrades the control that keeps phone numbers out of the Redis key
+    // downgrades the control that keeps email addresses out of the Redis key
     // space. A startup that refuses is a deployment problem; one that boots
     // is a privacy incident nobody notices.
     expect(() => createRateLimitConfig(config)).toThrow(MissingRateLimitKeySecretError);
@@ -39,7 +39,7 @@ describe('createRateLimitConfig', () => {
       parseEnv({
         ...BASE_ENV,
         RATE_LIMIT_KEY_SECRET: PEPPER,
-        OTP_RATE_LIMIT_PER_PHONE_HOUR: '3',
+        OTP_RATE_LIMIT_PER_EMAIL_HOUR: '3',
         OTP_RATE_LIMIT_PER_IP_HOUR: '9',
         SIGNIN_RATE_LIMIT_PER_IDENTIFIER_HOUR: '7',
         SIGNIN_RATE_LIMIT_PER_IP_HOUR: '21',

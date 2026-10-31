@@ -33,10 +33,10 @@ import { createThrowawayDatabase } from './support/throwaway-database';
  * the window is not a race but a fact of the test.
  */
 
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99455${String(phoneCounter).padStart(7, '0')}`;
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
 let tokenCounter = 0;
@@ -81,7 +81,7 @@ describe('notification preferences at send time (issue #143)', () => {
   }
 
   async function recipientWithDevices(count: number): Promise<Recipient> {
-    const created = await users.create({ phoneE164: nextPhone(), roles: [] });
+    const created = await users.create({ email: nextEmail(), roles: [] });
     const actor: Actor = {
       userId: created.user.id,
       sessionId: uuidV7(),

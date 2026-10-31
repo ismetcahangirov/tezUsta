@@ -46,10 +46,10 @@ import { grantTestSubscription } from './support/subscriptions';
  * reached one extra socket returns nothing to notice.
  */
 
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99455${String(phoneCounter).padStart(7, '0')}`;
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
 const SEARCH_POINT = { latitude: 40.372613, longitude: 49.842717 };
@@ -165,9 +165,7 @@ describe('conversation events on the socket (issue #179)', () => {
   }
 
   async function signIn(): Promise<Party> {
-    const created = await instanceA
-      .get(UsersRepository)
-      .create({ phoneE164: nextPhone(), roles: [] });
+    const created = await instanceA.get(UsersRepository).create({ email: nextEmail(), roles: [] });
     const pair = await instanceA.get(SessionsService).startSession({ userId: created.user.id });
     return { userId: created.user.id, accessToken: pair.accessToken };
   }

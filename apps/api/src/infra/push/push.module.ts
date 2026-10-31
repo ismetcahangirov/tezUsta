@@ -11,8 +11,8 @@ import { StubPushSender } from './stub-push-sender';
 /**
  * Chooses the {@link PushSender} implementation from validated configuration.
  *
- * The shape is `SmsModule`'s, with one difference that matters: ADR-0008's SMS
- * provider is **undecided**, so that module has only a stub, while push has a
+ * The shape is `EmailModule`'s, with one difference that matters: ADR-0072's
+ * email provider is **undecided**, so that module has only a stub, while push has a
  * decided provider (`technology-stack.md` — Expo's push service) and ships the
  * real sender here. `PUSH_PROVIDER` is an enum in `env.schema.ts`, which is
  * what makes the `switch` exhaustive and a `default` branch unnecessary rather

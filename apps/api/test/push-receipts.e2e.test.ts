@@ -33,10 +33,10 @@ import { createThrowawayDatabase } from './support/throwaway-database';
  * lets a test drive send → ticket → receipt end to end without a network.
  */
 
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99471${String(phoneCounter).padStart(7, '0')}`;
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
 let tokenCounter = 0;
@@ -74,7 +74,7 @@ describe('the push receipt sweep (issue #142)', () => {
   }
 
   async function registerDevice(): Promise<Registered> {
-    const created = await users.create({ phoneE164: nextPhone(), roles: [] });
+    const created = await users.create({ email: nextEmail(), roles: [] });
     const pushToken = nextToken();
     const device = await devices.register(
       { userId: created.user.id, sessionId: randomUUID(), roles: [], status: 'active' },

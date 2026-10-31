@@ -47,10 +47,11 @@ export interface SessionState {
   /** Which role's experience is on screen. */
   role: AppRole;
   /**
-   * The number an OTP was just sent to, held here rather than passed as a
-   * route parameter: a route parameter puts a full phone number into a
-   * deep-linkable URL and, on the web output, into browser history. Phone
-   * numbers are data this project keeps out of logs (CLAUDE.md §11).
+   * The email address an OTP was just sent to, already normalised, held here
+   * rather than passed as a route parameter: a route parameter puts a full
+   * address into a deep-linkable URL and, on the web output, into browser
+   * history. An address is personal data this project keeps out of logs
+   * (CLAUDE.md §11).
    */
   otpRequestedFor: string | null;
 }

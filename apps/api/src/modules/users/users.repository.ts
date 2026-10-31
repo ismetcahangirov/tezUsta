@@ -35,17 +35,11 @@ export class UsersRepository {
    * key. Committing them together means no request ever observes the
    * in-between state.
    */
-  async create(input: {
-    phoneE164: string;
-    roles: readonly UserRoleName[];
-  }): Promise<UserWithRoles> {
+  async create(input: { email: string; roles: readonly UserRoleName[] }): Promise<UserWithRoles> {
     const id = uuidV7();
 
     return this.db.transaction(async (tx) => {
-      const [created] = await tx
-        .insert(users)
-        .values({ id, phoneE164: input.phoneE164 })
-        .returning();
+      const [created] = await tx.insert(users).values({ id, email: input.email }).returning();
 
       if (created === undefined) {
         // Unreachable: an INSERT ... RETURNING that inserts one row returns
@@ -62,11 +56,11 @@ export class UsersRepository {
     });
   }
 
-  async findByPhone(phoneE164: string): Promise<UserRow | undefined> {
+  async findByEmail(email: string): Promise<UserRow | undefined> {
     const [row] = await this.db
       .select()
       .from(users)
-      .where(and(eq(users.phoneE164, phoneE164), isNull(users.deletedAt)))
+      .where(and(eq(users.email, email), isNull(users.deletedAt)))
       .limit(1);
     return row;
   }

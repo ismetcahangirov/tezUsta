@@ -268,7 +268,8 @@ verification approves the master. While the subscription is in trial, active or 
 the master receives work. Once it has expired the master cannot go available or
 accept, but finishes any job already accepted. The subscription is bought
 outside the app; the app shows its status only (ADR-0046 § 5 and § 7). The
-master signs in to that web page with their phone and an SMS code, and the
+master signs in to that web page with their email address and a code sent by
+email ([ADR-0072](../decisions/ADR-0072-email-one-time-code-sign-in.md)), and the
 session there reaches the subscription and nothing else
 ([ADR-0061](../decisions/ADR-0061-master-web-subscription-page.md)).
 

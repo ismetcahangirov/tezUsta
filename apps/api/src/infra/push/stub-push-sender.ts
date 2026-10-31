@@ -11,7 +11,7 @@ import type {
 /**
  * Thrown when the stub sender is constructed in production.
  *
- * The same mechanism `StubSmsSender` uses, for the same reason. A runtime
+ * The same mechanism `StubEmailSender` uses, for the same reason. A runtime
  * `if (nodeEnv !== 'production')` around the send would leave the service
  * booting, accepting orders, reporting green on every health check — and
  * delivering nothing, so a master never sees an offer and a customer never

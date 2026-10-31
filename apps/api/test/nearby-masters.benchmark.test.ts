@@ -185,8 +185,8 @@ describe.runIf(enabled)('nearby eligible masters — latency (issue #100)', () =
 
   async function seed(): Promise<void> {
     await pool.query(
-      `insert into users (id, phone_e164)
-       select gen_random_uuid(), '+9946' || lpad(g::text, 8, '0')
+      `insert into users (id, email)
+       select gen_random_uuid(), 'master-' || g || '@example.com'
          from generate_series(1, $1) g`,
       [MASTER_COUNT],
     );

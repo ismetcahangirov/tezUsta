@@ -19,16 +19,16 @@ import { tokenStore } from './token-store';
 export const authApi = api.injectEndpoints({
   endpoints: (build) => ({
     /**
-     * Sends an OTP. The response is identical for a known and an unknown
-     * number, which is what stops it being a user-enumeration oracle — so the
+     * Emails an OTP. The response is identical for a known and an unknown
+     * address, which is what stops it being a user-enumeration oracle — so the
      * screen must not draw any conclusion from it either.
      */
     requestOtp: build.mutation<void, OtpRequest>({
       query: (body) => ({ url: '/auth/otp/request', method: 'POST', body }),
-      async onQueryStarted({ phone }, { dispatch, queryFulfilled }) {
+      async onQueryStarted({ email }, { dispatch, queryFulfilled }) {
         try {
           await queryFulfilled;
-          dispatch(otpRequested(phone));
+          dispatch(otpRequested(email));
         } catch {
           // The mutation's own error state is what the screen renders.
           // Rethrowing here would surface as an unhandled rejection and tell

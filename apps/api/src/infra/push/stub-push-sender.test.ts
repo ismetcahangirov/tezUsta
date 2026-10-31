@@ -17,7 +17,7 @@ describe('StubPushSender (issue #141)', () => {
   it('refuses to construct in production', () => {
     // The whole control. A runtime guard around the send would leave the
     // service booting, reporting green, and delivering nothing — a silent,
-    // total notification outage. `StubSmsSender` refuses for the same reason.
+    // total notification outage. `StubEmailSender` refuses for the same reason.
     expect(() => new StubPushSender('production')).toThrow(StubPushSenderInProductionError);
   });
 

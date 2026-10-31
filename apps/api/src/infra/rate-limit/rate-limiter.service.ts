@@ -40,7 +40,7 @@ const LOG_DIGEST_HEX_LENGTH = 12;
  * `PEXPIRE key window` — and it has a failure that is not theoretical: if the
  * API process dies, is evicted, or simply loses its connection in the gap
  * between them, the key survives with **no expiry at all**. `PTTL` then
- * returns -1 forever, the counter only ever climbs, and the phone number or
+ * returns -1 forever, the counter only ever climbs, and the email address or
  * IP that happened to be mid-request is rate-limited permanently, with no
  * error anywhere and nothing to make it recover. The only cure is a human
  * finding and deleting a key whose name is a hash. On the OTP path that is a
@@ -172,8 +172,8 @@ function retryAfterSecondsFrom(ttlMs: number): number {
  * Redis so that N instances enforce ONE limit; `rate-limiter.service.test.ts`
  * asserts exactly that with two service instances on one Redis.
  *
- * **Why the subject is hashed.** The Redis key contains an HMAC of the phone
- * number, never the number. See {@link RateLimitConfig.keySecret}.
+ * **Why the subject is hashed.** The Redis key contains an HMAC of the email
+ * address, never the address. See {@link RateLimitConfig.keySecret}.
  *
  * This service is a primitive: it takes limits as arguments and has no
  * opinion about which endpoint deserves which. `RateLimitGuard` maps a policy
@@ -291,7 +291,7 @@ export class RateLimiterService {
 
   /**
    * The scope and dimension are part of the HMAC input, not only of the key
-   * name. That means the same phone number produces a different digest under
+   * name. That means the same email address produces a different digest under
    * `otp-request` than under `sign-in`, so somebody reading the key space
    * cannot even correlate "this unknown person hit both endpoints" — the
    * counters are unlinkable, which costs nothing and removes a whole class of

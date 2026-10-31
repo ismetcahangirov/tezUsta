@@ -64,7 +64,7 @@ See CLAUDE.md §8.
 
 ```
 Bad:   Implement authentication
-Good:  Implement customer phone authentication with refresh-token rotation
+Good:  Implement customer email authentication with refresh-token rotation
        and device session revocation
 ```
 
@@ -214,6 +214,6 @@ document.
 ## What does not belong in an issue
 
 - Credentials, tokens, or connection strings
-- Personal data (real phone numbers, addresses, customer names)
+- Personal data (real email addresses, home addresses, customer names)
 - Unreported security vulnerability detail — the repository is public; an issue
   is a disclosure. Contact the owner directly ([`security.md`](security.md)).

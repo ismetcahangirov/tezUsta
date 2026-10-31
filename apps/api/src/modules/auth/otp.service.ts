@@ -5,13 +5,13 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { AppError } from '../../common/errors/app-error';
 import { ERROR_CODES } from '../../common/errors/error-codes.types';
 import { uuidV7 } from '../../common/ids/uuid-v7';
-import { maskPhone } from '../../infra/phone/azerbaijani-phone';
+import { maskEmail } from '../../infra/email/email-address';
+import type { EmailSender } from '../../infra/email/email-sender.types';
+import { EMAIL_SENDER } from '../../infra/email/email-sender.types';
 import { RateLimiterService } from '../../infra/rate-limit/rate-limiter.service';
-import type { SmsSender } from '../../infra/sms/sms-sender.types';
-import { SMS_SENDER } from '../../infra/sms/sms-sender.types';
 import { UsersRepository } from '../users/users.repository';
 import type { DeviceInfo, TokenPair } from './auth.types';
-import { generateOtpCode, renderOtpMessage } from './otp-code';
+import { generateOtpCode, renderOtpEmail } from './otp-code';
 import type { OtpConfig } from './otp.config';
 import { OtpRepository } from './otp.repository';
 import { OTP_CONFIG } from './otp.tokens';
@@ -19,7 +19,7 @@ import { SessionsService } from './sessions.service';
 
 /**
  * The scope the per-code attempt cap is counted under in Redis. Keyed by the
- * **challenge id**, not by the phone number, so requesting a new code starts a
+ * **challenge id**, not by the email address, so requesting a new code starts a
  * fresh budget — an attacker cannot burn one code's attempts to lock out the
  * next, and a user who fat-fingered five times clears it by asking again
  * (`infra/rate-limit/rate-limit.types.ts` § AttemptRequest).
@@ -30,12 +30,12 @@ const ATTEMPT_SCOPE = 'otp-verify';
  * Scope and subject for the platform-wide daily send cap (issue #272).
  *
  * A **fixed** subject, deliberately — this counter is not about any one
- * phone number or IP, it is the aggregate behind all of them, so there is
+ * address or IP, it is the aggregate behind all of them, so there is
  * exactly one of it. Reusing {@link RateLimiterService.consumeAttempt} rather
  * than adding a fourth Lua script: its "set the TTL only once, at creation"
  * semantics are exactly what a rolling day window needs, and `AttemptRequest`
  * already documents that distinction from a backing-off rate limit — this is
- * a fixed budget on a resource (the day's SMS spend) rather than on a
+ * a fixed budget on a resource (the day's sending volume) rather than on a
  * per-caller identity.
  */
 const GLOBAL_DAILY_SCOPE = 'otp-global-daily';
@@ -47,16 +47,9 @@ const GLOBAL_DAILY_SUBJECT = 'global';
  */
 const HOUR_MS = 60 * 60 * 1000;
 const HOURLY_SCOPE = 'otp-global-hourly';
-const PREFIX_SCOPE = 'otp-prefix-hourly';
-const RANGE_SCOPE = 'otp-range-hourly';
 const BREAKER_SENT_SCOPE = 'otp-breaker-sent';
 const BREAKER_VERIFIED_SCOPE = 'otp-breaker-verified';
 const BREAKER_TRIPPED_SCOPE = 'otp-breaker-tripped';
-
-/** `+994` and the two-digit operator code: `+99450`. Not a person. */
-const PREFIX_LENGTH = 6;
-/** The operator code and three more digits: a range of ten thousand numbers. */
-const RANGE_LENGTH = 9;
 
 /** The clock hour `at` falls in, as `YYYY-MM-DDTHH` in UTC: the counters' window. */
 export function hourBucket(at: Date): string {
@@ -68,11 +61,11 @@ const DAY_MS = 24 * 60 * 60 * 1000;
  * The single answer every verification failure gets.
  *
  * Wrong code, expired code, already redeemed, attempt cap spent, no code ever
- * requested for that number, and "that number has no account" are one status,
+ * requested for that address, and "that address has no account" are one status,
  * one code and one message. Each distinction that leaked would be an oracle:
  * "expired" versus "wrong" tells an attacker their guess was correct but late,
- * and "no such challenge" versus "wrong code" answers *"has this number
- * requested a code?"* to anyone who asks (ADR-0008 § Security requirements).
+ * and "no such challenge" versus "wrong code" answers *"has this address
+ * requested a code?"* to anyone who asks (ADR-0072 § Security requirements).
  */
 class InvalidOtpError extends AppError {
   constructor() {
@@ -88,10 +81,10 @@ class InvalidOtpError extends AppError {
  *
  * A distinct failure from "the request was bad", and it must stay distinct in
  * the server's own reasoning: both causes are the shape of a launch-blocking
- * event (an expired SMS account, a sender ID revoked by an operator, or an
- * attack big enough to exhaust `OTP_GLOBAL_DAILY_CAP`) and each should page
+ * event (an expired provider account, a sending domain whose
+ * authentication records broke, or an attack big enough to exhaust `OTP_GLOBAL_DAILY_CAP`) and each should page
  * somebody, not read as user error. To the caller it says only that the code
- * could not be sent, which is true regardless of whether the number belongs
+ * could not be sent, which is true regardless of whether the address belongs
  * to an account, and regardless of which of the two causes it was — a cap
  * refusal must not read differently from a provider outage, or an attacker
  * gets a free signal for exactly how close to the ceiling they are.
@@ -108,9 +101,9 @@ class OtpDeliveryFailedError extends AppError {
   }
 }
 
-/** A request for a code. The number is already normalised by the Zod schema. */
+/** A request for a code. The address is already normalised by the Zod schema. */
 export interface RequestOtpInput {
-  readonly phoneE164: string;
+  readonly email: string;
 }
 
 /**
@@ -119,28 +112,28 @@ export interface RequestOtpInput {
  *
  * It carries the configured TTL and **nothing derived from the caller**: no
  * challenge id, no "a code was already sent", no account state. Two requests,
- * one for a number with an account and one for a number without, must produce
+ * one for an address with an account and one for an address without, must produce
  * the same bytes; a field that could differ between them is the enumeration
- * oracle ADR-0008 forbids, however useful it would be to a client.
+ * oracle ADR-0072 forbids, however useful it would be to a client.
  */
 export interface OtpRequestAccepted {
   readonly expiresInSeconds: number;
 }
 
 export interface VerifyOtpInput {
-  readonly phoneE164: string;
+  readonly email: string;
   readonly code: string;
   readonly device?: DeviceInfo | undefined;
 }
 
 /**
- * Sign-in for customers and masters: issue a code, prove the number, open a
- * session (ADR-0008 — there is no other consumer sign-in path).
+ * Sign-in for customers and masters: issue a code, prove the email address,
+ * open a session (ADR-0072 — there is no other consumer sign-in path).
  *
- * **Which SMS provider delivers the code is still an open decision**
- * (CLAUDE.md §1) and is the single highest-priority launch blocker. Everything
- * in this file works against the {@link SmsSender} interface, so the choice is
- * one new file in `infra/sms/` and one enum member — but until it is made,
+ * **Which email provider delivers the code is still an open decision**
+ * (CLAUDE.md §1) and blocks launch. Everything in this file works against the
+ * {@link EmailSender} interface, so the choice is one new file in
+ * `infra/email/` and one enum member — but until it is made,
  * nobody can actually sign in, because the only sender that exists refuses to
  * construct outside development.
  */
@@ -153,20 +146,20 @@ export class OtpService {
     private readonly users: UsersRepository,
     private readonly sessions: SessionsService,
     private readonly limiter: RateLimiterService,
-    @Inject(SMS_SENDER) private readonly sms: SmsSender,
+    @Inject(EMAIL_SENDER) private readonly mail: EmailSender,
     @Inject(OTP_CONFIG) private readonly config: OtpConfig,
   ) {}
 
   /**
-   * Issues a code and sends it, whether or not the number has an account.
+   * Issues a code and sends it, whether or not the address has an account.
    *
    * **The absence of a `users` lookup in this method is the feature.** The
    * obvious implementation — find the user, create one if missing, then send —
    * would make this endpoint both an account-creation endpoint that anyone can
-   * fire at any number in Azerbaijan and an enumeration oracle, because a
+   * fire at any address and an enumeration oracle, because a
    * "create" path and a "found" path never cost the same. Identity is decided
-   * at verification, by which point the caller has proven they hold the
-   * number. So the two cases here are not merely answered identically; they
+   * at verification, by which point the caller has proven they read that
+   * inbox. So the two cases here are not merely answered identically; they
    * execute the same statements.
    *
    * The order — write, then send — is the only safe one. Sending first risks a
@@ -180,28 +173,28 @@ export class OtpService {
     const expiresAt = new Date(now.getTime() + this.config.ttlMs);
 
     await this.challenges.replaceLiveChallenge(
-      { id, phoneE164: input.phoneE164, codeHash: this.hashCode(id, code), expiresAt },
+      { id, email: input.email, codeHash: this.hashCode(id, code), expiresAt },
       now,
     );
 
     // Immediately before the sender is called, and after every other refusal
-    // (the per-phone and per-IP limits in `RateLimitGuard`, both already spent
+    // (the per-address and per-IP limits in `RateLimitGuard`, both already spent
     // by the time this method runs) — so a request the guard would have
     // refused anyway never touches this budget. The challenge row above is
     // already written; a refusal here leaves it exactly as a `deliver()`
     // failure would — live, unsent, and superseded by whatever request
     // eventually gets through, per this method's own doc comment.
     await this.enforceGlobalDailyCap();
-    await this.enforceFraudControls(input.phoneE164, now);
+    await this.enforceFraudControls(now);
 
-    await this.deliver(input.phoneE164, code);
+    await this.deliver(input.email, code);
 
-    // The audit line for "a code was sent". Masked number and challenge id
-    // only: `docs/engineering/security.md` forbids a full phone number in a
-    // log, and the code itself may not appear in one at all (ADR-0008), which
+    // The audit line for "a code was sent". Masked address and challenge id
+    // only: `docs/engineering/security.md` forbids a full address in a log,
+    // and the code itself may not appear in one at all (ADR-0072), which
     // is why `code` is not interpolated here and must never be added.
     this.logger.log(
-      `otp code issued: challenge=${id} phone=${maskPhone(input.phoneE164)} ` +
+      `otp code issued: challenge=${id} email=${maskEmail(input.email)} ` +
         `expiresIn=${String(this.ttlSeconds())}s`,
     );
 
@@ -213,7 +206,7 @@ export class OtpService {
    *
    * The order of the steps is the security-relevant part:
    *
-   * 1. Find the one live challenge for the number. No challenge is the same
+   * 1. Find the one live challenge for the address. No challenge is the same
    *    failure as a wrong code.
    * 2. **Count the attempt before checking the code.** A guess that is
    *    evaluated before it is counted is a guess an attacker can make for free
@@ -224,21 +217,21 @@ export class OtpService {
    *    session.
    *
    * The account is created with **no role grant**. A user who has proven their
-   * number exists and can authenticate; whether they are a customer, a master,
+   * address exists and can authenticate; whether they are a customer, a master,
    * or both is a separate choice on a separate endpoint, and
    * `users.repository.ts` already documents the role-less user as a real state
    * rather than an anomaly.
    */
   async verify(input: VerifyOtpInput, now: Date = new Date()): Promise<TokenPair> {
-    const challengeId = await this.consumeCode(input.phoneE164, input.code, now);
+    const challengeId = await this.consumeCode(input.email, input.code, now);
 
-    const existing = await this.users.findByPhone(input.phoneE164);
+    const existing = await this.users.findByEmail(input.email);
     const userId =
-      existing?.id ?? (await this.users.create({ phoneE164: input.phoneE164, roles: [] })).user.id;
+      existing?.id ?? (await this.users.create({ email: input.email, roles: [] })).user.id;
 
     this.logger.log(
       `otp verified, session starting: challenge=${challengeId} ` +
-        `phone=${maskPhone(input.phoneE164)} newAccount=${String(existing === undefined)}`,
+        `email=${maskEmail(input.email)} newAccount=${String(existing === undefined)}`,
     );
 
     return this.sessions.startSession(
@@ -251,20 +244,20 @@ export class OtpService {
    * The web subscription page's code request
    * ([ADR-0061](docs/decisions/ADR-0061-master-web-subscription-page.md) § 4).
    *
-   * **A code is sent only to a phone whose account is an active master.**
-   * Every other phone gets the identical answer and no SMS, so the form tells
-   * nobody whether a number is registered, and the platform never pays to
-   * text a stranger's number from a web page. When a code is sent, it is
+   * **A code is sent only to an address whose account is an active master.**
+   * Every other address gets the identical answer and no email, so the form
+   * tells nobody whether an address is registered, and the platform never
+   * mails a stranger from a web page. When a code is sent, it is
    * through {@link request}, so every #390 control applies unchanged.
    */
   async requestForWebMaster(
     input: RequestOtpInput,
     now: Date = new Date(),
   ): Promise<OtpRequestAccepted> {
-    if ((await this.activeMasterUserId(input.phoneE164)) === undefined) {
+    if ((await this.activeMasterUserId(input.email)) === undefined) {
       this.logger.log(
-        `web otp request for a phone that is not an active master; nothing sent: ` +
-          `phone=${maskPhone(input.phoneE164)}`,
+        `web otp request for an address that is not an active master; nothing sent: ` +
+          `email=${maskEmail(input.email)}`,
       );
       return { expiresInSeconds: this.ttlSeconds() };
     }
@@ -275,21 +268,21 @@ export class OtpService {
    * The web subscription page's verify (ADR-0061 §§ 2 and 4): the same code
    * check as the app's, then a **web** session, and never a new account.
    *
-   * Eligibility is checked before the code is touched, so a phone that is not
+   * Eligibility is checked before the code is touched, so an address that is not
    * an active master can neither consume a code the app asked for nor learn
    * anything from the answer: it is the wrong-code answer.
    */
   async verifyForWebMaster(input: VerifyOtpInput, now: Date = new Date()): Promise<TokenPair> {
-    const userId = await this.activeMasterUserId(input.phoneE164);
+    const userId = await this.activeMasterUserId(input.email);
     if (userId === undefined) {
       throw new InvalidOtpError();
     }
 
-    const challengeId = await this.consumeCode(input.phoneE164, input.code, now);
+    const challengeId = await this.consumeCode(input.email, input.code, now);
 
     this.logger.log(
       `web otp verified, web session starting: challenge=${challengeId} ` +
-        `phone=${maskPhone(input.phoneE164)}`,
+        `email=${maskEmail(input.email)}`,
     );
 
     return this.sessions.startSession(
@@ -302,9 +295,9 @@ export class OtpService {
     );
   }
 
-  /** The account behind the phone, when it is active and holds the master role. */
-  private async activeMasterUserId(phoneE164: string): Promise<string | undefined> {
-    const account = await this.users.findByPhone(phoneE164);
+  /** The account behind the address, when it is active and holds the master role. */
+  private async activeMasterUserId(email: string): Promise<string | undefined> {
+    const account = await this.users.findByEmail(email);
     if (account === undefined || account.status !== 'active') {
       return undefined;
     }
@@ -313,13 +306,13 @@ export class OtpService {
   }
 
   /**
-   * Checks a code against the phone's live challenge and consumes it, with the
+   * Checks a code against the address's live challenge and consumes it, with the
    * per-challenge attempt cap and the breaker's success count: everything a
    * verify is, short of deciding whose session to open. Returns the challenge
    * id. Shared by the app's and the web page's verify, so the two cannot drift.
    */
-  private async consumeCode(phoneE164: string, code: string, now: Date): Promise<string> {
-    const challenge = await this.challenges.findLiveByPhone(phoneE164, now);
+  private async consumeCode(email: string, code: string, now: Date): Promise<string> {
+    const challenge = await this.challenges.findLiveByEmail(email, now);
     if (challenge === undefined) {
       throw new InvalidOtpError();
     }
@@ -354,14 +347,14 @@ export class OtpService {
 
     if (consumed === undefined) {
       if (tally.exhausted) {
-        // ADR-0008: "max 5 attempts per code, then invalidate". The counting
+        // ADR-0072: "max 5 attempts per code, then invalidate". The counting
         // is `RateLimiterService`'s; destroying the credential is this
         // module's, because only this module knows what the counter was
         // guarding (`rate-limit.types.ts` says so explicitly).
         await this.challenges.invalidate(challenge.id, 'attempts_exhausted', now);
         this.logger.warn(
           `otp attempt cap reached, challenge invalidated: challenge=${challenge.id} ` +
-            `phone=${maskPhone(phoneE164)}`,
+            `email=${maskEmail(email)}`,
         );
       }
       throw new InvalidOtpError();
@@ -373,7 +366,7 @@ export class OtpService {
     // only after occupying a key whose whole purpose is now gone.
     await this.limiter.clearAttempts(ATTEMPT_SCOPE, challenge.id);
     // The circuit breaker's numerator: a code that reached a person who
-    // entered it (#390). Pumped numbers never get here.
+    // entered it (#390). Codes mailed to addresses nobody reads never get here.
     await this.limiter.consumeAttempt({
       scope: BREAKER_VERIFIED_SCOPE,
       subject: hourBucket(now),
@@ -412,7 +405,7 @@ export class OtpService {
   /**
    * Refuses once the platform has sent `OTP_GLOBAL_DAILY_CAP` codes in the
    * current rolling 24h window (issue #272) — the aggregate backstop behind
-   * the per-phone and per-IP limits, which each bound one caller and neither
+   * the per-address and per-IP limits, which each bound one caller and neither
    * of which a distributed attacker rotating both stays under indefinitely.
    *
    * Counts every request that reaches this point, whether or not `deliver()`
@@ -423,7 +416,7 @@ export class OtpService {
    * Logs at `error` exactly once per window, on the (cap + 1)-th call — the
    * one that first finds the cap already spent — never on every refusal after
    * it, which would flood the very channel an operator needs to notice this
-   * in. No phone number in the line: this counter has no per-caller subject,
+   * in. No address in the line: this counter has no per-caller subject,
    * and `docs/engineering/security.md` forbids one anyway.
    */
   private async enforceGlobalDailyCap(): Promise<void> {
@@ -449,37 +442,34 @@ export class OtpService {
   }
 
   /**
-   * The fraud controls behind the daily cap (#390, ADR-0059), in the order
-   * that refuses the cheapest way first. Each refusal is the same generic
-   * {@link OtpDeliveryFailedError} the daily cap gives, so a caller cannot
-   * tell which one it met, and each logs one `error` line the first time it
-   * trips in an hour — with the scope, never a number:
+   * The fraud controls behind the daily cap (#390, ADR-0072 § 4), in the
+   * order that refuses the cheapest way first. Each refusal is the same
+   * generic {@link OtpDeliveryFailedError} the daily cap gives, so a caller
+   * cannot tell which one it met, and each logs one `error` line the first
+   * time it trips in an hour — with the scope, never an address:
    *
    * 1. **The hourly ceiling**, so a burst cannot spend a day's budget in an hour.
-   * 2. **Per operator prefix**, `+99450…`, per hour.
-   * 3. **Per range** of ten thousand numbers, `+99450123….`, per hour. SMS
-   *    pumping walks adjacent numbers on one operator's ranges, each number
-   *    once, so the per-phone and per-IP limits never see it; this does.
-   *    The range is a counter key only — hashed like every rate-limit subject,
-   *    and never logged.
-   * 4. **The circuit breaker.** Over the current and the previous hour, once
+   * 2. **The circuit breaker.** Over the current and the previous hour, once
    *    `breakerMinSends` codes have gone out, sending stops while fewer than
-   *    `breakerMinSuccessPercent` of them were entered correctly. A pumped
-   *    number never enters its code, so a pumping attack drives the share
-   *    toward zero, while real customers keep it high. It closes again on its
-   *    own as the bad hour ages out. `0` turns it off.
+   *    `breakerMinSuccessPercent` of them were entered correctly. A code
+   *    mailed to a stranger's address is never entered, so an attack that
+   *    sprays addresses drives the share toward zero, while real customers
+   *    keep it high. It closes again on its own as the bad hour ages out.
+   *    `0` turns it off.
+   *
+   * The per-operator-prefix and per-number-range caps that sat here under
+   * SMS are gone: they were keyed on a phone number's structure, which an
+   * email address does not have (ADR-0072 § 4).
    *
    * Every attempt that reaches a step counts towards it, sent or not, for the
    * daily cap's reason: the attempt is what is budgeted.
    */
-  private async enforceFraudControls(phoneE164: string, now: Date): Promise<void> {
+  private async enforceFraudControls(now: Date): Promise<void> {
     const hour = hourBucket(now);
     const window = { ttlMs: 2 * HOUR_MS };
 
     const ceilings: readonly (readonly [string, string, number])[] = [
       [HOURLY_SCOPE, hour, this.config.globalHourlyCap],
-      [PREFIX_SCOPE, `${hour}|${phoneE164.slice(0, PREFIX_LENGTH)}`, this.config.prefixHourlyCap],
-      [RANGE_SCOPE, `${hour}|${phoneE164.slice(0, RANGE_LENGTH)}`, this.config.rangeHourlyCap],
     ];
     for (const [scope, subject, cap] of ceilings) {
       const tally = await this.limiter.consumeAttempt({
@@ -539,24 +529,24 @@ export class OtpService {
    * Hands the message to whichever provider is configured, and lets **nothing**
    * the provider says reach a log.
    *
-   * `OutboundSms.body` contains the code, so a provider that includes its
+   * `OutboundEmail.text` contains the code, so a provider that includes its
    * request payload in an error — a perfectly ordinary thing for an HTTP
    * client to do — would put that code in the exception message, and the
    * global exception filter logs `error.stack` for every unhandled error.
-   * That single hop is how "codes never appear in logs" (ADR-0008) gets broken
+   * That single hop is how "codes never appear in logs" (ADR-0072) gets broken
    * without anybody writing a log statement at all. The interface already
    * forbids it in words; this catch is what makes the guarantee not depend on
    * a future vendor adapter honouring the comment.
    */
-  private async deliver(phoneE164: string, code: string): Promise<void> {
+  private async deliver(email: string, code: string): Promise<void> {
     try {
-      await this.sms.send({
-        to: phoneE164,
-        body: renderOtpMessage(code, Math.round(this.ttlSeconds() / 60)),
+      await this.mail.send({
+        to: email,
+        ...renderOtpEmail(code, Math.round(this.ttlSeconds() / 60)),
       });
     } catch (error: unknown) {
       this.logger.error(
-        `sms delivery failed: phone=${maskPhone(phoneE164)} ` +
+        `email delivery failed: email=${maskEmail(email)} ` +
           `error=${error instanceof Error ? error.name : 'unknown'}`,
       );
       throw new OtpDeliveryFailedError();

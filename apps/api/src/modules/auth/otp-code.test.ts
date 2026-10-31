@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { generateOtpCode, renderOtpMessage } from './otp-code';
+import { generateOtpCode, renderOtpEmail } from './otp-code';
 
 /**
  * A sample big enough that a generator which never emits some digit, or which
@@ -77,36 +77,23 @@ describe('generateOtpCode', () => {
   });
 });
 
-describe('renderOtpMessage', () => {
-  it('leads with the code, so it is readable from a lock-screen notification', () => {
-    const message = renderOtpMessage('123456', 5);
+describe('renderOtpEmail', () => {
+  it('leads the subject with the code, so it is readable from a notification', () => {
+    const { subject, text } = renderOtpEmail('123456', 5);
 
-    expect(message.startsWith('123456')).toBe(true);
-    expect(message).toContain('5 minutes');
+    expect(subject.startsWith('123456')).toBe(true);
+    expect(text).toContain('5 dəqiqə');
   });
 
-  it('carries nothing that identifies the recipient', () => {
-    const message = renderOtpMessage('123456', 5);
+  it('carries nothing that identifies the recipient, and no link', () => {
+    const { subject, text } = renderOtpEmail('123456', 5);
 
-    // An SMS body crosses an operator's network and lands on a lock screen.
-    // The code has to be there; a phone number, an account id or a link would
-    // be information handed to whoever is holding the handset, which is not
-    // necessarily the account's owner.
-    expect(message).not.toMatch(/\+994/);
-    expect(message).not.toMatch(/https?:/);
-  });
-
-  it('fits one GSM-7 segment, so it bills as one message (#390)', () => {
-    // GSM 03.38's basic set, minus the extension table: one Azerbaijani
-    // letter (ə, ğ, ı, ş) switches the whole message to UCS-2 and cuts a
-    // segment from 160 characters to 70. Copy changes must keep this.
-    const GSM7 =
-      /^[A-Za-z0-9 @£$¥èéùìòÇØøÅåΔ_ΦΓΛΩΠΨΣΘΞÆæßÉ!"#¤%&'()*+,\-./:;<=>?¡ÄÖÑÜ§¿äöñüà\n\r]*$/;
-
-    for (const ttl of [1, 5, 60]) {
-      const message = renderOtpMessage('123456', ttl);
-      expect(message).toMatch(GSM7);
-      expect(message.length).toBeLessThanOrEqual(160);
+    // The message lands on a lock screen and stays in an inbox. The code has
+    // to be there; an address or an account id would be information handed to
+    // whoever is holding the handset, and a link is what phishing looks like.
+    for (const part of [subject, text]) {
+      expect(part).not.toContain('@');
+      expect(part).not.toMatch(/https?:/);
     }
   });
 });

@@ -35,10 +35,10 @@ import { createThrowawayDatabase } from './support/throwaway-database';
  * without it having to remember to ask.
  */
 
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99452${String(phoneCounter).padStart(7, '0')}`;
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
 const ORDERS_ALLOWED_PER_HOUR = 3;
@@ -69,7 +69,7 @@ describe('order creation is rate limited (issue #81)', () => {
     addressId: string;
     userId: string;
   }> {
-    const created = await usersRepo.create({ phoneE164: nextPhone(), roles: [] });
+    const created = await usersRepo.create({ email: nextEmail(), roles: [] });
     const pair = await sessionsService.startSession({ userId: created.user.id });
 
     const profile = await post('/customers', pair.accessToken).send({ displayName: 'Müştəri' });

@@ -43,19 +43,30 @@ export function generateOtpCode(length: number): string {
 }
 
 /**
- * The SMS body.
+ * The email's subject and plain-text body.
  *
  * **The final wording is the owner's, not this file's** (CLAUDE.md §17, and
- * "languages at launch" is still an open decision in §1). Kept to the shortest
- * form that works on every handset until that decision lands: no branding, no
- * link, and the code near the front, because Android and iOS both surface the
- * first characters of an SMS in the notification and a code buried behind a
- * sentence forces the user to open the app they are already trying to enter.
+ * "languages at launch" is still an open decision in §1). Azerbaijani, like
+ * the sign-in screen that asked for it, and kept to the shortest form that
+ * works everywhere until that decision lands: plain text, no link,
+ * and the code at the front of the subject, because a mail notification on
+ * Android and iOS shows the subject, and a code buried in the body forces the
+ * user to open their inbox when they are trying to enter the app.
  *
- * Deliberately carries no phone number, no user id and no request id: an SMS
- * body traverses the operator's network and lands on a lock screen, which is
- * not a place to put anything that is not already in the recipient's hands.
+ * Deliberately carries no address, no user id and no request id: a message
+ * lands on a lock screen and sits in an inbox indefinitely, which is not a
+ * place to put anything that is not already in the recipient's hands. And no
+ * link at all — a code mail with a link in it is what a phishing mail looks
+ * like, and users should learn that ours never has one.
  */
-export function renderOtpMessage(code: string, ttlMinutes: number): string {
-  return `${code} is your TezUsta code. It expires in ${String(ttlMinutes)} minutes. Do not share it.`;
+export function renderOtpEmail(
+  code: string,
+  ttlMinutes: number,
+): { readonly subject: string; readonly text: string } {
+  return {
+    subject: `${code} — TezUsta giriş kodunuz`,
+    text:
+      `${code} — TezUsta giriş kodunuz. Kod ${String(ttlMinutes)} dəqiqə ərzində etibarlıdır. ` +
+      'Onu heç kimə deməyin. Kodu siz istəməmisinizsə, bu məktuba məhəl qoymayın.',
+  };
 }

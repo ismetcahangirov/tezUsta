@@ -30,9 +30,9 @@ const SECRET_NAME_TOKENS = [
   'TOKEN',
   'CREDENTIAL',
   // 'KEY' catches the case the rest of this list misses: names like
-  // EXPO_PUBLIC_SMS_API_KEY and EXPO_PUBLIC_S3_ACCESS_KEY_ID contain none of
-  // the words above, so without
-  // this the guard waves through exactly the "SMS or storage credential"
+  // EXPO_PUBLIC_EMAIL_API_KEY and EXPO_PUBLIC_S3_ACCESS_KEY_ID contain none of
+  // the words above, so without this the guard waves through exactly the
+  // "email-provider or storage credential"
   // CLAUDE.md §4 names as a violation. The two documented map-key exceptions
   // are matched by exact name in the allow-list below, which is consulted
   // first, so they are unaffected.

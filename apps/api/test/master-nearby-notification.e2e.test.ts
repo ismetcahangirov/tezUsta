@@ -39,10 +39,10 @@ const NEAR = { latitude: 40.37531, longitude: 49.842717 };
 /** About 2 km north — outside. */
 const FAR = { latitude: 40.39061, longitude: 49.842717 };
 
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99459${String(phoneCounter).padStart(7, '0')}`;
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
 describe('the "master nearby" push (issue #414)', () => {
@@ -66,7 +66,7 @@ describe('the "master nearby" push (issue #414)', () => {
 
   /** A customer, their address, a verified master online, and the order between them. */
   async function seed(status: string, from = FAR): Promise<Seeded> {
-    const customer = await usersRepo.create({ phoneE164: nextPhone(), roles: ['customer'] });
+    const customer = await usersRepo.create({ email: nextEmail(), roles: ['customer'] });
     const customerId = randomUUID();
     await pool.query('insert into customers (id, user_id, display_name) values ($1, $2, $3)', [
       customerId,
@@ -80,7 +80,7 @@ describe('the "master nearby" push (issue #414)', () => {
       [addressId, customerId, ADDRESS.longitude, ADDRESS.latitude],
     );
 
-    const masterUser = await usersRepo.create({ phoneE164: nextPhone(), roles: ['master'] });
+    const masterUser = await usersRepo.create({ email: nextEmail(), roles: ['master'] });
     const masterId = randomUUID();
     await pool.query(
       `insert into masters (id, user_id, display_name, verification_status, is_available)

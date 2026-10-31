@@ -67,8 +67,8 @@ describe('findExpoPublicSecretViolations', () => {
     // Neither name contains SECRET/PRIVATE/PASSWORD/TOKEN, and both are shapes
     // .env.example actually ships. These are the violations the guard exists
     // for, so they must not depend on the author having picked a scary word.
-    expect(findExpoPublicSecretViolations({ EXPO_PUBLIC_SMS_API_KEY: 'x' })).toEqual([
-      'EXPO_PUBLIC_SMS_API_KEY',
+    expect(findExpoPublicSecretViolations({ EXPO_PUBLIC_EMAIL_API_KEY: 'x' })).toEqual([
+      'EXPO_PUBLIC_EMAIL_API_KEY',
     ]);
     expect(findExpoPublicSecretViolations({ EXPO_PUBLIC_S3_ACCESS_KEY_ID: 'x' })).toEqual([
       'EXPO_PUBLIC_S3_ACCESS_KEY_ID',

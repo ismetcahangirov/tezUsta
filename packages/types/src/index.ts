@@ -24,7 +24,7 @@ export type {
   AdminPasswordChangeRequest,
   AdminPasswordResetStart,
   AdminPermission,
-  AdminPhoneReveal,
+  AdminEmailReveal,
   AdminRole,
   AdminSetupCompleteRequest,
   AdminSetupEnrolment,

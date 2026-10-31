@@ -26,7 +26,7 @@ process.env.JWT_ACCESS_SECRET ??= 'test-only-access-secret-0123456789abcdefghijk
 process.env.JWT_REFRESH_SECRET ??= 'test-only-refresh-secret-zyxwvutsrqponmlkjihgfedcba';
 
 // Issue #28 adds a third: `RateLimitModule` refuses to start without the
-// pepper it hashes phone numbers and IPs under, so every integration test
+// pepper it hashes email addresses and IPs under, so every integration test
 // that instantiates `AppModule` needs one. Distinct from the two above —
 // `env.schema.ts` rejects a pepper that equals either JWT secret.
 //
@@ -175,16 +175,13 @@ process.env.BILLING_RECONCILE_INTERVAL_SECONDS ??= '0';
 // its back; its own suite calls `renewDue()` directly.
 process.env.SUBSCRIPTION_RENEWAL_INTERVAL_SECONDS ??= '0';
 
-// Issue #390 adds OTP fraud controls: an hourly ceiling, per-prefix and
-// per-range caps, and a circuit breaker on codes entered. The suites that
-// sign in send many codes to adjacent numbers and enter few of them, which is
-// exactly the pattern those controls refuse, so they are set out of reach
-// here. Their own suite, `auth.otp-fraud-controls.e2e.test.ts`, sets small
-// values on purpose. Each must fit inside the one above it, and the daily cap
-// defaults to 2000.
+// Issue #390 adds OTP fraud controls: an hourly ceiling and a circuit
+// breaker on codes entered (ADR-0072 § 4). The suites that sign in send many
+// codes and enter few of them, which is exactly the pattern those controls
+// refuse, so they are set out of reach here. Their own suite,
+// `auth.otp-fraud-controls.e2e.test.ts`, sets small values on purpose. The
+// hourly cap must fit inside the daily one, which defaults to 2000.
 process.env.OTP_GLOBAL_HOURLY_CAP ??= '2000';
-process.env.OTP_PREFIX_HOURLY_CAP ??= '2000';
-process.env.OTP_RANGE_HOURLY_CAP ??= '2000';
 process.env.OTP_BREAKER_MIN_SUCCESS_PERCENT ??= '0';
 
 // Issue #142 adds the push-receipt sweep, on the same kind of BullMQ job

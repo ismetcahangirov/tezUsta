@@ -226,7 +226,7 @@ In `apps/api` each suite gets a throwaway database of its own
 
 ## Mocking
 
-- **Mock at the boundary** — the HTTP transport, the SMS provider, the maps
+- **Mock at the boundary** — the HTTP transport, the email provider, the maps
   provider. Not internal modules.
 - **Do not mock the database** in integration tests. Use a real container; a
   mocked database tests the mock.

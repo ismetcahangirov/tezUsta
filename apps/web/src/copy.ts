@@ -6,7 +6,7 @@ import type { SubscriptionBillingPeriod, SubscriptionStatus } from '@tezusta/typ
  * **Placeholder copy, in Azerbaijani.** ADR-0061 leaves the page's wording to
  * the owner (CLAUDE.md § 17), and the languages at launch are still open. What
  * is not a placeholder is what the copy must never do: tell a visitor whether
- * a phone number belongs to a master (ADR-0061 § 4).
+ * an email address belongs to a master (ADR-0061 § 4).
  */
 export const copy = {
   appName: 'TezUsta',
@@ -19,21 +19,21 @@ export const copy = {
   signIn: {
     intro:
       'Bu səhifə TezUsta tətbiqində qeydiyyatdan keçmiş ustalar üçündür. ' +
-      'Tətbiqdəki telefon nömrənizlə daxil olun.',
-    phone: 'Telefon nömrəsi',
-    phoneHint: 'Məsələn, 050 123 45 67',
+      'Tətbiqdəki e-poçt ünvanınızla daxil olun.',
+    email: 'E-poçt ünvanı',
+    emailHint: 'Məsələn, usta@gmail.com',
     sendCode: 'Kod göndər',
     sending: 'Göndərilir…',
-    // The same sentence for every phone: whether a code was really sent is
+    // The same sentence for every address: whether a code was really sent is
     // exactly what the page must not reveal (ADR-0061 § 4).
-    codeSent: 'Nömrə qeydiyyatlı ustaya aiddirsə, ona SMS ilə kod göndərildi.',
-    code: 'SMS kodu',
+    codeSent: 'Ünvan qeydiyyatlı ustaya aiddirsə, ona e-poçtla kod göndərildi.',
+    code: 'Təsdiq kodu',
     verify: 'Daxil ol',
     verifying: 'Yoxlanılır…',
-    changePhone: 'Başqa nömrə',
-    invalidPhone: 'Azərbaycan mobil nömrəsini daxil edin.',
+    changeEmail: 'Başqa ünvan',
+    invalidEmail: 'Düzgün e-poçt ünvanı daxil edin.',
     wrongCode: 'Kod yanlışdır və ya vaxtı keçib.',
-    unavailable: 'SMS göndərmək hazırda mümkün deyil. Bir az sonra yenidən cəhd edin.',
+    unavailable: 'E-poçt göndərmək hazırda mümkün deyil. Bir az sonra yenidən cəhd edin.',
   },
 
   subscription: {

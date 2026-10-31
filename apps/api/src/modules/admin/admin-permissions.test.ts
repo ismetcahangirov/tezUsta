@@ -55,7 +55,7 @@ describe('the role bundles (ADR-0043 § 1)', () => {
     }
     const suspenders = roles.filter((role) => ROLE_PERMISSIONS[role].includes('customers.suspend'));
     expect(suspenders.sort()).toEqual(['moderator', 'super_admin']);
-    // A phone number stays behind `pii.read`, which moderator does not hold.
+    // An email address stays behind `pii.read`, which moderator does not hold.
     expect(ROLE_PERMISSIONS.moderator).not.toContain('pii.read');
   });
 

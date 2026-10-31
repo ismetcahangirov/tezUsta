@@ -4,7 +4,7 @@ import type { AdminAccountStatus } from '@tezusta/types';
 export const customersCopy = {
   title: 'Customers',
   searchLabel: 'Search',
-  searchHint: 'A name, a customer id, or a whole phone number such as +994501234567.',
+  searchHint: 'A name, a customer id, or a whole email address such as leyla@example.com.',
   search: 'Search',
   clear: 'Clear',
   filterLabel: 'Filter by account status',
@@ -12,7 +12,7 @@ export const customersCopy = {
   tableCaption: 'Customers',
   columns: {
     name: 'Name',
-    phone: 'Phone',
+    email: 'Email',
     status: 'Account',
     orders: 'Orders',
     lastOrder: 'Last order',
@@ -31,7 +31,7 @@ export const customersCopy = {
   notFound: 'There is no customer with this id.',
   profile: 'Profile',
   joined: 'Joined',
-  phone: 'Phone',
+  email: 'Email',
   ratings: 'Ratings received',
   statusSince: 'Since',
   statusReason: 'Reason',
@@ -60,7 +60,7 @@ export const customersCopy = {
   actions: 'Actions',
   suspend: 'Suspend account',
   reinstate: 'Reinstate account',
-  revealNumber: 'Reveal number',
+  revealEmail: 'Reveal email',
 
   confirmTitle: { suspend: 'Suspend this account?', reinstate: 'Reinstate this account?' },
   confirmBody: {
@@ -85,12 +85,12 @@ export const customersCopy = {
   followUp: 'Orders a master already holds — follow these up:',
   reinstated: 'The account is active again.',
 
-  revealTitle: (name: string) => `Reveal ${name}’s number`,
-  revealBody: 'The number is shown once, and the reveal is recorded with your reason.',
-  revealReasonHint: 'Why you need the number. Recorded in the audit log.',
+  revealTitle: (name: string) => `Reveal ${name}’s email address`,
+  revealBody: 'The address is shown once, and the reveal is recorded with your reason.',
+  revealReasonHint: 'Why you need the address. Recorded in the audit log.',
   reveal: 'Reveal',
   revealing: 'Revealing…',
-  revealedLabel: 'Phone number',
+  revealedLabel: 'Email address',
   close: 'Close',
 
   errors: {

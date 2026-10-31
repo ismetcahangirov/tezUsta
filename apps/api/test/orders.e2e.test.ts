@@ -29,10 +29,10 @@ import { createThrowawayDatabase } from './support/throwaway-database';
  * against a read-then-write implementation; a concurrent one does not.
  */
 
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99451${String(phoneCounter).padStart(7, '0')}`;
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
 function envelopeWithoutRequestId(body: unknown): unknown {
@@ -83,7 +83,7 @@ describe('order creation over HTTP (issue #81)', () => {
   }
 
   async function signIn(): Promise<string> {
-    const created = await usersRepo.create({ phoneE164: nextPhone(), roles: [] });
+    const created = await usersRepo.create({ email: nextEmail(), roles: [] });
     const pair = await sessionsService.startSession({ userId: created.user.id });
     expect(tokens.verifyAccessToken(pair.accessToken).sub).toBe(created.user.id);
     return pair.accessToken;

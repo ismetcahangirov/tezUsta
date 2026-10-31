@@ -37,10 +37,10 @@ import { createThrowawayDatabase } from './support/throwaway-database';
 
 const MONTHLY_MINOR = 2_500;
 
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99458${String(phoneCounter).padStart(7, '0')}`;
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
 interface SignedInMaster {
@@ -61,7 +61,7 @@ describe('subscription auto-renewal (ADR-0058, issue #323)', () => {
   let adminId: string;
 
   async function signIn(): Promise<string> {
-    const created = await usersRepo.create({ phoneE164: nextPhone(), roles: [] });
+    const created = await usersRepo.create({ email: nextEmail(), roles: [] });
     return (await sessions.startSession({ userId: created.user.id })).accessToken;
   }
 

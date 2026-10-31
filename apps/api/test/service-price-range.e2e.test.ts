@@ -55,10 +55,10 @@ const cacheGlobPrefix = namespacedCacheKey(
  * aggregate.
  */
 
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99456${String(phoneCounter).padStart(7, '0')}`;
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
 describe('GET /services/:id/price-range (issue #84)', () => {
@@ -100,7 +100,7 @@ describe('GET /services/:id/price-range (issue #84)', () => {
   async function createMaster(status: MasterVerificationStatusName = 'active'): Promise<string> {
     const masterId = randomUUID();
     const userId = randomUUID();
-    await pool.query(`insert into users (id, phone_e164) values ($1, $2)`, [userId, nextPhone()]);
+    await pool.query(`insert into users (id, email) values ($1, $2)`, [userId, nextEmail()]);
     await pool.query(
       `insert into masters (id, user_id, display_name, verification_status)
        values ($1, $2, $3, $4)`,

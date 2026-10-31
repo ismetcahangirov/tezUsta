@@ -22,8 +22,8 @@ export const otpInvalidationReason = pgEnum('otp_invalidation_reason', [
 ]);
 
 /**
- * One row per OTP code ever issued (ADR-0008 — sign-in is phone + SMS OTP, and
- * there is no other consumer sign-in path).
+ * One row per OTP code ever issued (ADR-0072 — sign-in is email + a one-time
+ * code, and there is no other consumer sign-in path).
  *
  * **Why Postgres and not Redis, when the rate-limit counters for the same
  * endpoint live in Redis.** The two have opposite requirements. A counter may
@@ -35,13 +35,13 @@ export const otpInvalidationReason = pgEnum('otp_invalidation_reason', [
  * pattern on `refresh_tokens` — `UPDATE ... WHERE ... IS NULL RETURNING *`,
  * where exactly one caller gets a row back and every other gets zero.
  *
- * **There is no foreign key to `users`, and that is the point.** The number is
+ * **There is no foreign key to `users`, and that is the point.** The address is
  * not proven to belong to anybody until a code is verified, so a row here
  * cannot reference an account: creating a `users` row at request time would
  * turn `POST /auth/otp/request` into an account-creation endpoint that anyone
- * can fire at any number in Azerbaijan, and would make "does this number have
- * an account?" answerable by watching the table. The account is created at
- * verification, from the phone number this row carries.
+ * can fire at any address, and would make "does this address have an
+ * account?" answerable by watching the table. The account is created at
+ * verification, from the email address this row carries.
  *
  * Rows carry no `updated_at`, for the same reason `refresh_tokens` does not:
  * every mutable column here is written exactly once, by one conditional
@@ -54,13 +54,13 @@ export const otpChallenges = pgTable(
     id: uuid('id').primaryKey(),
 
     /**
-     * Normalised E.164 (`infra/phone/azerbaijani-phone.ts`) before it is
-     * written or compared — never the string the caller typed. The lookup at
+     * Normalised (`infra/email/email-address.ts`) before it is written or
+     * compared — never the string the caller typed. The lookup at
      * verification is an equality match on this column, so a row written as
-     * `0501234567` and a verification arriving as `+994501234567` would be two
-     * different numbers and the code would simply never verify.
+     * `Ali@Example.com` and a verification arriving as `ali@example.com` would
+     * be two different addresses and the code would simply never verify.
      */
-    phoneE164: text('phone_e164').notNull(),
+    email: text('email').notNull(),
 
     /**
      * HMAC-SHA256 of `<challenge id>|<code>`, keyed by `OTP_CODE_PEPPER` — a
@@ -88,7 +88,7 @@ export const otpChallenges = pgTable(
 
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 
-    /** `created_at + OTP_TTL_SECONDS`, capped at five minutes by ADR-0008. */
+    /** `created_at + OTP_TTL_SECONDS`, capped at five minutes by ADR-0072. */
     expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
 
     /**
@@ -104,13 +104,13 @@ export const otpChallenges = pgTable(
   },
   (table) => [
     /**
-     * **At most one redeemable code per phone number, enforced by the
+     * **At most one redeemable code per email address, enforced by the
      * database.**
      *
-     * ADR-0008 requires that a new code invalidate the previous one, to
+     * ADR-0072 requires that a new code invalidate the previous one, to
      * prevent "a pool of valid codes". The request path does that explicitly —
      * supersede, then insert, in one transaction — but an application-only
-     * rule holds exactly until two requests for one number overlap, which a
+     * rule holds exactly until two requests for one address overlap, which a
      * double-tapped button produces routinely. This index makes the overlap
      * lose instead of quietly leaving two live codes: the second insert raises
      * `23505` and the request path retries the whole transaction, which then
@@ -121,8 +121,8 @@ export const otpChallenges = pgTable(
      * still occupies the slot, which is why the supersede statement matches on
      * liveness rather than on expiry — it clears the slot regardless.
      */
-    uniqueIndex('otp_challenges_live_per_phone_unique')
-      .on(table.phoneE164)
+    uniqueIndex('otp_challenges_live_per_email_unique')
+      .on(table.email)
       .where(sql`${table.consumedAt} is null and ${table.invalidatedAt} is null`),
 
     /**

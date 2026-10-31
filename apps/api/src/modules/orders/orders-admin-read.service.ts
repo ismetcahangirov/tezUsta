@@ -14,6 +14,7 @@ import { ERROR_CODES } from '../../common/errors/error-codes.types';
 import { NotFoundError } from '../../common/errors/not-found.error';
 import { resolveLocalizedText } from '../../common/i18n/resolve-localized-text';
 import type { LocalizedText } from '../../common/i18n/localized-text.types';
+import { maskEmail } from '../../infra/email/email-address';
 import { arrivalOutcome } from './arrival-promise.mapper';
 import { ADMIN_WITHHELD_STATUSES, allowedNextStatuses } from './order-lifecycle';
 import { OrdersAdminRepository } from './orders-admin.repository';
@@ -44,15 +45,6 @@ function decodeCursor(cursor: string | undefined): string | null {
   } catch {
     return null;
   }
-}
-
-/**
- * `+994 •• ••• •• 67` — the country code and the last two digits, enough to
- * tell two numbers apart on a call without disclosing either (ADR-0043 § 6).
- */
-export function maskPhone(e164: string): string {
-  const countryCode = e164.startsWith('+994') ? '+994' : e164.slice(0, 3);
-  return `${countryCode} •• ••• •• ${e164.slice(-2)}`;
 }
 
 export class TranscriptNotAvailableError extends AppError {
@@ -135,7 +127,7 @@ export class OrdersAdminReadService {
         : {
             id: row.master.id,
             displayName: row.master.displayName ?? '',
-            phoneMasked: row.master.phoneE164 === null ? '' : maskPhone(row.master.phoneE164),
+            emailMasked: row.master.email === null ? '' : maskEmail(row.master.email),
           };
     return {
       id: order.id,
@@ -160,7 +152,7 @@ export class OrdersAdminReadService {
       customer: {
         id: row.customer.id,
         displayName: row.customer.displayName,
-        phoneMasked: maskPhone(row.customer.phoneE164),
+        emailMasked: maskEmail(row.customer.email),
       },
       master,
       history: history.map((entry) => ({
@@ -186,14 +178,14 @@ export class OrdersAdminReadService {
     };
   }
 
-  /** The full number of one party, for a reveal the admin module has authorised and audited. */
-  async partyPhone(orderId: string, party: 'customer' | 'master'): Promise<string> {
+  /** The full address of one party, for a reveal the admin module has authorised and audited. */
+  async partyEmail(orderId: string, party: 'customer' | 'master'): Promise<string> {
     const row = await this.repository.findDetail(orderId);
-    const phone = party === 'customer' ? row?.customer.phoneE164 : row?.master?.phoneE164;
-    if (phone === undefined || phone === null) {
+    const email = party === 'customer' ? row?.customer.email : row?.master?.email;
+    if (email === undefined || email === null) {
       throw new NotFoundError();
     }
-    return phone;
+    return email;
   }
 
   async transcript(orderId: string): Promise<AdminOrderTranscript> {

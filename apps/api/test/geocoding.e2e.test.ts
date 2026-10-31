@@ -62,11 +62,11 @@ import { createThrowawayDatabase } from './support/throwaway-database';
  * that.
  */
 
-/** `users.phone_e164` is unique among live rows — see `addresses.e2e.test.ts`. */
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99456${String(phoneCounter).padStart(7, '0')}`;
+/** `users.email` is unique among live rows — see `addresses.e2e.test.ts`. */
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
 let addressCounter = 0;
@@ -343,8 +343,8 @@ describe('geocoding endpoints over HTTP (issue #36)', () => {
   }
 
   async function signIn(): Promise<SignedIn> {
-    const phoneE164 = nextPhone();
-    const created = await usersRepo.create({ phoneE164, roles: [] });
+    const email = nextEmail();
+    const created = await usersRepo.create({ email, roles: [] });
     const pair = await sessionsService.startSession({ userId: created.user.id });
     // Sanity check on the harness itself, not the system under test: a
     // malformed access token here would make every 401 assertion below
@@ -1019,12 +1019,12 @@ describe('the geocode endpoints spend from a budget (issue #36)', () => {
   });
 
   async function tokenFor(): Promise<string> {
-    // Reuses the file's own `nextPhone()` counter rather than a random
-    // number: `users.phone_e164` is unique among live rows, and only a
+    // Reuses the file's own `nextEmail()` counter rather than a random
+    // number: `users.email` is unique among live rows, and only a
     // counter actually guarantees that. A `Math.random()` collision here
     // would fail with a confusing unique-constraint error instead of the
     // rate-limit assertion this describe block exists to make.
-    const created = await usersRepo.create({ phoneE164: nextPhone(), roles: ['customer'] });
+    const created = await usersRepo.create({ email: nextEmail(), roles: ['customer'] });
     const pair = await sessionsService.startSession({ userId: created.user.id });
     return pair.accessToken;
   }

@@ -105,10 +105,10 @@ import { createThrowawayDatabase } from './support/throwaway-database';
 
 const enabled = process.env.ORDERS_BENCHMARK === '1';
 
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+9940${String(phoneCounter).padStart(9, '0')}`;
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
 function percentile(sorted: readonly number[], fraction: number): number {
@@ -388,8 +388,8 @@ describe.runIf(enabled)('order creation under concurrent load (issue #291)', () 
   /** A real user, a real customer profile and a real saved address — over HTTP, unmeasured setup. */
   async function seedCustomer(): Promise<Customer> {
     const created = await pool.query<{ id: string }>(
-      `insert into users (id, phone_e164) values (gen_random_uuid(), $1) returning id`,
-      [nextPhone()],
+      `insert into users (id, email) values (gen_random_uuid(), $1) returning id`,
+      [nextEmail()],
     );
     const userId = created.rows[0]?.id;
     if (userId === undefined) {
@@ -625,16 +625,16 @@ describe.runIf(enabled)('standard authenticated reads under concurrent load (iss
     const customerUserIds = Array.from({ length: HISTORY_CUSTOMERS }, () => randomUUID());
     const customerIds = Array.from({ length: HISTORY_CUSTOMERS }, () => randomUUID());
     const addressIds = Array.from({ length: HISTORY_CUSTOMERS }, () => randomUUID());
-    const customerPhones = Array.from({ length: HISTORY_CUSTOMERS }, () => nextPhone());
+    const customerEmails = Array.from({ length: HISTORY_CUSTOMERS }, () => nextEmail());
     const customerNames = customerIds.map((_, index) => `Bench müştəri ${String(index)}`);
     const addressLabels = addressIds.map(() => 'Bench ünvan');
     const lons = addressIds.map(() => BAKU_CENTRE.longitude + (Math.random() - 0.5) * 0.3);
     const lats = addressIds.map(() => BAKU_CENTRE.latitude + (Math.random() - 0.5) * 0.3);
 
-    await pool.query(
-      `insert into users (id, phone_e164) select * from unnest($1::uuid[], $2::text[])`,
-      [customerUserIds, customerPhones],
-    );
+    await pool.query(`insert into users (id, email) select * from unnest($1::uuid[], $2::text[])`, [
+      customerUserIds,
+      customerEmails,
+    ]);
     await pool.query(
       `insert into customers (id, user_id, display_name)
        select * from unnest($1::uuid[], $2::uuid[], $3::text[])`,
@@ -652,13 +652,13 @@ describe.runIf(enabled)('standard authenticated reads under concurrent load (iss
     // (nothing this scenario reads touches nearby-masters or presence).
     const masterUserIds = Array.from({ length: HISTORY_MASTERS }, () => randomUUID());
     const masterIds = Array.from({ length: HISTORY_MASTERS }, () => randomUUID());
-    const masterPhones = Array.from({ length: HISTORY_MASTERS }, () => nextPhone());
+    const masterEmails = Array.from({ length: HISTORY_MASTERS }, () => nextEmail());
     const masterNames = masterIds.map((_, index) => `Bench usta ${String(index)}`);
 
-    await pool.query(
-      `insert into users (id, phone_e164) select * from unnest($1::uuid[], $2::text[])`,
-      [masterUserIds, masterPhones],
-    );
+    await pool.query(`insert into users (id, email) select * from unnest($1::uuid[], $2::text[])`, [
+      masterUserIds,
+      masterEmails,
+    ]);
     await pool.query(
       `insert into masters (id, user_id, display_name, verification_status, is_available)
        select m, u, name, 'active', true

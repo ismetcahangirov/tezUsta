@@ -51,7 +51,7 @@ describe('ordered indexes can serve the order they were built for (issue #191)',
   let database: ThrowawayDatabase;
   let pool: Pool;
   let serviceId: string;
-  let phoneCounter = 0;
+  let emailCounter = 0;
 
   function required<T>(value: T | undefined, what: string): T {
     if (value === undefined) {
@@ -60,16 +60,16 @@ describe('ordered indexes can serve the order they were built for (issue #191)',
     return value;
   }
 
-  function nextPhone(): string {
-    phoneCounter += 1;
-    return `+99451${String(phoneCounter).padStart(7, '0')}`;
+  function nextEmail(): string {
+    emailCounter += 1;
+    return `user-${String(emailCounter)}@example.com`;
   }
 
   async function insertUser(): Promise<string> {
     const { rows } = await pool.query<{ id: string }>(
-      `INSERT INTO users (id, phone_e164, status)
+      `INSERT INTO users (id, email, status)
        VALUES (gen_random_uuid(), $1, 'active') RETURNING id`,
-      [nextPhone()],
+      [nextEmail()],
     );
     return required(rows[0]?.id, 'user');
   }
@@ -107,7 +107,7 @@ describe('ordered indexes can serve the order they were built for (issue #191)',
     const { rows } = await pool.query<{ id: string }>(
       `INSERT INTO admin_users (id, email, display_name)
        VALUES (gen_random_uuid(), $1, 'Admin') RETURNING id`,
-      [`admin-${String((phoneCounter += 1))}-${Date.now().toString(36)}@tezusta.az`],
+      [`admin-${String((emailCounter += 1))}-${Date.now().toString(36)}@tezusta.az`],
     );
     return required(rows[0]?.id, 'admin user');
   }

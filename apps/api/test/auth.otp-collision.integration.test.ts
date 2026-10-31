@@ -36,12 +36,12 @@ import { createThrowawayDatabase } from './support/throwaway-database';
  * this test chooses.
  */
 
-const PHONE = '+994509998877';
+const EMAIL = 'collision@example.com';
 
 /** Long enough that a slow machine is not mistaken for a deadlock. */
 const BLOCK_TIMEOUT_MS = 10_000;
 
-describe('two OTP requests for one number, colliding on the unique index', () => {
+describe('two OTP requests for one address, colliding on the unique index', () => {
   let pool: Pool;
   let db: Database;
   let database: ThrowawayDatabase;
@@ -109,14 +109,14 @@ describe('two OTP requests for one number, colliding on the unique index', () =>
     // which is precisely the state two genuinely simultaneous requests are in.
     await blocker.query('BEGIN');
     await blocker.query(
-      `INSERT INTO otp_challenges (id, phone_e164, code_hash, expires_at)
+      `INSERT INTO otp_challenges (id, email, code_hash, expires_at)
        VALUES ($1, $2, $3, now() + interval '5 minutes')`,
-      [holder, PHONE, 'a'.repeat(64)],
+      [holder, EMAIL, 'a'.repeat(64)],
     );
 
     const loser = repository.replaceLiveChallenge({
       id: uuidV7(),
-      phoneE164: PHONE,
+      email: EMAIL,
       codeHash: 'b'.repeat(64),
       expiresAt: new Date(Date.now() + 300_000),
     });
@@ -128,9 +128,9 @@ describe('two OTP requests for one number, colliding on the unique index', () =>
     // `DrizzleQueryError`, the SQLSTATE was on its `cause`, the retry's guard
     // did not match, and the error travelled to the client as a 500.
     const created = await loser;
-    expect(created.phoneE164).toBe(PHONE);
+    expect(created.email).toBe(EMAIL);
 
-    const rows = await db.select().from(otpChallenges).where(eq(otpChallenges.phoneE164, PHONE));
+    const rows = await db.select().from(otpChallenges).where(eq(otpChallenges.email, EMAIL));
     const live = rows.filter((row) => row.consumedAt === null && row.invalidatedAt === null);
 
     // Both attempts are on record, and the winner's row was superseded by the

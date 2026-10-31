@@ -278,10 +278,10 @@ See [`docs/engineering/security.md`](docs/engineering/security.md).
 ## Open decisions
 
 These are blocked on the project owner and are **not** decided by engineering:
-the SMS provider, the object storage provider, the subscription billing
+the email provider and sending domain, the object storage provider, the subscription billing
 provider, the launch subscription prices, trial and grace, master
-verification criteria, hosting, account recovery when a
-phone number is lost, languages at launch, whether in-app chat ships at launch,
+verification criteria, hosting, account recovery when
+access to the email address is lost, languages at launch, whether in-app chat ships at launch,
 and the owner-supplied artwork.
 
 The sign-in method, admin sign-in, dispatch model, pricing ownership, the price

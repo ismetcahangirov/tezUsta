@@ -5,7 +5,7 @@
     "tools"
   ],
   "totals": {
-    "files": 1438,
+    "files": 1434,
     "tests": 430,
     "violations": 0
   },
@@ -48,7 +48,7 @@
         "apps/admin/src/features/customers/CustomerStatusBadge.tsx",
         "apps/admin/src/features/customers/CustomerStatusDialog.tsx",
         "apps/admin/src/features/customers/CustomersPage.tsx",
-        "apps/admin/src/features/customers/RevealCustomerPhoneDialog.tsx",
+        "apps/admin/src/features/customers/RevealCustomerEmailDialog.tsx",
         "apps/admin/src/features/customers/api.ts",
         "apps/admin/src/features/customers/copy.ts",
         "apps/admin/src/features/dashboard/api.ts",
@@ -66,7 +66,7 @@
         "apps/admin/src/features/orders/OrdersPage.tsx",
         "apps/admin/src/features/orders/OrdersTable.tsx",
         "apps/admin/src/features/orders/OverrideDialog.tsx",
-        "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
+        "apps/admin/src/features/orders/RevealEmailDialog.tsx",
         "apps/admin/src/features/orders/api.ts",
         "apps/admin/src/features/orders/rules.ts",
         "apps/admin/src/features/portfolio/PortfolioPage.tsx",
@@ -108,8 +108,8 @@
       ]
     },
     "apps/api": {
-      "files": 699,
-      "tests": 220,
+      "files": 692,
+      "tests": 218,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -142,6 +142,7 @@
         "apps/api/src/infra/database/schema/subscription-billing.ts",
         "apps/api/src/infra/database/schema/subscriptions.ts",
         "apps/api/src/infra/database/seed/seed-service-catalogue.ts",
+        "apps/api/src/infra/email/email.module.ts",
         "apps/api/src/infra/geo/google-geocoding.provider.ts",
         "apps/api/src/infra/geo/stub-geocoding.provider.ts",
         "apps/api/src/infra/media/media.module.ts",
@@ -359,14 +360,13 @@
       ]
     },
     "apps/mobile": {
-      "files": 541,
-      "tests": 178,
+      "files": 544,
+      "tests": 180,
       "untested": [
         "apps/mobile/.storybook/main.ts",
         "apps/mobile/.storybook/preview.tsx",
         "apps/mobile/app.config.js",
         "apps/mobile/app/(auth)/_layout.tsx",
-        "apps/mobile/app/(auth)/sign-in.tsx",
         "apps/mobile/app/(customer)/(tabs)/_layout.tsx",
         "apps/mobile/app/(customer)/(tabs)/index.tsx",
         "apps/mobile/app/(customer)/(tabs)/orders.tsx",
@@ -696,13 +696,13 @@
         "apps/admin/src/features/catalogue/form-support.ts",
         "apps/admin/src/features/customers/CustomerDetailPage.tsx",
         "apps/admin/src/features/customers/CustomerStatusDialog.tsx",
-        "apps/admin/src/features/customers/RevealCustomerPhoneDialog.tsx",
+        "apps/admin/src/features/customers/RevealCustomerEmailDialog.tsx",
         "apps/admin/src/features/dashboard/DashboardPage.tsx",
         "apps/admin/src/features/masters/MasterActionDialog.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/orders/OrderDetailPage.tsx",
         "apps/admin/src/features/orders/OverrideDialog.tsx",
-        "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
+        "apps/admin/src/features/orders/RevealEmailDialog.tsx",
         "apps/admin/src/features/portfolio/PortfolioPostPage.tsx",
         "apps/admin/src/features/portfolio/RemovePostDialog.tsx",
         "apps/admin/src/features/reports/CloseReportDialog.tsx",
@@ -854,7 +854,7 @@
         "apps/admin/src/features/customers/CustomerDetailPage.tsx",
         "apps/admin/src/features/customers/CustomerStatusDialog.tsx",
         "apps/admin/src/features/customers/CustomersPage.tsx",
-        "apps/admin/src/features/customers/RevealCustomerPhoneDialog.tsx",
+        "apps/admin/src/features/customers/RevealCustomerEmailDialog.tsx",
         "apps/admin/src/features/dashboard/DashboardPage.tsx",
         "apps/admin/src/features/masters/MasterActionDialog.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
@@ -862,7 +862,7 @@
         "apps/admin/src/features/orders/OrderDetailPage.tsx",
         "apps/admin/src/features/orders/OrdersTable.tsx",
         "apps/admin/src/features/orders/OverrideDialog.tsx",
-        "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
+        "apps/admin/src/features/orders/RevealEmailDialog.tsx",
         "apps/admin/src/features/portfolio/PortfolioPage.tsx",
         "apps/admin/src/features/portfolio/PortfolioPostPage.tsx",
         "apps/admin/src/features/portfolio/RemovalDialog.tsx",
@@ -903,7 +903,7 @@
         "apps/admin/src/features/customers/CustomerDetailPage.tsx",
         "apps/admin/src/features/customers/CustomerStatusDialog.tsx",
         "apps/admin/src/features/customers/CustomersPage.tsx",
-        "apps/admin/src/features/customers/RevealCustomerPhoneDialog.tsx",
+        "apps/admin/src/features/customers/RevealCustomerEmailDialog.tsx",
         "apps/admin/src/features/dashboard/DashboardPage.tsx",
         "apps/admin/src/features/masters/MasterActionDialog.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
@@ -912,7 +912,7 @@
         "apps/admin/src/features/orders/OrdersPage.tsx",
         "apps/admin/src/features/orders/OrdersTable.tsx",
         "apps/admin/src/features/orders/OverrideDialog.tsx",
-        "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
+        "apps/admin/src/features/orders/RevealEmailDialog.tsx",
         "apps/admin/src/features/portfolio/PortfolioPage.tsx",
         "apps/admin/src/features/portfolio/PortfolioPostPage.tsx",
         "apps/admin/src/features/portfolio/RemovalDialog.tsx",
@@ -977,10 +977,10 @@
       "dependsOn": [],
       "dependedOnBy": [
         "apps/admin/src/features/customers/CustomerStatusDialog.tsx",
-        "apps/admin/src/features/customers/RevealCustomerPhoneDialog.tsx",
+        "apps/admin/src/features/customers/RevealCustomerEmailDialog.tsx",
         "apps/admin/src/features/masters/MasterActionDialog.tsx",
         "apps/admin/src/features/orders/OverrideDialog.tsx",
-        "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
+        "apps/admin/src/features/orders/RevealEmailDialog.tsx",
         "apps/admin/src/features/reports/CloseReportDialog.tsx",
         "apps/admin/src/features/subscription/SubscriptionDialogs.tsx"
       ],
@@ -1009,10 +1009,10 @@
       "dependedOnBy": [
         "apps/admin/src/features/admins/AccountActionDialog.tsx",
         "apps/admin/src/features/customers/CustomerStatusDialog.tsx",
-        "apps/admin/src/features/customers/RevealCustomerPhoneDialog.tsx",
+        "apps/admin/src/features/customers/RevealCustomerEmailDialog.tsx",
         "apps/admin/src/features/masters/MasterActionDialog.tsx",
         "apps/admin/src/features/orders/OverrideDialog.tsx",
-        "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
+        "apps/admin/src/features/orders/RevealEmailDialog.tsx",
         "apps/admin/src/features/portfolio/RemovalDialog.tsx",
         "apps/admin/src/features/reports/CloseReportDialog.tsx",
         "apps/admin/src/features/reviews/RemoveReviewDialog.tsx",
@@ -1554,7 +1554,7 @@
         "apps/admin/src/components/Button.tsx",
         "apps/admin/src/features/customers/CustomerStatusBadge.tsx",
         "apps/admin/src/features/customers/CustomerStatusDialog.tsx",
-        "apps/admin/src/features/customers/RevealCustomerPhoneDialog.tsx",
+        "apps/admin/src/features/customers/RevealCustomerEmailDialog.tsx",
         "apps/admin/src/features/customers/api.ts",
         "apps/admin/src/features/customers/copy.ts",
         "apps/admin/src/features/orders/OrdersTable.tsx",
@@ -1627,7 +1627,7 @@
       "coveredByTests": [],
       "orphan": false
     },
-    "apps/admin/src/features/customers/RevealCustomerPhoneDialog.tsx": {
+    "apps/admin/src/features/customers/RevealCustomerEmailDialog.tsx": {
       "workspace": "apps/admin",
       "module": "apps/admin",
       "isTest": false,
@@ -1659,7 +1659,7 @@
         "apps/admin/src/features/customers/CustomerDetailPage.tsx",
         "apps/admin/src/features/customers/CustomerStatusDialog.tsx",
         "apps/admin/src/features/customers/CustomersPage.tsx",
-        "apps/admin/src/features/customers/RevealCustomerPhoneDialog.tsx"
+        "apps/admin/src/features/customers/RevealCustomerEmailDialog.tsx"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -1676,7 +1676,7 @@
         "apps/admin/src/features/customers/CustomerStatusBadge.tsx",
         "apps/admin/src/features/customers/CustomerStatusDialog.tsx",
         "apps/admin/src/features/customers/CustomersPage.tsx",
-        "apps/admin/src/features/customers/RevealCustomerPhoneDialog.tsx"
+        "apps/admin/src/features/customers/RevealCustomerEmailDialog.tsx"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -1938,7 +1938,7 @@
         "apps/admin/src/components/Button.tsx",
         "apps/admin/src/features/orders/OrderStatusBadge.tsx",
         "apps/admin/src/features/orders/OverrideDialog.tsx",
-        "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
+        "apps/admin/src/features/orders/RevealEmailDialog.tsx",
         "apps/admin/src/features/orders/api.ts",
         "apps/admin/src/features/orders/copy.ts",
         "apps/admin/src/features/orders/rules.ts",
@@ -2033,7 +2033,7 @@
       "coveredByTests": [],
       "orphan": false
     },
-    "apps/admin/src/features/orders/RevealPhoneDialog.tsx": {
+    "apps/admin/src/features/orders/RevealEmailDialog.tsx": {
       "workspace": "apps/admin",
       "module": "apps/admin",
       "isTest": false,
@@ -2067,7 +2067,7 @@
         "apps/admin/src/features/orders/OrderDetailPage.tsx",
         "apps/admin/src/features/orders/OrdersPage.tsx",
         "apps/admin/src/features/orders/OverrideDialog.tsx",
-        "apps/admin/src/features/orders/RevealPhoneDialog.tsx"
+        "apps/admin/src/features/orders/RevealEmailDialog.tsx"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -2086,7 +2086,7 @@
         "apps/admin/src/features/orders/OrdersPage.tsx",
         "apps/admin/src/features/orders/OrdersTable.tsx",
         "apps/admin/src/features/orders/OverrideDialog.tsx",
-        "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
+        "apps/admin/src/features/orders/RevealEmailDialog.tsx",
         "apps/admin/src/features/orders/orders.test.tsx",
         "apps/admin/src/features/orders/rules.ts"
       ],
@@ -2124,7 +2124,7 @@
         "apps/admin/src/features/orders/OrdersPage.tsx",
         "apps/admin/src/features/orders/OrdersTable.tsx",
         "apps/admin/src/features/orders/OverrideDialog.tsx",
-        "apps/admin/src/features/orders/RevealPhoneDialog.tsx"
+        "apps/admin/src/features/orders/RevealEmailDialog.tsx"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -2637,10 +2637,10 @@
       ],
       "dependedOnBy": [
         "apps/admin/src/auth/SignInPage.tsx",
-        "apps/admin/src/features/customers/RevealCustomerPhoneDialog.tsx",
+        "apps/admin/src/features/customers/RevealCustomerEmailDialog.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/orders/OrderDetailPage.tsx",
-        "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
+        "apps/admin/src/features/orders/RevealEmailDialog.tsx",
         "apps/admin/src/features/portfolio/PortfolioPostPage.tsx",
         "apps/admin/src/shell/Shell.tsx"
       ],
@@ -4693,6 +4693,7 @@
         "apps/api/src/infra/config/load-app-config.ts",
         "apps/api/src/infra/config/parse-env.ts",
         "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/infra/email/email.module.ts",
         "apps/api/src/infra/geo/geocoding.module.ts",
         "apps/api/src/infra/geo/routing.module.ts",
         "apps/api/src/infra/media/media.module.ts",
@@ -4717,7 +4718,6 @@
         "apps/api/src/infra/redis/bullmq-connection.provider.ts",
         "apps/api/src/infra/redis/realtime-connection.provider.ts",
         "apps/api/src/infra/redis/redis.module.ts",
-        "apps/api/src/infra/sms/sms.module.ts",
         "apps/api/src/infra/storage/storage.config.ts",
         "apps/api/src/infra/storage/storage.module.ts",
         "apps/api/src/main.ts",
@@ -4846,6 +4846,7 @@
         "apps/api/src/infra/config/config.module.test.ts",
         "apps/api/src/infra/config/config.module.ts",
         "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/infra/email/email.module.ts",
         "apps/api/src/infra/geo/geocoding.module.ts",
         "apps/api/src/infra/geo/routing.module.test.ts",
         "apps/api/src/infra/geo/routing.module.ts",
@@ -4867,7 +4868,6 @@
         "apps/api/src/infra/redis/bullmq-connection.provider.ts",
         "apps/api/src/infra/redis/realtime-connection.provider.ts",
         "apps/api/src/infra/redis/redis.module.ts",
-        "apps/api/src/infra/sms/sms.module.ts",
         "apps/api/src/infra/storage/storage.module.test.ts",
         "apps/api/src/infra/storage/storage.module.ts",
         "apps/api/src/main.ts",
@@ -5065,7 +5065,6 @@
         "apps/api/src/infra/queue/deferred-queue.processor.test.ts",
         "apps/api/src/infra/queue/media-work.service.test.ts",
         "apps/api/src/infra/rate-limit/rate-limit.config.test.ts",
-        "apps/api/src/infra/sms/sms.module.test.ts",
         "apps/api/src/infra/storage/storage.module.test.ts",
         "apps/api/src/main.ts",
         "apps/api/src/modules/auth/auth.config.test.ts",
@@ -5192,7 +5191,6 @@
         "apps/api/src/infra/queue/deferred-queue.processor.test.ts",
         "apps/api/src/infra/queue/media-work.service.test.ts",
         "apps/api/src/infra/rate-limit/rate-limit.config.test.ts",
-        "apps/api/src/infra/sms/sms.module.test.ts",
         "apps/api/src/infra/storage/storage.module.test.ts",
         "apps/api/src/modules/auth/auth.config.test.ts",
         "apps/api/src/modules/auth/otp.config.test.ts",
@@ -6654,6 +6652,119 @@
       ],
       "orphan": false
     },
+    "apps/api/src/infra/email/email-address.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/email/email-address.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/email/email-address.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/infra/email/email-address.test.ts",
+        "apps/api/src/infra/email/stub-email-sender.ts",
+        "apps/api/src/modules/admin/admin-customers.service.ts",
+        "apps/api/src/modules/auth/otp.schema.ts",
+        "apps/api/src/modules/auth/otp.service.ts",
+        "apps/api/src/modules/orders/orders-admin-read.service.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/email/email-address.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/email/email-sender.types.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/infra/email/email.module.ts",
+        "apps/api/src/infra/email/email.module.ts",
+        "apps/api/src/infra/email/stub-email-sender.ts",
+        "apps/api/src/modules/auth/otp.service.ts",
+        "apps/api/src/modules/auth/otp.service.ts",
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
+        "apps/api/test/auth.otp-global-cap.e2e.test.ts",
+        "apps/api/test/auth.otp-global-cap.e2e.test.ts",
+        "apps/api/test/auth.otp.e2e.test.ts",
+        "apps/api/test/auth.otp.e2e.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
+        "apps/api/test/auth.otp-global-cap.e2e.test.ts",
+        "apps/api/test/auth.otp-global-cap.e2e.test.ts",
+        "apps/api/test/auth.otp.e2e.test.ts",
+        "apps/api/test/auth.otp.e2e.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/email/email.module.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/email/email-sender.types.ts",
+        "apps/api/src/infra/email/email-sender.types.ts",
+        "apps/api/src/infra/email/stub-email-sender.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/auth/otp.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/email/stub-email-sender.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/email/stub-email-sender.ts",
+        "apps/api/test/support/log-sink.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/email/stub-email-sender.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/email/email-address.ts",
+        "apps/api/src/infra/email/email-sender.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/email/email.module.ts",
+        "apps/api/src/infra/email/stub-email-sender.test.ts",
+        "apps/api/test/auth.otp-global-cap.e2e.test.ts",
+        "apps/api/test/auth.otp.e2e.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/email/stub-email-sender.test.ts",
+        "apps/api/test/auth.otp-global-cap.e2e.test.ts",
+        "apps/api/test/auth.otp.e2e.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts"
+      ],
+      "orphan": false
+    },
     "apps/api/src/infra/geo/driving-estimate.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -7201,37 +7312,6 @@
       ],
       "coveredByTests": [
         "apps/api/src/infra/observability/log-levels.test.ts"
-      ],
-      "orphan": false
-    },
-    "apps/api/src/infra/phone/azerbaijani-phone.test.ts": {
-      "workspace": "apps/api",
-      "module": "apps/api",
-      "isTest": true,
-      "dependsOn": [
-        "apps/api/src/infra/phone/azerbaijani-phone.ts"
-      ],
-      "dependedOnBy": [],
-      "coveredByTests": [],
-      "orphan": false
-    },
-    "apps/api/src/infra/phone/azerbaijani-phone.ts": {
-      "workspace": "apps/api",
-      "module": "apps/api",
-      "isTest": false,
-      "dependsOn": [],
-      "dependedOnBy": [
-        "apps/api/src/infra/phone/azerbaijani-phone.test.ts",
-        "apps/api/src/infra/sms/azerbaijan-only-sms-sender.ts",
-        "apps/api/src/infra/sms/failover-sms-sender.ts",
-        "apps/api/src/infra/sms/plivo-sms-sender.ts",
-        "apps/api/src/infra/sms/stub-sms-sender.ts",
-        "apps/api/src/infra/sms/twilio-sms-sender.ts",
-        "apps/api/src/modules/auth/otp.schema.ts",
-        "apps/api/src/modules/auth/otp.service.ts"
-      ],
-      "coveredByTests": [
-        "apps/api/src/infra/phone/azerbaijani-phone.test.ts"
       ],
       "orphan": false
     },
@@ -8334,231 +8414,6 @@
       ],
       "orphan": false
     },
-    "apps/api/src/infra/sms/azerbaijan-only-sms-sender.ts": {
-      "workspace": "apps/api",
-      "module": "apps/api",
-      "isTest": false,
-      "dependsOn": [
-        "apps/api/src/infra/phone/azerbaijani-phone.ts",
-        "apps/api/src/infra/sms/sms-sender.types.ts"
-      ],
-      "dependedOnBy": [
-        "apps/api/src/infra/sms/sms-providers.test.ts",
-        "apps/api/src/infra/sms/sms.module.test.ts",
-        "apps/api/src/infra/sms/sms.module.ts"
-      ],
-      "coveredByTests": [
-        "apps/api/src/infra/sms/sms-providers.test.ts",
-        "apps/api/src/infra/sms/sms.module.test.ts"
-      ],
-      "orphan": false
-    },
-    "apps/api/src/infra/sms/failover-sms-sender.ts": {
-      "workspace": "apps/api",
-      "module": "apps/api",
-      "isTest": false,
-      "dependsOn": [
-        "apps/api/src/infra/phone/azerbaijani-phone.ts",
-        "apps/api/src/infra/sms/sms-http.ts",
-        "apps/api/src/infra/sms/sms-sender.types.ts"
-      ],
-      "dependedOnBy": [
-        "apps/api/src/infra/sms/sms-providers.test.ts",
-        "apps/api/src/infra/sms/sms.module.ts"
-      ],
-      "coveredByTests": [
-        "apps/api/src/infra/sms/sms-providers.test.ts"
-      ],
-      "orphan": false
-    },
-    "apps/api/src/infra/sms/plivo-sms-sender.ts": {
-      "workspace": "apps/api",
-      "module": "apps/api",
-      "isTest": false,
-      "dependsOn": [
-        "apps/api/src/infra/phone/azerbaijani-phone.ts",
-        "apps/api/src/infra/sms/sms-http.ts",
-        "apps/api/src/infra/sms/sms-http.ts",
-        "apps/api/src/infra/sms/sms-sender.types.ts"
-      ],
-      "dependedOnBy": [
-        "apps/api/src/infra/sms/sms-providers.test.ts",
-        "apps/api/src/infra/sms/sms.module.ts"
-      ],
-      "coveredByTests": [
-        "apps/api/src/infra/sms/sms-providers.test.ts"
-      ],
-      "orphan": false
-    },
-    "apps/api/src/infra/sms/sms-http.ts": {
-      "workspace": "apps/api",
-      "module": "apps/api",
-      "isTest": false,
-      "dependsOn": [],
-      "dependedOnBy": [
-        "apps/api/src/infra/sms/failover-sms-sender.ts",
-        "apps/api/src/infra/sms/plivo-sms-sender.ts",
-        "apps/api/src/infra/sms/plivo-sms-sender.ts",
-        "apps/api/src/infra/sms/sms-providers.test.ts",
-        "apps/api/src/infra/sms/sms-providers.test.ts",
-        "apps/api/src/infra/sms/twilio-sms-sender.ts",
-        "apps/api/src/infra/sms/twilio-sms-sender.ts"
-      ],
-      "coveredByTests": [
-        "apps/api/src/infra/sms/sms-providers.test.ts",
-        "apps/api/src/infra/sms/sms-providers.test.ts"
-      ],
-      "orphan": false
-    },
-    "apps/api/src/infra/sms/sms-providers.test.ts": {
-      "workspace": "apps/api",
-      "module": "apps/api",
-      "isTest": true,
-      "dependsOn": [
-        "apps/api/src/infra/sms/azerbaijan-only-sms-sender.ts",
-        "apps/api/src/infra/sms/failover-sms-sender.ts",
-        "apps/api/src/infra/sms/plivo-sms-sender.ts",
-        "apps/api/src/infra/sms/sms-http.ts",
-        "apps/api/src/infra/sms/sms-http.ts",
-        "apps/api/src/infra/sms/sms-sender.types.ts",
-        "apps/api/src/infra/sms/twilio-sms-sender.ts"
-      ],
-      "dependedOnBy": [],
-      "coveredByTests": [],
-      "orphan": false
-    },
-    "apps/api/src/infra/sms/sms-sender.types.ts": {
-      "workspace": "apps/api",
-      "module": "apps/api",
-      "isTest": false,
-      "dependsOn": [],
-      "dependedOnBy": [
-        "apps/api/src/infra/sms/azerbaijan-only-sms-sender.ts",
-        "apps/api/src/infra/sms/failover-sms-sender.ts",
-        "apps/api/src/infra/sms/plivo-sms-sender.ts",
-        "apps/api/src/infra/sms/sms-providers.test.ts",
-        "apps/api/src/infra/sms/sms.module.ts",
-        "apps/api/src/infra/sms/sms.module.ts",
-        "apps/api/src/infra/sms/stub-sms-sender.ts",
-        "apps/api/src/infra/sms/twilio-sms-sender.ts",
-        "apps/api/src/modules/auth/otp.service.ts",
-        "apps/api/src/modules/auth/otp.service.ts",
-        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
-        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
-        "apps/api/test/auth.otp-global-cap.e2e.test.ts",
-        "apps/api/test/auth.otp-global-cap.e2e.test.ts",
-        "apps/api/test/auth.otp.e2e.test.ts",
-        "apps/api/test/auth.otp.e2e.test.ts",
-        "apps/api/test/web-auth.e2e.test.ts",
-        "apps/api/test/web-auth.e2e.test.ts"
-      ],
-      "coveredByTests": [
-        "apps/api/src/infra/sms/sms-providers.test.ts",
-        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
-        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
-        "apps/api/test/auth.otp-global-cap.e2e.test.ts",
-        "apps/api/test/auth.otp-global-cap.e2e.test.ts",
-        "apps/api/test/auth.otp.e2e.test.ts",
-        "apps/api/test/auth.otp.e2e.test.ts",
-        "apps/api/test/web-auth.e2e.test.ts",
-        "apps/api/test/web-auth.e2e.test.ts"
-      ],
-      "orphan": false
-    },
-    "apps/api/src/infra/sms/sms.module.test.ts": {
-      "workspace": "apps/api",
-      "module": "apps/api",
-      "isTest": true,
-      "dependsOn": [
-        "apps/api/src/infra/config/parse-env.ts",
-        "apps/api/src/infra/sms/azerbaijan-only-sms-sender.ts",
-        "apps/api/src/infra/sms/sms.module.ts",
-        "apps/api/src/infra/sms/stub-sms-sender.ts"
-      ],
-      "dependedOnBy": [],
-      "coveredByTests": [],
-      "orphan": false
-    },
-    "apps/api/src/infra/sms/sms.module.ts": {
-      "workspace": "apps/api",
-      "module": "apps/api",
-      "isTest": false,
-      "dependsOn": [
-        "apps/api/src/infra/config/app-config.types.ts",
-        "apps/api/src/infra/config/config.tokens.ts",
-        "apps/api/src/infra/sms/azerbaijan-only-sms-sender.ts",
-        "apps/api/src/infra/sms/failover-sms-sender.ts",
-        "apps/api/src/infra/sms/plivo-sms-sender.ts",
-        "apps/api/src/infra/sms/sms-sender.types.ts",
-        "apps/api/src/infra/sms/sms-sender.types.ts",
-        "apps/api/src/infra/sms/stub-sms-sender.ts",
-        "apps/api/src/infra/sms/twilio-sms-sender.ts"
-      ],
-      "dependedOnBy": [
-        "apps/api/src/infra/sms/sms.module.test.ts",
-        "apps/api/src/modules/auth/otp.module.ts"
-      ],
-      "coveredByTests": [
-        "apps/api/src/infra/sms/sms.module.test.ts"
-      ],
-      "orphan": false
-    },
-    "apps/api/src/infra/sms/stub-sms-sender.test.ts": {
-      "workspace": "apps/api",
-      "module": "apps/api",
-      "isTest": true,
-      "dependsOn": [
-        "apps/api/src/infra/sms/stub-sms-sender.ts",
-        "apps/api/test/support/log-sink.ts"
-      ],
-      "dependedOnBy": [],
-      "coveredByTests": [],
-      "orphan": false
-    },
-    "apps/api/src/infra/sms/stub-sms-sender.ts": {
-      "workspace": "apps/api",
-      "module": "apps/api",
-      "isTest": false,
-      "dependsOn": [
-        "apps/api/src/infra/phone/azerbaijani-phone.ts",
-        "apps/api/src/infra/sms/sms-sender.types.ts"
-      ],
-      "dependedOnBy": [
-        "apps/api/src/infra/sms/sms.module.test.ts",
-        "apps/api/src/infra/sms/sms.module.ts",
-        "apps/api/src/infra/sms/stub-sms-sender.test.ts",
-        "apps/api/test/auth.otp-global-cap.e2e.test.ts",
-        "apps/api/test/auth.otp.e2e.test.ts",
-        "apps/api/test/web-auth.e2e.test.ts"
-      ],
-      "coveredByTests": [
-        "apps/api/src/infra/sms/sms.module.test.ts",
-        "apps/api/src/infra/sms/stub-sms-sender.test.ts",
-        "apps/api/test/auth.otp-global-cap.e2e.test.ts",
-        "apps/api/test/auth.otp.e2e.test.ts",
-        "apps/api/test/web-auth.e2e.test.ts"
-      ],
-      "orphan": false
-    },
-    "apps/api/src/infra/sms/twilio-sms-sender.ts": {
-      "workspace": "apps/api",
-      "module": "apps/api",
-      "isTest": false,
-      "dependsOn": [
-        "apps/api/src/infra/phone/azerbaijani-phone.ts",
-        "apps/api/src/infra/sms/sms-http.ts",
-        "apps/api/src/infra/sms/sms-http.ts",
-        "apps/api/src/infra/sms/sms-sender.types.ts"
-      ],
-      "dependedOnBy": [
-        "apps/api/src/infra/sms/sms-providers.test.ts",
-        "apps/api/src/infra/sms/sms.module.ts"
-      ],
-      "coveredByTests": [
-        "apps/api/src/infra/sms/sms-providers.test.ts"
-      ],
-      "orphan": false
-    },
     "apps/api/src/infra/storage/image-content-type.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -9348,6 +9203,7 @@
         "apps/api/src/common/errors/not-found.error.ts",
         "apps/api/src/infra/database/database-error.ts",
         "apps/api/src/infra/database/schema/users.ts",
+        "apps/api/src/infra/email/email-address.ts",
         "apps/api/src/modules/admin/admin-customers.repository.ts",
         "apps/api/src/modules/admin/admin-customers.repository.ts",
         "apps/api/src/modules/admin/admin-customers.schema.ts",
@@ -11018,8 +10874,8 @@
         "apps/api/src/infra/config/app-config.types.ts",
         "apps/api/src/infra/config/config.tokens.ts",
         "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/infra/email/email.module.ts",
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
-        "apps/api/src/infra/sms/sms.module.ts",
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/otp.config.ts",
         "apps/api/src/modules/auth/otp.controller.ts",
@@ -11083,7 +10939,7 @@
       "isTest": false,
       "dependsOn": [
         "apps/api/src/common/pipes/zod-validation.pipe.ts",
-        "apps/api/src/infra/phone/azerbaijani-phone.ts"
+        "apps/api/src/infra/email/email-address.ts"
       ],
       "dependedOnBy": [
         "apps/api/src/modules/auth/otp.controller.ts",
@@ -11100,10 +10956,10 @@
         "apps/api/src/common/errors/app-error.ts",
         "apps/api/src/common/errors/error-codes.types.ts",
         "apps/api/src/common/ids/uuid-v7.ts",
-        "apps/api/src/infra/phone/azerbaijani-phone.ts",
+        "apps/api/src/infra/email/email-address.ts",
+        "apps/api/src/infra/email/email-sender.types.ts",
+        "apps/api/src/infra/email/email-sender.types.ts",
         "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
-        "apps/api/src/infra/sms/sms-sender.types.ts",
-        "apps/api/src/infra/sms/sms-sender.types.ts",
         "apps/api/src/modules/auth/auth.types.ts",
         "apps/api/src/modules/auth/otp-code.ts",
         "apps/api/src/modules/auth/otp.config.ts",
@@ -15069,6 +14925,7 @@
         "apps/api/src/common/errors/not-found.error.ts",
         "apps/api/src/common/i18n/localized-text.types.ts",
         "apps/api/src/common/i18n/resolve-localized-text.ts",
+        "apps/api/src/infra/email/email-address.ts",
         "apps/api/src/modules/orders/arrival-promise.mapper.ts",
         "apps/api/src/modules/orders/order-lifecycle.ts",
         "apps/api/src/modules/orders/orders-admin.repository.ts",
@@ -17635,11 +17492,11 @@
         "apps/api/src/common/errors/error-envelope.types.ts",
         "apps/api/src/infra/config/parse-env.ts",
         "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/email/email-sender.types.ts",
+        "apps/api/src/infra/email/email-sender.types.ts",
         "apps/api/src/infra/rate-limit/rate-limit.config.ts",
         "apps/api/src/infra/rate-limit/rate-limit.tokens.ts",
         "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
-        "apps/api/src/infra/sms/sms-sender.types.ts",
-        "apps/api/src/infra/sms/sms-sender.types.ts",
         "apps/api/src/modules/auth/otp.config.ts",
         "apps/api/src/modules/auth/otp.service.ts",
         "apps/api/src/modules/auth/otp.tokens.ts",
@@ -17659,12 +17516,12 @@
         "apps/api/src/common/errors/error-envelope.types.ts",
         "apps/api/src/infra/config/parse-env.ts",
         "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/email/email-sender.types.ts",
+        "apps/api/src/infra/email/email-sender.types.ts",
+        "apps/api/src/infra/email/stub-email-sender.ts",
         "apps/api/src/infra/rate-limit/rate-limit.config.ts",
         "apps/api/src/infra/rate-limit/rate-limit.tokens.ts",
         "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
-        "apps/api/src/infra/sms/sms-sender.types.ts",
-        "apps/api/src/infra/sms/sms-sender.types.ts",
-        "apps/api/src/infra/sms/stub-sms-sender.ts",
         "apps/api/src/modules/auth/otp.config.ts",
         "apps/api/src/modules/auth/otp.tokens.ts",
         "apps/api/test/support/throwaway-database.ts",
@@ -17688,12 +17545,12 @@
         "apps/api/src/infra/database/schema/otp-challenges.ts",
         "apps/api/src/infra/database/schema/sessions.ts",
         "apps/api/src/infra/database/schema/users.ts",
+        "apps/api/src/infra/email/email-sender.types.ts",
+        "apps/api/src/infra/email/email-sender.types.ts",
+        "apps/api/src/infra/email/stub-email-sender.ts",
         "apps/api/src/infra/rate-limit/rate-limit.config.ts",
         "apps/api/src/infra/rate-limit/rate-limit.tokens.ts",
         "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
-        "apps/api/src/infra/sms/sms-sender.types.ts",
-        "apps/api/src/infra/sms/sms-sender.types.ts",
-        "apps/api/src/infra/sms/stub-sms-sender.ts",
         "apps/api/src/modules/auth/otp.service.ts",
         "apps/api/src/modules/auth/token.service.ts",
         "apps/api/src/modules/users/users.repository.ts",
@@ -19994,9 +19851,9 @@
       "dependedOnBy": [
         "apps/api/src/infra/calls/livekit-call-media.provider.test.ts",
         "apps/api/src/infra/calls/stub-call-media.provider.test.ts",
+        "apps/api/src/infra/email/stub-email-sender.test.ts",
         "apps/api/src/infra/geo/google-routes.provider.test.ts",
         "apps/api/src/infra/observability/log-levels.test.ts",
-        "apps/api/src/infra/sms/stub-sms-sender.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
@@ -20012,9 +19869,9 @@
       "coveredByTests": [
         "apps/api/src/infra/calls/livekit-call-media.provider.test.ts",
         "apps/api/src/infra/calls/stub-call-media.provider.test.ts",
+        "apps/api/src/infra/email/stub-email-sender.test.ts",
         "apps/api/src/infra/geo/google-routes.provider.test.ts",
         "apps/api/src/infra/observability/log-levels.test.ts",
-        "apps/api/src/infra/sms/stub-sms-sender.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
@@ -20629,9 +20486,9 @@
         "apps/api/src/infra/billing/stub-billing.provider.ts",
         "apps/api/src/infra/config/parse-env.ts",
         "apps/api/src/infra/database/migrate.ts",
-        "apps/api/src/infra/sms/sms-sender.types.ts",
-        "apps/api/src/infra/sms/sms-sender.types.ts",
-        "apps/api/src/infra/sms/stub-sms-sender.ts",
+        "apps/api/src/infra/email/email-sender.types.ts",
+        "apps/api/src/infra/email/email-sender.types.ts",
+        "apps/api/src/infra/email/stub-email-sender.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/users/users.repository.ts",
         "apps/api/test/support/throwaway-database.ts",
@@ -20708,8 +20565,12 @@
         "apps/mobile/src/auth/index.ts",
         "apps/mobile/src/components/index.ts"
       ],
-      "dependedOnBy": [],
-      "coveredByTests": [],
+      "dependedOnBy": [
+        "apps/mobile/src/auth/SignInScreen.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/auth/SignInScreen.test.tsx"
+      ],
       "orphan": false
     },
     "apps/mobile/app/(auth)/verify.tsx": {
@@ -21833,6 +21694,20 @@
       ],
       "orphan": false
     },
+    "apps/mobile/src/auth/SignInScreen.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/app/(auth)/sign-in.tsx",
+        "apps/mobile/src/store/index.ts",
+        "apps/mobile/src/store/session-slice.ts",
+        "apps/mobile/test/support/test-store.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/mobile/src/auth/VerifyScreen.test.tsx": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
@@ -21964,6 +21839,31 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/mobile/src/auth/email-address.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/auth/email-address.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/auth/email-address.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/src/auth/email-address.test.ts",
+        "apps/mobile/src/auth/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/auth/email-address.test.ts"
+      ],
+      "orphan": false
+    },
     "apps/mobile/src/auth/index.ts": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
@@ -21973,6 +21873,7 @@
         "apps/mobile/src/auth/auth-base-query.ts",
         "apps/mobile/src/auth/auth-endpoints.ts",
         "apps/mobile/src/auth/auth.types.ts",
+        "apps/mobile/src/auth/email-address.ts",
         "apps/mobile/src/auth/refresh.ts",
         "apps/mobile/src/auth/refresh.ts",
         "apps/mobile/src/auth/route-guard.ts",
@@ -29713,6 +29614,7 @@
         "apps/mobile/src/addresses/addresses-endpoints.test.ts",
         "apps/mobile/src/addresses/addresses-settings-entry.test.tsx",
         "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
+        "apps/mobile/src/auth/SignInScreen.test.tsx",
         "apps/mobile/src/auth/VerifyScreen.test.tsx",
         "apps/mobile/src/auth/auth-endpoints.test.ts",
         "apps/mobile/src/auth/useAuthGuard.test.tsx",
@@ -29744,6 +29646,7 @@
         "apps/mobile/src/addresses/addresses-endpoints.test.ts",
         "apps/mobile/src/addresses/addresses-settings-entry.test.tsx",
         "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
+        "apps/mobile/src/auth/SignInScreen.test.tsx",
         "apps/mobile/src/auth/VerifyScreen.test.tsx",
         "apps/mobile/src/auth/auth-endpoints.test.ts",
         "apps/mobile/src/auth/useAuthGuard.test.tsx",
@@ -29789,6 +29692,7 @@
         "apps/mobile/app/index.tsx",
         "apps/mobile/src/addresses/addresses-settings-entry.test.tsx",
         "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
+        "apps/mobile/src/auth/SignInScreen.test.tsx",
         "apps/mobile/src/auth/VerifyScreen.test.tsx",
         "apps/mobile/src/auth/access-token.ts",
         "apps/mobile/src/auth/auth-base-query.ts",
@@ -29833,6 +29737,7 @@
       "coveredByTests": [
         "apps/mobile/src/addresses/addresses-settings-entry.test.tsx",
         "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
+        "apps/mobile/src/auth/SignInScreen.test.tsx",
         "apps/mobile/src/auth/VerifyScreen.test.tsx",
         "apps/mobile/src/auth/auth-endpoints.test.ts",
         "apps/mobile/src/auth/route-guard.test.ts",
@@ -30678,6 +30583,7 @@
         "apps/mobile/src/addresses/addresses-endpoints.test.ts",
         "apps/mobile/src/addresses/addresses-settings-entry.test.tsx",
         "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
+        "apps/mobile/src/auth/SignInScreen.test.tsx",
         "apps/mobile/src/auth/VerifyScreen.test.tsx",
         "apps/mobile/src/auth/auth-endpoints.test.ts",
         "apps/mobile/src/auth/useAuthGuard.test.tsx",
@@ -30739,6 +30645,7 @@
         "apps/mobile/src/addresses/addresses-endpoints.test.ts",
         "apps/mobile/src/addresses/addresses-settings-entry.test.tsx",
         "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
+        "apps/mobile/src/auth/SignInScreen.test.tsx",
         "apps/mobile/src/auth/VerifyScreen.test.tsx",
         "apps/mobile/src/auth/auth-endpoints.test.ts",
         "apps/mobile/src/auth/useAuthGuard.test.tsx",

@@ -11,11 +11,11 @@ import { AppModule } from '../src/app.module';
 import type { ErrorEnvelope } from '../src/common/errors/error-envelope.types';
 import { parseEnv } from '../src/infra/config/parse-env';
 import { runMigrations } from '../src/infra/database/migrate';
+import type { EmailSender, OutboundEmail } from '../src/infra/email/email-sender.types';
+import { EMAIL_SENDER } from '../src/infra/email/email-sender.types';
 import type { RateLimitConfig, RateLimitPolicy } from '../src/infra/rate-limit/rate-limit.config';
 import { RATE_LIMIT_CONFIG } from '../src/infra/rate-limit/rate-limit.tokens';
 import { RateLimiterService } from '../src/infra/rate-limit/rate-limiter.service';
-import type { OutboundSms, SmsSender } from '../src/infra/sms/sms-sender.types';
-import { SMS_SENDER } from '../src/infra/sms/sms-sender.types';
 import type { OtpConfig } from '../src/modules/auth/otp.config';
 import { hourBucket } from '../src/modules/auth/otp.service';
 import { OTP_CONFIG } from '../src/modules/auth/otp.tokens';
@@ -23,17 +23,17 @@ import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
 
 /**
- * The OTP fraud controls behind the daily cap (#390, ADR-0059), through the
- * real `AppModule` and Redis: the hourly ceiling, the per-prefix and
- * per-range caps, and the circuit breaker on codes entered.
+ * The OTP fraud controls behind the daily cap (#390, ADR-0072 § 4), through
+ * the real `AppModule` and Redis: the hourly ceiling and the circuit breaker
+ * on codes entered. The per-prefix and per-range caps went with the phone
+ * number: they were keyed on its structure, which an email address does not
+ * have.
  *
  * Every per-caller limit is made unreachable, as `auth.otp-global-cap.e2e`
- * does, so a refusal here can only be the control under test. Each test uses
- * its own operator prefix, and the counters are cleared between tests.
+ * does, so a refusal here can only be the control under test. Every test
+ * uses fresh addresses, and the counters are cleared between tests.
  */
 
-const RANGE_CAP = 2;
-const PREFIX_CAP = 4;
 const HOURLY_CAP = 12;
 const BREAKER_MIN_SENDS = 6;
 const BREAKER_MIN_SUCCESS_PERCENT = 50;
@@ -82,55 +82,48 @@ const testOtpConfig: OtpConfig = Object.freeze({
   maxAttempts: 5,
   globalDailyCap: 1_000,
   globalHourlyCap: HOURLY_CAP,
-  prefixHourlyCap: PREFIX_CAP,
-  rangeHourlyCap: RANGE_CAP,
   breakerMinSends: BREAKER_MIN_SENDS,
   breakerMinSuccessPercent: BREAKER_MIN_SUCCESS_PERCENT,
 });
 
-/** Records what was sent, so a test can read the code a number was given. */
-class RecordingSmsSender implements SmsSender {
-  readonly sent: OutboundSms[] = [];
+/** Records what was sent, so a test can read the code an address was given. */
+class RecordingEmailSender implements EmailSender {
+  readonly sent: OutboundEmail[] = [];
 
-  send(message: OutboundSms): Promise<void> {
+  send(message: OutboundEmail): Promise<void> {
     this.sent.push(message);
     return Promise.resolve();
   }
 
-  codeFor(phone: string): string {
-    const message = [...this.sent].reverse().find((candidate) => candidate.to === phone);
-    const code = message?.body.match(/^\d{6}/)?.[0];
+  codeFor(email: string): string {
+    const message = [...this.sent].reverse().find((candidate) => candidate.to === email);
+    const code = message?.text.match(/^\d{6}/)?.[0];
     if (code === undefined) {
-      throw new Error('No code was sent to that number.');
+      throw new Error('No code was sent to that address.');
     }
     return code;
   }
 }
 
-/** Every number this file asked a code for, so its prefix and range counters can be cleared. */
-const used = new Set<string>();
-
 let app: NestFastifyApplication;
 let database: ThrowawayDatabase;
 let originalDatabaseUrl: string | undefined;
-let sms: RecordingSmsSender;
+let mail: RecordingEmailSender;
 let limiter: RateLimiterService;
 let serial = 0;
 
-/** A fresh number in range `+994{op}{range}…`, so a test decides which counters it shares. */
-function phone(operator: string, range: string): string {
+/** A fresh address per call; the controls under test count every address alike. */
+function address(): string {
   serial += 1;
-  const to = `+994${operator}${range}${String(serial % 10_000).padStart(4, '0')}`;
-  used.add(to);
-  return to;
+  return `fraud-${String(serial)}@example.com`;
 }
 
 function requestCode(to: string) {
-  return request(app.getHttpServer()).post('/auth/otp/request').send({ phone: to });
+  return request(app.getHttpServer()).post('/auth/otp/request').send({ email: to });
 }
 
 function verify(to: string, code: string) {
-  return request(app.getHttpServer()).post('/auth/otp/verify').send({ phone: to, code });
+  return request(app.getHttpServer()).post('/auth/otp/verify').send({ email: to, code });
 }
 
 function expectGenericRefusal(response: request.Response): void {
@@ -139,9 +132,8 @@ function expectGenericRefusal(response: request.Response): void {
 }
 
 /**
- * Drops every #390 counter for this hour and the last: the platform-wide ones
- * by hour, and each used number's prefix and range — the subjects
- * `OtpService` builds, spelled the same way.
+ * Drops every #390 counter for this hour and the last — all platform-wide,
+ * keyed by hour, spelled the way `OtpService` builds them.
  */
 async function clearCounters(): Promise<void> {
   const now = new Date();
@@ -156,13 +148,8 @@ async function clearCounters(): Promise<void> {
     ]) {
       clears.push(limiter.clearAttempts(scope, hour));
     }
-    for (const to of used) {
-      clears.push(limiter.clearAttempts('otp-prefix-hourly', `${hour}|${to.slice(0, 6)}`));
-      clears.push(limiter.clearAttempts('otp-range-hourly', `${hour}|${to.slice(0, 9)}`));
-    }
   }
   await Promise.all(clears);
-  used.clear();
 }
 
 beforeAll(async () => {
@@ -176,21 +163,21 @@ beforeAll(async () => {
     .useValue(testRateLimits)
     .overrideProvider(OTP_CONFIG)
     .useValue(testOtpConfig)
-    .overrideProvider(SMS_SENDER)
-    .useValue(new RecordingSmsSender())
+    .overrideProvider(EMAIL_SENDER)
+    .useValue(new RecordingEmailSender())
     .compile();
   app = moduleRef.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
   await app.init();
   await app.getHttpAdapter().getInstance().ready();
 
-  sms = app.get<RecordingSmsSender>(SMS_SENDER);
+  mail = app.get<RecordingEmailSender>(EMAIL_SENDER);
   limiter = app.get(RateLimiterService);
 }, 60_000);
 
 afterEach(async () => {
   vi.restoreAllMocks();
   await clearCounters();
-  sms.sent.length = 0;
+  mail.sent.length = 0;
 });
 
 afterAll(async () => {
@@ -203,79 +190,48 @@ afterAll(async () => {
   await database.drop();
 });
 
-describe('the per-range cap (#390)', () => {
-  it('refuses a third number in one range of ten thousand, and still sends to the next range', async () => {
-    const first = await requestCode(phone('50', '100'));
-    const second = await requestCode(phone('50', '100'));
-    const third = phone('50', '100');
-    const refused = await requestCode(third);
-
-    expect([first.status, second.status]).toEqual([200, 200]);
-    expectGenericRefusal(refused);
-    expect(sms.sent.map((message) => message.to)).not.toContain(third);
-
-    expect((await requestCode(phone('50', '101'))).status).toBe(200);
-  });
-});
-
-describe('the per-prefix cap (#390)', () => {
-  it('refuses past the cap on one operator prefix, across its ranges, and not on another', async () => {
-    for (let range = 0; range < PREFIX_CAP; range += 1) {
-      expect((await requestCode(phone('51', `20${String(range)}`))).status).toBe(200);
-    }
-
-    expectGenericRefusal(await requestCode(phone('51', '209')));
-    expect((await requestCode(phone('55', '200'))).status).toBe(200);
-  });
-});
-
 describe('the hourly ceiling (#390)', () => {
-  it('refuses past the hourly cap however the numbers are spread, and logs it once without a number', async () => {
+  it('refuses past the hourly cap across distinct addresses, and logs it once without an address', async () => {
     const errors = vi.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);
-    const operators = ['10', '50', '51', '55', '60', '70', '77', '99'];
     for (let i = 0; i < HOURLY_CAP; i += 1) {
-      const operator = operators[i % operators.length] ?? '50';
-      const to = phone(operator, `3${String(i).padStart(2, '0')}`);
+      const to = address();
       expect((await requestCode(to)).status).toBe(200);
       // Real customers enter their codes, which keeps the breaker shut, so
       // the refusal below is the hourly cap's and nothing else's.
-      expect((await verify(to, sms.codeFor(to))).status).toBe(200);
+      expect((await verify(to, mail.codeFor(to))).status).toBe(200);
     }
 
-    const refusedOnce = phone('77', '399');
+    const refusedOnce = address();
     expectGenericRefusal(await requestCode(refusedOnce));
-    expectGenericRefusal(await requestCode(phone('99', '399')));
+    expectGenericRefusal(await requestCode(address()));
+    expect(mail.sent.map((message) => message.to)).not.toContain(refusedOnce);
 
     const lines = errors.mock.calls.map((call) => String(call[0]));
     expect(lines.filter((line) => line.includes('otp-global-hourly cap reached'))).toHaveLength(1);
-    expect(lines.join('\n')).not.toContain(refusedOnce.slice(4));
+    expect(lines.join('\n')).not.toContain(refusedOnce);
   });
 });
 
 describe('the circuit breaker (#390)', () => {
-  /** Requests a code for each of `count` numbers spread across prefixes and ranges. */
-  async function send(count: number, offset: number): Promise<string[]> {
-    const operators = ['10', '50', '51', '55', '60', '70'];
-    const phones: string[] = [];
+  /** Requests a code for each of `count` fresh addresses. */
+  async function send(count: number): Promise<string[]> {
+    const emails: string[] = [];
     for (let i = 0; i < count; i += 1) {
-      const to = phone(
-        operators[(i + offset) % operators.length] ?? '50',
-        `4${String(i + offset).padStart(2, '0')}`,
-      );
+      const to = address();
       expect((await requestCode(to)).status).toBe(200);
-      phones.push(to);
+      emails.push(to);
     }
-    return phones;
+    return emails;
   }
 
-  it('opens when too few sent codes are entered, refusing every number, and says so once', async () => {
+  it('opens when too few sent codes are entered, refusing every address, and says so once', async () => {
     const errors = vi.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);
-    await send(BREAKER_MIN_SENDS, 0);
+    await send(BREAKER_MIN_SENDS);
 
-    const blocked = phone('99', '499');
+    const blocked = address();
     expectGenericRefusal(await requestCode(blocked));
-    expectGenericRefusal(await requestCode(phone('77', '499')));
-    expect(sms.sent.map((message) => message.to)).not.toContain(blocked);
+    expectGenericRefusal(await requestCode(address()));
+    expect(mail.sent.map((message) => message.to)).not.toContain(blocked);
 
     const opened = errors.mock.calls
       .map((call) => String(call[0]))
@@ -285,17 +241,17 @@ describe('the circuit breaker (#390)', () => {
   });
 
   it('stays closed while enough codes are entered', async () => {
-    const phones = await send(BREAKER_MIN_SENDS, 20);
-    for (const to of phones.slice(0, BREAKER_MIN_SENDS / 2)) {
-      expect((await verify(to, sms.codeFor(to))).status).toBe(200);
+    const emails = await send(BREAKER_MIN_SENDS);
+    for (const to of emails.slice(0, BREAKER_MIN_SENDS / 2)) {
+      expect((await verify(to, mail.codeFor(to))).status).toBe(200);
     }
 
-    expect((await requestCode(phone('99', '450'))).status).toBe(200);
+    expect((await requestCode(address())).status).toBe(200);
   });
 
   it('stays closed below its minimum sample, however few codes were entered', async () => {
-    await send(BREAKER_MIN_SENDS - 1, 40);
+    await send(BREAKER_MIN_SENDS - 1);
 
-    expect((await requestCode(phone('99', '470'))).status).toBe(200);
+    expect((await requestCode(address())).status).toBe(200);
   });
 });

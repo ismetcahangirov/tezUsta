@@ -15,8 +15,8 @@ export interface AdminCustomerSummary {
   /** The customer profile id. */
   readonly id: string;
   readonly displayName: string;
-  /** `+994 •• ••• •• 67`. The full number is a separate, audited reveal. */
-  readonly phoneMasked: string;
+  /** `a•••@gmail.com`. The full address is a separate, audited reveal. */
+  readonly emailMasked: string;
   readonly status: AdminAccountStatus;
   readonly createdAt: string;
   /** Every order but drafts. */

@@ -34,10 +34,10 @@ import { createThrowawayDatabase } from './support/throwaway-database';
  * (that is `reviews.e2e.test.ts`).
  */
 
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99450${String(phoneCounter).padStart(7, '0')}`;
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
 interface Person {
@@ -77,7 +77,7 @@ describe('ratings exposed to the counterpart (issue #225)', () => {
   }
 
   async function person(roles: { customer?: boolean; master?: boolean }): Promise<Person> {
-    const created = await app.get(UsersRepository).create({ phoneE164: nextPhone(), roles: [] });
+    const created = await app.get(UsersRepository).create({ email: nextEmail(), roles: [] });
     const pair = await app.get(SessionsService).startSession({ userId: created.user.id });
     let customerId: string | undefined;
     let masterId: string | undefined;

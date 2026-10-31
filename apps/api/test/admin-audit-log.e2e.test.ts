@@ -26,7 +26,7 @@ describe('GET /admin/audit-log (issue #243)', () => {
   let pool: Pool;
   let admins: AdminRepository;
   const originalDatabaseUrl = process.env.DATABASE_URL;
-  let phoneCounter = 0;
+  let emailCounter = 0;
 
   async function newAdmin(roles: readonly AdminRole[]) {
     const created = await admins.createAdmin({
@@ -49,10 +49,10 @@ describe('GET /admin/audit-log (issue #243)', () => {
   }
 
   async function activeMaster(): Promise<string> {
-    phoneCounter += 1;
+    emailCounter += 1;
     const user = await pool.query<{ id: string }>(
-      `insert into users (id, phone_e164, status) values (gen_random_uuid(), $1, 'active') returning id`,
-      [`+99455${String(phoneCounter).padStart(7, '0')}`],
+      `insert into users (id, email, status) values (gen_random_uuid(), $1, 'active') returning id`,
+      [`master-${String(emailCounter)}@example.com`],
     );
     const master = await pool.query<{ id: string }>(
       `insert into masters (id, user_id, display_name, verification_status)

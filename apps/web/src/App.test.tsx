@@ -101,7 +101,7 @@ describe('signing in (ADR-0061 § 2)', () => {
 
     const { user } = renderApp('/');
 
-    await user.type(await screen.findByLabelText(copy.signIn.phone), '050 123 45 67');
+    await user.type(await screen.findByLabelText(copy.signIn.email), '  usta@example.com ');
     await user.click(screen.getByRole('button', { name: copy.signIn.sendCode }));
     expect(await screen.findByText(copy.signIn.codeSent)).toBeInTheDocument();
 
@@ -110,11 +110,39 @@ describe('signing in (ADR-0061 § 2)', () => {
 
     expect(await screen.findByText(copy.subscription.status.active)).toBeInTheDocument();
     expect(server.calls('POST', '/api/web/auth/otp/request')[0]?.body).toEqual({
-      phone: '050 123 45 67',
+      email: 'usta@example.com',
     });
     expect(server.calls('POST', '/api/web/auth/otp/verify')[0]?.body).toEqual({
-      phone: '050 123 45 67',
+      email: 'usta@example.com',
       code: '123456',
+    });
+  });
+
+  it('asks again for an address that is not shaped like one, without sending it', async () => {
+    const server = installFakeServer();
+    server.on('GET', SUBSCRIPTION, apiError(401, 'UNAUTHORIZED'));
+    server.on('GET', OFFER, apiError(401, 'UNAUTHORIZED'));
+    server.on('POST', '/api/web/auth/refresh', apiError(401, 'UNAUTHORIZED'));
+    server.on('POST', '/api/web/auth/otp/request', {
+      status: 200,
+      body: { expiresInSeconds: 300 },
+    });
+
+    const { user } = renderApp('/');
+    const field = await screen.findByLabelText(copy.signIn.email);
+    await user.type(field, 'usta@example');
+    await user.click(screen.getByRole('button', { name: copy.signIn.sendCode }));
+
+    expect(await screen.findByText(copy.signIn.invalidEmail)).toBeInTheDocument();
+    expect(field).toHaveAttribute('aria-invalid', 'true');
+    expect(server.calls('POST', '/api/web/auth/otp/request')).toHaveLength(0);
+
+    await user.type(field, '.com');
+    expect(screen.queryByText(copy.signIn.invalidEmail)).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: copy.signIn.sendCode }));
+    expect(await screen.findByText(copy.signIn.codeSent)).toBeInTheDocument();
+    expect(server.calls('POST', '/api/web/auth/otp/request')[0]?.body).toEqual({
+      email: 'usta@example.com',
     });
   });
 
@@ -133,7 +161,7 @@ describe('signing in (ADR-0061 § 2)', () => {
     }
   });
 
-  it('says a wrong code is wrong, the same way for any phone', async () => {
+  it('says a wrong code is wrong, the same way for any address', async () => {
     const server = installFakeServer();
     server.on('GET', SUBSCRIPTION, apiError(401, 'UNAUTHORIZED'));
     server.on('GET', OFFER, apiError(401, 'UNAUTHORIZED'));
@@ -145,7 +173,7 @@ describe('signing in (ADR-0061 § 2)', () => {
     server.on('POST', '/api/web/auth/otp/verify', apiError(401, 'UNAUTHORIZED'));
 
     const { user } = renderApp('/');
-    await user.type(await screen.findByLabelText(copy.signIn.phone), '0501234567');
+    await user.type(await screen.findByLabelText(copy.signIn.email), 'usta@example.com');
     await user.click(screen.getByRole('button', { name: copy.signIn.sendCode }));
     await user.type(await screen.findByLabelText(copy.signIn.code), '000000');
     await user.click(screen.getByRole('button', { name: copy.signIn.verify }));
@@ -160,7 +188,7 @@ describe('signing in (ADR-0061 § 2)', () => {
     const { user } = renderApp('/');
     await user.click(await screen.findByRole('button', { name: copy.subscription.signOut }));
 
-    expect(await screen.findByLabelText(copy.signIn.phone)).toBeInTheDocument();
+    expect(await screen.findByLabelText(copy.signIn.email)).toBeInTheDocument();
     expect(server.calls('POST', '/api/web/auth/sign-out')).toHaveLength(1);
   });
 });

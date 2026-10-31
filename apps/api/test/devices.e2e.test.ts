@@ -30,11 +30,11 @@ import { createThrowawayDatabase } from './support/throwaway-database';
  * a mocked repository would assert the mock rather than the constraint.
  */
 
-/** `users.phone_e164` is unique among live rows — see `addresses.e2e.test.ts`. */
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99477${String(phoneCounter).padStart(7, '0')}`;
+/** `users.email` is unique among live rows — see `addresses.e2e.test.ts`. */
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
 /** A syntactically valid but never-issued uuid — well-formed, guaranteed absent. */
@@ -98,8 +98,8 @@ describe('device registry endpoints over HTTP (issue #140)', () => {
   }
 
   async function signIn(): Promise<SignedIn> {
-    const phoneE164 = nextPhone();
-    const created = await usersRepo.create({ phoneE164, roles: [] });
+    const email = nextEmail();
+    const created = await usersRepo.create({ email, roles: [] });
     const pair = await sessionsService.startSession({ userId: created.user.id });
     expect(tokens.verifyAccessToken(pair.accessToken).sub).toBe(created.user.id);
     return { userId: created.user.id, accessToken: pair.accessToken };

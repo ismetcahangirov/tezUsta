@@ -22,8 +22,8 @@ a mandatory TOTP second factor**, against a distinct `admin_users` table with no
 overlap with `users`. Sessions refresh for 8 hours, idle out after 30 minutes,
 and live in an httpOnly cookie rather than a bearer token, because the admin
 panel is a browser application and a cookie closes the XSS token-theft path. An
-admin credential cannot sign in to the mobile app and a phone OTP cannot sign in
-here.
+admin credential cannot sign in to the mobile app and an emailed OTP cannot sign
+in here.
 
 The split across Epics matters: **the `admin` role and its guard ship in EPIC
 2**, with the rest of authorization, so that admin endpoints written in EPIC 3, 5
@@ -177,14 +177,15 @@ change carries a reason and is audited in the same transaction.
 
 The **Customers** page (#328,
 [ADR-0050](../decisions/ADR-0050-admin-customer-accounts.md)) finds a customer
-by a name prefix, by their id, or by a **whole** phone number. Part of a number
-finds nobody. Every role can read it. `customers.suspend` (moderator and
+by a name prefix, by their id, or by a **whole** email address. Part of an
+address finds nobody
+([ADR-0072](../decisions/ADR-0072-email-one-time-code-sign-in.md) § 5). Every role can read it. `customers.suspend` (moderator and
 super_admin) can suspend and reinstate.
 
 - **The file** shows the profile, the order counts, the saved addresses and the
   order history. Addresses are listed by their label only, because no district
-  is stored. Opening the file is audited. The phone number is masked; revealing
-  it needs `pii.read` and a reason, and is audited.
+  is stored. Opening the file is audited. The email address is masked;
+  revealing it needs `pii.read` and a reason, and is audited.
 - **A suspension belongs to the account.** It signs the person out everywhere,
   refuses their next request, and cancels their orders still searching for a
   master. Orders a master already holds are not touched. They are listed for
@@ -227,13 +228,14 @@ These constrain the schema and must hold from the first admin endpoint:
    timeout, and a **mandatory** TOTP second factor
    ([ADR-0014](../decisions/ADR-0014-admin-authentication.md)). An admin account
    can suspend a master, resolve a dispute, and read personal data across the
-   whole platform; binding that to an SMS OTP would make a SIM swap a
-   platform-wide compromise.
+   whole platform; binding that to a single emailed code would make one
+   compromised mailbox a platform-wide compromise (ADR-0014 made the same
+   argument about SMS and SIM swap).
 3. **Least privilege.** Not every staff member needs refunds or PII access.
    Granularity is **OPEN**, but the schema must not assume a single `is_admin`
    boolean — that assumption is expensive to unwind.
-4. **PII access is logged and minimised.** Viewing a customer's address or phone
-   number is an event worth recording.
+4. **PII access is logged and minimised.** Viewing a customer's address or email
+   address is an event worth recording.
 5. **No destructive deletes.** Admin actions soft-delete or supersede. Order
    history, payments, and reviews stay accountable.
 6. **Admin endpoints are a separate, separately-guarded surface** — never a

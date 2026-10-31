@@ -68,10 +68,10 @@ import { createThrowawayDatabase } from './support/throwaway-database';
  * dispatch can assign one, which is a different Epic's test to own.
  */
 
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99457${String(phoneCounter).padStart(7, '0')}`;
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
 /** A syntactically valid but never-issued uuid — well-formed, guaranteed absent. */
@@ -349,7 +349,7 @@ describe('order problem photos over HTTP (issue #83)', () => {
   }
 
   async function signIn(): Promise<SignedIn> {
-    const created = await usersRepo.create({ phoneE164: nextPhone(), roles: [] });
+    const created = await usersRepo.create({ email: nextEmail(), roles: [] });
     const pair = await sessionsService.startSession({ userId: created.user.id });
     expect(tokens.verifyAccessToken(pair.accessToken).sub).toBe(created.user.id);
     return { userId: created.user.id, accessToken: pair.accessToken };

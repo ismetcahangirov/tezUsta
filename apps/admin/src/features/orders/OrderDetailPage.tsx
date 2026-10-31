@@ -14,7 +14,7 @@ import { type OrderParty, ordersApi, useOrderDetailQuery, useOrderTranscriptQuer
 import { ordersCopy } from './copy';
 import { OrderStatusBadge } from './OrderStatusBadge';
 import { OverrideDialog } from './OverrideDialog';
-import { RevealPhoneDialog } from './RevealPhoneDialog';
+import { RevealEmailDialog } from './RevealEmailDialog';
 import { OVERRIDE_PERMISSIONS, shortOrderId } from './rules';
 
 /** Where an inspection price stands (ADR-0060): not quoted, awaiting, approved or declined. */
@@ -289,19 +289,19 @@ function PartyCard({
           <p className="text-body-strong text-text">{person.displayName}</p>
           <div className="flex flex-wrap items-center gap-3">
             <span className="font-mono text-body text-text">
-              {person.phoneMasked === '' ? ordersCopy.noPhone : person.phoneMasked}
+              {person.emailMasked === '' ? ordersCopy.noEmail : person.emailMasked}
             </span>
-            {me.permissions.includes('pii.read') && person.phoneMasked !== '' && (
+            {me.permissions.includes('pii.read') && person.emailMasked !== '' && (
               <Button
-                label={ordersCopy.revealNumber}
-                aria-label={`${ordersCopy.revealNumber}: ${label}`}
+                label={ordersCopy.revealEmail}
+                aria-label={`${ordersCopy.revealEmail}: ${label}`}
                 variant="secondary"
                 onClick={() => setRevealing(true)}
               />
             )}
           </div>
           {revealing && (
-            <RevealPhoneDialog
+            <RevealEmailDialog
               orderId={orderId}
               party={party}
               name={person.displayName}

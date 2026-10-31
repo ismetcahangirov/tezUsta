@@ -68,7 +68,7 @@ logic error.
 feat(order): add order creation endpoint with address validation
 fix(matching): prevent double assignment under concurrent accept
 perf(location): add GiST index for nearby-master radius query
-security(auth): rate-limit OTP requests per phone number
+security(auth): rate-limit OTP requests per email address
 test(order): cover invalid state machine transitions
 docs(architecture): document realtime location budget
 chore(repo): initialize engineering foundation

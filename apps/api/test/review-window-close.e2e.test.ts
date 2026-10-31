@@ -41,10 +41,10 @@ import { createThrowawayDatabase } from './support/throwaway-database';
  * schedules the job is asserted through the real transition endpoint.
  */
 
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99455${String(phoneCounter).padStart(7, '0')}`;
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
 const WINDOW_HOURS = 2;
@@ -84,7 +84,7 @@ describe('the review window closing (issue #223)', () => {
   }
 
   async function party(role: 'customers' | 'masters'): Promise<Party> {
-    const created = await app.get(UsersRepository).create({ phoneE164: nextPhone(), roles: [] });
+    const created = await app.get(UsersRepository).create({ email: nextEmail(), roles: [] });
     const pair = await app.get(SessionsService).startSession({ userId: created.user.id });
     const profile = await http('post', `/${role}`, pair.accessToken).send({ displayName: 'Ad' });
     expect(profile.status).toBe(201);

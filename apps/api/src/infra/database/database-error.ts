@@ -13,8 +13,8 @@
  * Two consequences, one per issue this module exists for:
  *
  * - The message — and therefore `stack`, which begins with it — interpolates
- *   every bound parameter. On the authentication path those are phone
- *   numbers, which CLAUDE.md §11 forbids logging (issue #63).
+ *   every bound parameter. On the authentication path those are email
+ *   addresses, which CLAUDE.md §11 forbids logging (issue #63).
  * - The driver's SQLSTATE is no longer on the thrown error. It is on
  *   `cause`, so a `catch` that matched `error.code === '23505'` on the
  *   throwable itself stopped matching the day the wrapper appeared, and the
@@ -43,7 +43,7 @@ const MAX_CAUSE_DEPTH = 8;
  *
  * Everything omitted is omitted on purpose, and the omissions are the point:
  *
- * - `detail` reads `Key (phone_e164)=(+994...) already exists.` on a unique
+ * - `detail` reads `Key (email)=(ali@example.com) already exists.` on a unique
  *   violation — the bound value, verbatim.
  * - `message` echoes the offending literal on a cast failure
  *   (`invalid input syntax for type uuid: "..."`).
@@ -203,7 +203,7 @@ function stackFrames(error: unknown): string | undefined {
  * that is not a database error loses any detail to this module.
  *
  * The SQL text is included and the parameters are not, which is the whole
- * shape of the answer: `insert into "users" ("phone_e164") values ($1)` says
+ * shape of the answer: `insert into "users" ("email") values ($1)` says
  * which statement failed without saying whose number it failed on. Drizzle
  * always binds values as parameters rather than interpolating them, so the
  * text it hands over carries placeholders only.

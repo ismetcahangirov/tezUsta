@@ -73,9 +73,9 @@ describe('the master subscription (issue #322)', () => {
   async function seedMaster(): Promise<string> {
     const userId = randomUUID();
     const masterId = randomUUID();
-    await pool.query('insert into users (id, phone_e164) values ($1, $2)', [
+    await pool.query('insert into users (id, email) values ($1, $2)', [
       userId,
-      `+99450${String(Math.floor(Math.random() * 10_000_000)).padStart(7, '0')}`,
+      `master-${randomUUID()}@example.com`,
     ]);
     await pool.query(
       `insert into masters (id, user_id, display_name, verification_status)

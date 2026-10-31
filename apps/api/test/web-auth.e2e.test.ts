@@ -14,9 +14,9 @@ import { BILLING_PROVIDER } from '../src/infra/billing/billing.types';
 import type { StubBillingProvider } from '../src/infra/billing/stub-billing.provider';
 import { parseEnv } from '../src/infra/config/parse-env';
 import { runMigrations } from '../src/infra/database/migrate';
-import type { OutboundSms, SmsSender } from '../src/infra/sms/sms-sender.types';
-import { SMS_SENDER } from '../src/infra/sms/sms-sender.types';
-import { StubSmsSender } from '../src/infra/sms/stub-sms-sender';
+import type { EmailSender, OutboundEmail } from '../src/infra/email/email-sender.types';
+import { EMAIL_SENDER } from '../src/infra/email/email-sender.types';
+import { StubEmailSender } from '../src/infra/email/stub-email-sender';
 import { SessionsService } from '../src/modules/auth/sessions.service';
 import { UsersRepository } from '../src/modules/users/users.repository';
 import type { ThrowawayDatabase } from './support/throwaway-database';
@@ -28,7 +28,7 @@ import { createThrowawayDatabase } from './support/throwaway-database';
  *
  * What is asserted is the boundary the ADR draws:
  *
- * - only an active master is ever texted, and every phone gets the same answer;
+ * - only an active master is ever mailed a code, and every address gets the same answer;
  * - a verified code opens a `web` session, in httpOnly cookies, never a body token;
  * - the web cookie reaches the `@WebSurface()` routes with the CSRF header,
  *   and nothing else;
@@ -39,38 +39,38 @@ import { createThrowawayDatabase } from './support/throwaway-database';
 
 const CSRF = { 'x-tezusta-web': '1' };
 
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99455${String(phoneCounter).padStart(7, '0')}`;
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
-class CapturingSmsSender implements SmsSender {
-  readonly sent: OutboundSms[] = [];
+class CapturingEmailSender implements EmailSender {
+  readonly sent: OutboundEmail[] = [];
 
-  constructor(private readonly inner: SmsSender) {}
+  constructor(private readonly inner: EmailSender) {}
 
-  async send(message: OutboundSms): Promise<void> {
+  async send(message: OutboundEmail): Promise<void> {
     this.sent.push(message);
     await this.inner.send(message);
   }
 
-  to(phoneE164: string): OutboundSms[] {
-    return this.sent.filter((message) => message.to === phoneE164);
+  to(email: string): OutboundEmail[] {
+    return this.sent.filter((message) => message.to === email);
   }
 
-  lastCodeFor(phoneE164: string): string {
-    const message = this.to(phoneE164).at(-1);
-    const match = message === undefined ? null : /\d{4,12}/.exec(message.body);
+  lastCodeFor(email: string): string {
+    const message = this.to(email).at(-1);
+    const match = message === undefined ? null : /\d{4,12}/.exec(message.text);
     if (match === null) {
-      throw new Error(`No code was texted to ${phoneE164}.`);
+      throw new Error(`No code was mailed to ${email}.`);
     }
     return match[0];
   }
 }
 
 interface Master {
-  readonly phone: string;
+  readonly email: string;
   readonly userId: string;
   readonly masterId: string;
   /** The app's bearer token, for the app-side assertions. */
@@ -87,7 +87,7 @@ describe('the web subscription page sign-in (ADR-0061)', () => {
   let app: NestFastifyApplication;
   let database: ThrowawayDatabase;
   let pool: Pool;
-  let sms: CapturingSmsSender;
+  let mail: CapturingEmailSender;
   let stub: StubBillingProvider;
   let usersRepo: UsersRepository;
   let sessions: SessionsService;
@@ -103,8 +103,8 @@ describe('the web subscription page sign-in (ADR-0061)', () => {
   }
 
   async function seedMaster(verification = 'active'): Promise<Master> {
-    const phone = nextPhone();
-    const created = await usersRepo.create({ phoneE164: phone, roles: [] });
+    const email = nextEmail();
+    const created = await usersRepo.create({ email, roles: [] });
     const appToken = (await sessions.startSession({ userId: created.user.id })).accessToken;
     const profile = await http()
       .post('/masters')
@@ -116,21 +116,21 @@ describe('the web subscription page sign-in (ADR-0061)', () => {
       masterId,
       verification,
     ]);
-    return { phone, userId: created.user.id, masterId, appToken };
+    return { email, userId: created.user.id, masterId, appToken };
   }
 
   async function seedCustomer(): Promise<string> {
-    const phone = nextPhone();
-    await usersRepo.create({ phoneE164: phone, roles: ['customer'] });
-    return phone;
+    const email = nextEmail();
+    await usersRepo.create({ email, roles: ['customer'] });
+    return email;
   }
 
-  function requestCode(phone: string) {
-    return http().post('/web/auth/otp/request').send({ phone });
+  function requestCode(email: string) {
+    return http().post('/web/auth/otp/request').send({ email });
   }
 
-  function verify(phone: string, code: string, headers: Record<string, string> = CSRF) {
-    return http().post('/web/auth/otp/verify').set(headers).send({ phone, code });
+  function verify(email: string, code: string, headers: Record<string, string> = CSRF) {
+    return http().post('/web/auth/otp/verify').set(headers).send({ email, code });
   }
 
   function cookiesOf(response: request.Response): WebCookies {
@@ -141,8 +141,8 @@ describe('the web subscription page sign-in (ADR-0061)', () => {
   }
 
   async function signInOnWeb(master: Master): Promise<WebCookies> {
-    expect((await requestCode(master.phone)).status).toBe(200);
-    const response = await verify(master.phone, sms.lastCodeFor(master.phone));
+    expect((await requestCode(master.email)).status).toBe(200);
+    const response = await verify(master.email, mail.lastCodeFor(master.email));
     expect(response.status).toBe(200);
     return cookiesOf(response);
   }
@@ -166,14 +166,14 @@ describe('the web subscription page sign-in (ADR-0061)', () => {
     set('REFRESH_RATE_LIMIT_PER_IP_HOUR', '9000');
 
     const moduleRef = await Test.createTestingModule({ imports: [AppModule] })
-      .overrideProvider(SMS_SENDER)
-      .useValue(new CapturingSmsSender(new StubSmsSender('test')))
+      .overrideProvider(EMAIL_SENDER)
+      .useValue(new CapturingEmailSender(new StubEmailSender('test')))
       .compile();
     app = moduleRef.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
     await app.init();
     await app.getHttpAdapter().getInstance().ready();
 
-    sms = app.get<CapturingSmsSender>(SMS_SENDER);
+    mail = app.get<CapturingEmailSender>(EMAIL_SENDER);
     stub = app.get<StubBillingProvider>(BILLING_PROVIDER);
     usersRepo = app.get(UsersRepository);
     sessions = app.get(SessionsService);
@@ -213,52 +213,52 @@ describe('the web subscription page sign-in (ADR-0061)', () => {
     }
   });
 
-  describe('who is texted', () => {
-    it('texts an active master, and gives every other phone the same answer and no SMS', async () => {
+  describe('who is mailed a code', () => {
+    it('mails an active master, and gives every other address the same answer and no email', async () => {
       const master = await seedMaster();
       const customer = await seedCustomer();
-      const stranger = nextPhone();
+      const stranger = nextEmail();
 
       const answers = [];
-      for (const phone of [master.phone, customer, stranger]) {
-        const response = await requestCode(phone);
+      for (const email of [master.email, customer, stranger]) {
+        const response = await requestCode(email);
         expect(response.status).toBe(200);
         answers.push(response.body as unknown);
       }
 
       expect(answers[1]).toStrictEqual(answers[0]);
       expect(answers[2]).toStrictEqual(answers[0]);
-      expect(sms.to(master.phone)).toHaveLength(1);
-      expect(sms.to(customer)).toHaveLength(0);
-      expect(sms.to(stranger)).toHaveLength(0);
+      expect(mail.to(master.email)).toHaveLength(1);
+      expect(mail.to(customer)).toHaveLength(0);
+      expect(mail.to(stranger)).toHaveLength(0);
     });
 
-    it('creates no account for a phone it has never seen', async () => {
-      const stranger = nextPhone();
+    it('creates no account for an address it has never seen', async () => {
+      const stranger = nextEmail();
       await requestCode(stranger);
       const refused = await verify(stranger, '000000');
 
       expect(refused.status).toBe(401);
-      const { rows } = await pool.query('select 1 from users where phone_e164 = $1', [stranger]);
+      const { rows } = await pool.query('select 1 from users where email = $1', [stranger]);
       expect(rows).toHaveLength(0);
     });
 
     it('refuses a customer exactly as it refuses a wrong code, even with a code the app sent', async () => {
       const master = await seedMaster();
-      await requestCode(master.phone);
-      const wrong = await verify(master.phone, '000000');
+      await requestCode(master.email);
+      const wrong = await verify(master.email, '000000');
 
       const customer = await seedCustomer();
       // A code the app path issued for the customer's own sign-in.
-      expect((await http().post('/auth/otp/request').send({ phone: customer })).status).toBe(200);
-      const refused = await verify(customer, sms.lastCodeFor(customer));
+      expect((await http().post('/auth/otp/request').send({ email: customer })).status).toBe(200);
+      const refused = await verify(customer, mail.lastCodeFor(customer));
 
       expect(refused.status).toBe(wrong.status);
       expect(codeOf(refused)).toBe(codeOf(wrong));
       // Not consumed: the customer can still sign in to the app with it.
       const app = await http()
         .post('/auth/otp/verify')
-        .send({ phone: customer, code: sms.lastCodeFor(customer) });
+        .send({ email: customer, code: mail.lastCodeFor(customer) });
       expect(app.status).toBe(200);
     });
   });
@@ -266,8 +266,8 @@ describe('the web subscription page sign-in (ADR-0061)', () => {
   describe('the web session', () => {
     it('is two httpOnly, SameSite=Strict cookies and no token in the body, on a web session row', async () => {
       const master = await seedMaster();
-      await requestCode(master.phone);
-      const response = await verify(master.phone, sms.lastCodeFor(master.phone));
+      await requestCode(master.email);
+      const response = await verify(master.email, mail.lastCodeFor(master.email));
 
       expect(response.status).toBe(200);
       const body = response.body as WebSession;
@@ -295,11 +295,11 @@ describe('the web subscription page sign-in (ADR-0061)', () => {
 
     it('refuses a sign-in without the CSRF header, and consumes nothing', async () => {
       const master = await seedMaster();
-      await requestCode(master.phone);
-      const code = sms.lastCodeFor(master.phone);
+      await requestCode(master.email);
+      const code = mail.lastCodeFor(master.email);
 
-      expect((await verify(master.phone, code, {})).status).toBe(403);
-      expect((await verify(master.phone, code)).status).toBe(200);
+      expect((await verify(master.email, code, {})).status).toBe(403);
+      expect((await verify(master.email, code)).status).toBe(200);
     });
 
     it('reaches the subscription routes, with the CSRF header and only with it', async () => {

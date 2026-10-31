@@ -21,7 +21,7 @@ const DURATION_PATTERN = /^\d+(ms|s|m|h|d)$/;
 
 /**
  * `.env.example` uses an empty string as the placeholder for "not configured
- * yet" (`S3_ENDPOINT=`, `SMS_API_KEY=`, …), and a real `.env` file produced by
+ * yet" (`S3_ENDPOINT=`, …), and a real `.env` file produced by
  * copying it keeps that convention. Treat an empty string exactly like an
  * absent variable everywhere, so "unset" and "set to empty" behave
  * identically instead of empty silently failing a `.min()` check meant for a
@@ -215,7 +215,7 @@ function nonNegativeInt(defaultValue: number): z.ZodType<number> {
  *
  * `positiveInt` is the right tool for a pool size or a radius, where "very
  * large" is a bad idea an operator finds out about. It is the wrong tool for
- * a rate limit: `OTP_RATE_LIMIT_PER_PHONE_HOUR=1000000` passes every shape
+ * a rate limit: `OTP_RATE_LIMIT_PER_EMAIL_HOUR=1000000` passes every shape
  * check, boots cleanly, reports nothing, and leaves the endpoint ADR-0008
  * calls a **financial** control completely unthrottled. The same typo in the
  * other direction (`0`) is the case `docs/engineering/security.md`
@@ -403,7 +403,7 @@ export const rawEnvSchema = z
 
     // --- Object storage (ADR-0005, ADR-0024) — required by EPIC 5/6 -------
     // Defaults to `stub` for the same reason `MAPS_PROVIDER` and
-    // `SMS_PROVIDER` do: a clone of this repository runs, and its tests pass,
+    // `EMAIL_PROVIDER` do: a clone of this repository runs, and its tests pass,
     // with no storage account. The stub refuses to construct under
     // NODE_ENV=production, so the default cannot quietly ship.
     STORAGE_PROVIDER: z.preprocess(emptyToUndefined, z.enum(['s3', 'stub']).default('stub')),
@@ -694,7 +694,7 @@ export const rawEnvSchema = z
 
     // --- Maps & geocoding (ADR-0004) ---------------------------------------
     // Defaults to `stub` so a clone of this repository runs, and its tests
-    // pass, with no billing account and no key — the same shape `SMS_PROVIDER`
+    // pass, with no billing account and no key — the same shape `EMAIL_PROVIDER`
     // takes. The stub refuses to construct under NODE_ENV=production, so the
     // default cannot quietly ship.
     MAPS_PROVIDER: z.preprocess(emptyToUndefined, z.enum(['google', 'stub']).default('stub')),
@@ -796,38 +796,12 @@ export const rawEnvSchema = z
      */
     SUBSCRIPTION_RENEWAL_LEAD_HOURS: boundedInt(24, 1, 72),
 
-    // --- SMS / OTP (ADR-0008, ADR-0059) ---------------------------------
-    // Plivo is the primary, Twilio the fallback (ADR-0059). 'stub' stays the
-    // default for development and tests, and refuses production.
-    SMS_PROVIDER: z.preprocess(
-      emptyToUndefined,
-      z.enum(['stub', 'plivo', 'twilio']).default('stub'),
-    ),
-    /**
-     * The provider a send falls back to when the primary errors or times out
-     * (#390). Unset means no fallback. Never the same as `SMS_PROVIDER`.
-     */
-    SMS_FALLBACK_PROVIDER: z.preprocess(emptyToUndefined, z.enum(['plivo', 'twilio']).optional()),
-    /**
-     * The alphanumeric sender the message comes from, `TezUsta` (ADR-0059):
-     * numeric senders fail on Azercell, and generic ones are refused.
-     * Required by a real provider.
-     */
-    SMS_SENDER_ID: z.preprocess(
-      emptyToUndefined,
-      z
-        .string()
-        .regex(/^[A-Za-z0-9]{1,11}$/, 'must be 1–11 letters or digits, the alphanumeric sender')
-        .optional(),
-    ),
-    /** How long one provider call may take before the fallback is tried, in ms. */
-    SMS_TIMEOUT_MS: boundedInt(5_000, 1_000, 30_000),
-    // Plivo's account credentials (ADR-0059). Secrets: never `EXPO_PUBLIC_`.
-    PLIVO_AUTH_ID: optionalString(),
-    PLIVO_AUTH_TOKEN: optionalString(),
-    // Twilio's account credentials (ADR-0059), for the fallback.
-    TWILIO_ACCOUNT_SID: optionalString(),
-    TWILIO_AUTH_TOKEN: optionalString(),
+    // --- Email / OTP (ADR-0072) -------------------------------------------
+    // Sign-in is an email address and a one-time code (ADR-0072). No delivery
+    // provider is chosen yet, so 'stub' is the only value; it is the default
+    // for development and tests, and it refuses production. A real provider
+    // is one adapter in `infra/email/` and one enum member here.
+    EMAIL_PROVIDER: z.preprocess(emptyToUndefined, z.enum(['stub']).default('stub')),
     // The pepper every OTP code is HMAC'd under before it reaches a database
     // row. Optional here and required by the module that needs it (`OtpModule`
     // — see `otp.config.ts`), exactly like the JWT secrets and the rate-limit
@@ -851,7 +825,7 @@ export const rawEnvSchema = z
     // which `positiveInt` could not hold — `OTP_TTL_SECONDS=86400` passed it
     // and left a code redeemable for a day, widening exactly the brute-force
     // and interception window the bound exists to close. The floor is the
-    // other failure: a TTL shorter than the time an SMS takes to arrive means
+    // other failure: a TTL shorter than the time an email takes to arrive means
     // every code expires in flight, and `docs/engineering/security.md`
     // § Environment validation names `OTP_TTL_SECONDS=0` as its example of a
     // range that must be validated.
@@ -860,18 +834,20 @@ export const rawEnvSchema = z
     // keyspace of 10^6, so ten guesses is already 1-in-100,000 per code and
     // anything beyond that stops being a cap; ADR-0008 fixes the value at 5.
     OTP_MAX_ATTEMPTS: boundedInt(5, 1, 10),
-    // 100 SMS per hour to one number is not a rate limit, it is a bill. The
-    // ceiling exists so an extra zero fails the deploy instead of the budget.
-    OTP_RATE_LIMIT_PER_PHONE_HOUR: boundedInt(5, 1, 100),
+    // 100 codes an hour to one address is not a rate limit, it is somebody's
+    // inbox flooded from our sending domain, which is what costs that domain
+    // its reputation. The ceiling exists so an extra zero fails the deploy.
+    OTP_RATE_LIMIT_PER_EMAIL_HOUR: boundedInt(5, 1, 100),
     // Higher, because a carrier NAT legitimately puts many real users behind
     // one address — but still bounded for the same reason.
     OTP_RATE_LIMIT_PER_IP_HOUR: boundedInt(20, 1, 10_000),
     // Platform-wide ceiling on OTP sends per rolling 24h window (issue #272).
-    // The two limits above bound ONE phone number and ONE address; neither
-    // bounds a distributed attacker who spreads requests across many numbers
-    // and many IPs, each comfortably inside its own budget — the exact gap
-    // ADR-0008 § Security requirements calls out ("SMS cost abuse is the
-    // realistic attack here"). This is the aggregate backstop behind both.
+    // The two limits above bound ONE email address and ONE IP; neither
+    // bounds a distributed attacker who spreads requests across many
+    // addresses and many IPs, each comfortably inside its own budget. An
+    // email costs little, but a sending domain that mails thousands of
+    // strangers is soon a sending domain whose mail lands in spam, and then
+    // nobody can sign in (ADR-0072 § 4). This is the aggregate backstop.
     //
     // 2000/day is sized for an early Baku launch, not for scale: refresh
     // tokens rotate for 30 days (ADR-0008), so a signed-in user rarely needs a
@@ -887,30 +863,26 @@ export const rawEnvSchema = z
     // further with a new deploy if the business volume genuinely needs it.
     OTP_GLOBAL_DAILY_CAP: boundedInt(2000, 50, 100_000),
     /**
-     * The fraud controls behind the daily cap (#390, ADR-0059). Each refuses
+     * The fraud controls behind the daily cap (#390, ADR-0072 § 4). Each refuses
      * the send with the same generic delivery failure the daily cap gives, so
      * none of them tells a caller which one it tripped.
      *
      * - An hourly ceiling under the daily one, so a burst cannot spend the
      *   whole day's budget in its first hour.
-     * - Per operator prefix (`+99450`, …) and per range of ten thousand
-     *   numbers (`+99450123….`) per hour: SMS pumping walks adjacent numbers
-     *   on one operator, which per-phone and per-IP limits never see.
      * - A circuit breaker: over the current and previous hour, once at least
      *   `OTP_BREAKER_MIN_SENDS` codes went out, sending stops while fewer than
      *   `OTP_BREAKER_MIN_SUCCESS_PERCENT` of them were entered correctly.
-     *   Pumped numbers never enter their code. **0 turns it off.**
+     *   Codes sent to addresses nobody reads are never entered. **0 turns it
+     *   off.**
      *
      * Launch defaults, the owner's to tune against real traffic.
      */
     OTP_GLOBAL_HOURLY_CAP: boundedInt(300, 10, 100_000),
-    OTP_PREFIX_HOURLY_CAP: boundedInt(150, 5, 100_000),
-    OTP_RANGE_HOURLY_CAP: boundedInt(10, 1, 10_000),
     OTP_BREAKER_MIN_SENDS: boundedInt(50, 10, 100_000),
     OTP_BREAKER_MIN_SUCCESS_PERCENT: boundedInt(20, 0, 100),
 
     // --- Authentication rate limiting (issue #28, ADR-0008) ---------------
-    // The pepper every phone number and IP is hashed under before it becomes
+    // The pepper every email address and IP is hashed under before it becomes
     // a Redis key. Optional here and required by `RateLimitModule`, exactly
     // like the two JWT secrets above: the module that needs a value is the
     // one that fails startup without it.
@@ -1478,7 +1450,7 @@ export const rawEnvSchema = z
      * How long a spent or never-redeemed OTP challenge is kept after its
      * `expires_at` has passed (#276).
      *
-     * `otp_challenges` holds a phone number on every row (ADR-0008) and, until
+     * `otp_challenges` holds an email address on every row (ADR-0072) and, until
      * this sweep, had no job retiring them — `otp_challenges_expires_at_idx`
      * promised one in its own comment since the table was created. The cutoff
      * is `expires_at` alone, never `consumed_at`: a row's own `expires_at` is
@@ -1546,7 +1518,7 @@ export const rawEnvSchema = z
     /**
      * Which push transport delivers.
      *
-     * Unlike `SMS_PROVIDER`, the real provider **exists** — Expo's push
+     * Unlike `EMAIL_PROVIDER`, the real provider **exists** — Expo's push
      * service is decided (`technology-stack.md`), not open. The default is
      * still `stub` for the reason every other provider here defaults to one:
      * a clone of this repository runs, and its tests pass, with no Expo
@@ -1630,7 +1602,7 @@ export const rawEnvSchema = z
      * Which call media server mints join tokens and answers for rooms.
      *
      * LiveKit is **decided** (ADR-0034), so this is `PUSH_PROVIDER`'s shape
-     * rather than `SMS_PROVIDER`'s: a real adapter exists beside the stub. The
+     * rather than `EMAIL_PROVIDER`'s: a real adapter exists beside the stub. The
      * default is still `stub` for the reason every provider here defaults to
      * one — a clone runs, and its suites pass, without a media server — and
      * `StubCallMediaProvider` refuses to construct under NODE_ENV=production,
@@ -1819,26 +1791,10 @@ export const rawEnvSchema = z
   .superRefine((value, ctx) => {
     // Each OTP ceiling sits inside the one above it, or the inner one never
     // binds and only looks like a control (#390).
-    for (const [inner, outer] of [
-      ['OTP_GLOBAL_HOURLY_CAP', 'OTP_GLOBAL_DAILY_CAP'],
-      ['OTP_PREFIX_HOURLY_CAP', 'OTP_GLOBAL_HOURLY_CAP'],
-      ['OTP_RANGE_HOURLY_CAP', 'OTP_PREFIX_HOURLY_CAP'],
-    ] as const) {
+    for (const [inner, outer] of [['OTP_GLOBAL_HOURLY_CAP', 'OTP_GLOBAL_DAILY_CAP']] as const) {
       if (value[inner] > value[outer]) {
         ctx.addIssue({ code: 'custom', path: [inner], message: `must not exceed ${outer}` });
       }
-    }
-    // A fallback that is the primary is no fallback: the same outage takes
-    // both (#390).
-    if (
-      value.SMS_FALLBACK_PROVIDER !== undefined &&
-      value.SMS_FALLBACK_PROVIDER === value.SMS_PROVIDER
-    ) {
-      ctx.addIssue({
-        code: 'custom',
-        path: ['SMS_FALLBACK_PROVIDER'],
-        message: 'must be a different provider from SMS_PROVIDER',
-      });
     }
     if (value.REVIEW_REMINDER_DELAY_HOURS >= value.REVIEW_WINDOW_HOURS) {
       ctx.addIssue({
@@ -1877,7 +1833,7 @@ export const rawEnvSchema = z
     }
 
     // Same argument, third secret. The rate-limit pepper is handed to
-    // `createHmac` over attacker-chosen input (a phone number the caller
+    // `createHmac` over attacker-chosen input (an email address the caller
     // supplies), which is not a position to put a token-signing key in — and
     // a secret shared between two subsystems cannot be rotated for one of
     // them without breaking the other, so it never gets rotated at all.
@@ -2279,27 +2235,17 @@ export function toAppConfig(env: RawEnv): AppConfig {
       geocodePerUserHour: env.GEOCODE_RATE_LIMIT_PER_USER_HOUR,
       geocodePerIpHour: env.GEOCODE_RATE_LIMIT_PER_IP_HOUR,
     }),
-    sms: Object.freeze({
-      provider: env.SMS_PROVIDER,
-      fallbackProvider: env.SMS_FALLBACK_PROVIDER,
-      senderId: env.SMS_SENDER_ID,
-      timeoutMs: env.SMS_TIMEOUT_MS,
-      plivo: Object.freeze({ authId: env.PLIVO_AUTH_ID, authToken: env.PLIVO_AUTH_TOKEN }),
-      twilio: Object.freeze({
-        accountSid: env.TWILIO_ACCOUNT_SID,
-        authToken: env.TWILIO_AUTH_TOKEN,
-      }),
+    email: Object.freeze({
+      provider: env.EMAIL_PROVIDER,
       otp: Object.freeze({
         codePepper: env.OTP_CODE_PEPPER,
         length: env.OTP_LENGTH,
         ttlSeconds: env.OTP_TTL_SECONDS,
         maxAttempts: env.OTP_MAX_ATTEMPTS,
-        rateLimitPerPhoneHour: env.OTP_RATE_LIMIT_PER_PHONE_HOUR,
+        rateLimitPerEmailHour: env.OTP_RATE_LIMIT_PER_EMAIL_HOUR,
         rateLimitPerIpHour: env.OTP_RATE_LIMIT_PER_IP_HOUR,
         globalDailyCap: env.OTP_GLOBAL_DAILY_CAP,
         globalHourlyCap: env.OTP_GLOBAL_HOURLY_CAP,
-        prefixHourlyCap: env.OTP_PREFIX_HOURLY_CAP,
-        rangeHourlyCap: env.OTP_RANGE_HOURLY_CAP,
         breakerMinSends: env.OTP_BREAKER_MIN_SENDS,
         breakerMinSuccessPercent: env.OTP_BREAKER_MIN_SUCCESS_PERCENT,
       }),

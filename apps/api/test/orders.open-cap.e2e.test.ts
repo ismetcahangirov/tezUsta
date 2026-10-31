@@ -32,10 +32,10 @@ import { createThrowawayDatabase } from './support/throwaway-database';
 const CAP = 3;
 const DESCRIPTION = 'Mətbəxdə kran sızır, su kəsilmir.';
 
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99452${String(phoneCounter).padStart(7, '0')}`;
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
 interface OrderBody {
@@ -70,7 +70,7 @@ describe('the open-order cap per customer (issue #273)', () => {
   }
 
   async function signInAsCustomer(): Promise<Customer> {
-    const created = await usersRepo.create({ phoneE164: nextPhone(), roles: [] });
+    const created = await usersRepo.create({ email: nextEmail(), roles: [] });
     const { accessToken } = await sessionsService.startSession({ userId: created.user.id });
 
     const profile = await post('/customers', accessToken).send({ displayName: 'Müştəri' });

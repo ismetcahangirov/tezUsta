@@ -10,7 +10,7 @@ import { type OrderParty, ordersApi } from './api';
 import { ordersCopy } from './copy';
 import { orderErrorMessage } from './rules';
 
-export interface RevealPhoneDialogProps {
+export interface RevealEmailDialogProps {
   orderId: string;
   party: OrderParty;
   name: string;
@@ -18,19 +18,19 @@ export interface RevealPhoneDialogProps {
 }
 
 /**
- * Reveals one party's full number with a reason (ADR-0043 § 6).
+ * Reveals one party's full email address with a reason (ADR-0043 § 6).
  *
- * The number is held in this dialog's own state and nowhere else: the request
+ * The address is held in this dialog's own state and nowhere else: the request
  * is dispatched with `track: false`, so the store never sees it, and closing
  * the dialog unmounts the only copy. Opening it again is a new, audited reveal.
  */
-export function RevealPhoneDialog({ orderId, party, name, onClose }: RevealPhoneDialogProps) {
+export function RevealEmailDialog({ orderId, party, name, onClose }: RevealEmailDialogProps) {
   const dispatch = useAppDispatch();
   const [reason, setReason] = useState('');
   const [touched, setTouched] = useState(false);
   const [busy, setBusy] = useState(false);
   const [failureCode, setFailureCode] = useState<string | null | undefined>(undefined);
-  const [phone, setPhone] = useState<string | null>(null);
+  const [email, setEmail] = useState<string | null>(null);
 
   const problem = reasonProblem(reason);
   const reasonError =
@@ -46,7 +46,7 @@ export function RevealPhoneDialog({ orderId, party, name, onClose }: RevealPhone
     setBusy(true);
     setFailureCode(undefined);
     const result = await dispatch(
-      ordersApi.endpoints.revealPhone.initiate(
+      ordersApi.endpoints.revealEmail.initiate(
         { orderId, party, reason: reason.trim() },
         { track: false },
       ),
@@ -56,12 +56,12 @@ export function RevealPhoneDialog({ orderId, party, name, onClose }: RevealPhone
       setFailureCode(describeFailure(result.error)?.code ?? null);
       return;
     }
-    setPhone(result.data.phoneE164);
+    setEmail(result.data.email);
   }
 
   return (
     <Modal title={ordersCopy.revealTitle(name)} onClose={onClose} busy={busy}>
-      {phone === null ? (
+      {email === null ? (
         <form
           noValidate
           className="flex flex-col gap-4"
@@ -101,7 +101,7 @@ export function RevealPhoneDialog({ orderId, party, name, onClose }: RevealPhone
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
             <span className="text-caption text-text-muted">{ordersCopy.revealedLabel}</span>
-            <output className="select-all text-h2 text-text">{phone}</output>
+            <output className="select-all break-all text-h2 text-text">{email}</output>
           </div>
           <div className="flex justify-end">
             <Button label={ordersCopy.close} variant="secondary" onClick={onClose} />

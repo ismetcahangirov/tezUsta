@@ -18,16 +18,16 @@ import { AdminRepository } from './admin.repository';
 /** The audit actions that set an account's status from the panel. */
 export const CUSTOMER_STATUS_ACTIONS = ['customer.suspend', 'customer.reinstate'] as const;
 
-/** How the list's `q` is read: an id, a whole phone number, or a name prefix. */
+/** How the list's `q` is read: an id, a whole email address, or a name prefix. */
 export type CustomerSearch =
   | { readonly kind: 'id'; readonly customerId: string }
-  | { readonly kind: 'phone'; readonly phoneE164: string }
+  | { readonly kind: 'email'; readonly email: string }
   | { readonly kind: 'name'; readonly prefix: string };
 
 export interface AdminCustomerListRow {
   readonly id: string;
   readonly displayName: string;
-  readonly phoneE164: string;
+  readonly email: string;
   readonly status: UserStatusName;
   readonly createdAt: Date;
   readonly orderCount: number;
@@ -38,7 +38,7 @@ export interface AdminCustomerRow {
   readonly id: string;
   readonly userId: string;
   readonly displayName: string;
-  readonly phoneE164: string;
+  readonly email: string;
   readonly status: UserStatusName;
   readonly createdAt: Date;
   readonly ratingCount: number;
@@ -81,7 +81,7 @@ export class AdminCustomersRepository {
   /**
    * Newest first, by keyset. A name search is served by
    * `customers_display_name_prefix_idx`, the unfiltered list by
-   * `customers_created_idx`, a phone by `users_phone_e164_live_unique` and an
+   * `customers_created_idx`, an address by `users_email_live_unique` and an
    * id by the primary key. The two counts per row read
    * `orders_customer_created_idx` for the page's rows only.
    */
@@ -101,7 +101,7 @@ export class AdminCustomersRepository {
       .select({
         id: customers.id,
         displayName: customers.displayName,
-        phoneE164: users.phoneE164,
+        email: users.email,
         status: users.status,
         createdAt: customers.createdAt,
         orderCount: sql<number>`(select count(*) from ${orders} o where o.customer_id = ${customers.id} and o.status <> 'DRAFT')::int`,
@@ -115,8 +115,8 @@ export class AdminCustomersRepository {
             ? undefined
             : search.kind === 'id'
               ? eq(customers.id, search.customerId)
-              : search.kind === 'phone'
-                ? and(eq(users.phoneE164, search.phoneE164), isNull(users.deletedAt))
+              : search.kind === 'email'
+                ? and(eq(users.email, search.email), isNull(users.deletedAt))
                 : // Both sides lowered by the database: JavaScript lowers `İ`
                   // to `i` plus a combining dot, Postgres to a plain `i`, and
                   // a prefix lowered by one and compared against a column
@@ -149,7 +149,7 @@ export class AdminCustomersRepository {
         id: customers.id,
         userId: customers.userId,
         displayName: customers.displayName,
-        phoneE164: users.phoneE164,
+        email: users.email,
         status: users.status,
         createdAt: customers.createdAt,
         ratingCount: customers.ratingCount,

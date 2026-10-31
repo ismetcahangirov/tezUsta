@@ -42,7 +42,7 @@ import { grantTestSubscription } from './support/subscriptions';
  *
  * The rest of the suite is the two rules that are easy to lose and invisible
  * in review once lost: the offer card carries **no address, no customer name
- * and no phone number** — asserted against the serialized response body rather
+ * and no email address** — asserted against the serialized response body rather
  * than against the intent — and the whole eligibility predicate is
  * re-evaluated at the instant of the accept, one test per term, each revoking
  * exactly one thing between the offer and the tap.
@@ -56,11 +56,11 @@ import { grantTestSubscription } from './support/subscriptions';
  * instantiation.
  */
 
-/** `users.phone_e164` is unique among live rows. */
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99455${String(phoneCounter).padStart(7, '0')}`;
+/** `users.email` is unique among live rows. */
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
 /** The floor `env.schema.ts` allows, so presence expiry is quick to arrange. */
@@ -164,7 +164,7 @@ describe('the master offer feed, decline and accept over HTTP (issue #101)', () 
   }
 
   async function signIn(): Promise<{ userId: string; accessToken: string }> {
-    const created = await usersRepo.create({ phoneE164: nextPhone(), roles: [] });
+    const created = await usersRepo.create({ email: nextEmail(), roles: [] });
     const pair = await sessionsService.startSession({ userId: created.user.id });
     expect(tokens.verifyAccessToken(pair.accessToken).sub).toBe(created.user.id);
     return { userId: created.user.id, accessToken: pair.accessToken };
@@ -570,7 +570,7 @@ describe('the master offer feed, decline and accept over HTTP (issue #101)', () 
      * to `DISPATCH_MAX_MASTERS_PER_BROADCAST` masters who mostly never take
      * the job.
      */
-    it('carries no address, no customer name, no phone number and no customer id — photos included', async () => {
+    it('carries no address, no customer name, no email address and no customer id — photos included', async () => {
       const master = await seedMaster();
       const order = await seedOrder();
       await attachPhoto(order);
@@ -583,7 +583,7 @@ describe('the master offer feed, decline and accept over HTTP (issue #101)', () 
       expect((res.body as MasterOffer[])[0]?.photos).toHaveLength(1);
       expect(body).not.toContain('Nizami');
       expect(body).not.toContain('Müştəri');
-      expect(body).not.toContain('+994');
+      expect(body).not.toContain('@example.com');
       expect(body).not.toContain(order.addressId);
       expect(body).not.toContain(order.customerId);
       expect(body).not.toContain(order.orderId);

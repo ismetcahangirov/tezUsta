@@ -1,6 +1,9 @@
 # ADR-0050 — Customer accounts in the admin panel
 
 - **Status:** Accepted
+- **Amended by:** [ADR-0072](ADR-0072-email-one-time-code-sign-in.md) — § 5
+  searches by a whole email address instead of a whole E.164 number, and the
+  reveal is of the email address. The rest stands.
 - **Date:** 13 October 2026
 - **Decided by:** Issue #328 (the owner's specification). § 3 and § 4 depart
   from the issue's wording, for the reasons given there. Both are flagged in

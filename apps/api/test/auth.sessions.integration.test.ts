@@ -35,17 +35,17 @@ const AUTH_CONFIG: AuthConfig = {
 };
 
 /**
- * `users.phone_e164` is partial-unique among live rows, so every test that
- * creates a user needs a phone number no other test in this file has used —
+ * `users.email` is partial-unique among live rows, so every test that
+ * creates a user needs an email address no other test in this file has used —
  * sharing one throwaway database across tests (rather than one per test, as
  * `database.migrations.test.ts` does) means each test's own seed must not
  * collide with another's (CLAUDE.md §13: "every test seeds and cleans its own
  * data").
  */
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99450${String(phoneCounter).padStart(7, '0')}`;
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
 describe('auth: users, roles, and device sessions against real Postgres', () => {
@@ -94,7 +94,7 @@ describe('auth: users, roles, and device sessions against real Postgres', () => 
   describe('users can hold more than one role', () => {
     it('creates a user with both customer and master roles and reads both back', async () => {
       const created = await usersRepo.create({
-        phoneE164: nextPhone(),
+        email: nextEmail(),
         roles: ['customer', 'master'],
       });
 
@@ -105,31 +105,31 @@ describe('auth: users, roles, and device sessions against real Postgres', () => 
     });
   });
 
-  describe('the partial unique index on live phone numbers', () => {
-    it('rejects a second live user with the same phone_e164', async () => {
-      const phone = nextPhone();
-      await usersRepo.create({ phoneE164: phone, roles: ['customer'] });
+  describe('the partial unique index on live email addresses', () => {
+    it('rejects a second live user with the same email', async () => {
+      const email = nextEmail();
+      await usersRepo.create({ email, roles: ['customer'] });
 
-      await expect(usersRepo.create({ phoneE164: phone, roles: ['customer'] })).rejects.toThrow();
+      await expect(usersRepo.create({ email, roles: ['customer'] })).rejects.toThrow();
     });
 
-    it('allows re-registering a phone number once the previous holder is soft-deleted', async () => {
-      const phone = nextPhone();
-      const first = await usersRepo.create({ phoneE164: phone, roles: ['customer'] });
+    it('allows re-registering an email address once the previous holder is soft-deleted', async () => {
+      const email = nextEmail();
+      const first = await usersRepo.create({ email, roles: ['customer'] });
 
       // No public API soft-deletes a user yet (out of scope for issue #25) —
       // this reaches into the table directly to set up the state the partial
       // index is meant to permit.
       await db.update(users).set({ deletedAt: new Date() }).where(eq(users.id, first.user.id));
 
-      const second = await usersRepo.create({ phoneE164: phone, roles: ['master'] });
+      const second = await usersRepo.create({ email, roles: ['master'] });
 
       expect(second.user.id).not.toBe(first.user.id);
-      expect(second.user.phoneE164).toBe(phone);
+      expect(second.user.email).toBe(email);
     });
 
     it('findByIdWithRoles returns undefined for a soft-deleted user', async () => {
-      const created = await usersRepo.create({ phoneE164: nextPhone(), roles: ['customer'] });
+      const created = await usersRepo.create({ email: nextEmail(), roles: ['customer'] });
       await db.update(users).set({ deletedAt: new Date() }).where(eq(users.id, created.user.id));
 
       await expect(usersRepo.findByIdWithRoles(created.user.id)).resolves.toBeUndefined();
@@ -138,7 +138,7 @@ describe('auth: users, roles, and device sessions against real Postgres', () => 
 
   describe('SessionsService.startSession', () => {
     it('creates exactly one sessions row and one linked refresh_tokens row, with expires_at set from the refresh TTL', async () => {
-      const created = await usersRepo.create({ phoneE164: nextPhone(), roles: ['customer'] });
+      const created = await usersRepo.create({ email: nextEmail(), roles: ['customer'] });
       const now = new Date();
 
       await sessionsService.startSession({ userId: created.user.id }, now);
@@ -161,7 +161,7 @@ describe('auth: users, roles, and device sessions against real Postgres', () => 
     });
 
     it('never stores the refresh token, or its secret half, in plaintext anywhere on the row', async () => {
-      const created = await usersRepo.create({ phoneE164: nextPhone(), roles: ['customer'] });
+      const created = await usersRepo.create({ email: nextEmail(), roles: ['customer'] });
       const pair = await sessionsService.startSession({
         userId: created.user.id,
       });
@@ -187,7 +187,7 @@ describe('auth: users, roles, and device sessions against real Postgres', () => 
     });
 
     it('issues an access token whose sid equals the id of the session row it created', async () => {
-      const created = await usersRepo.create({ phoneE164: nextPhone(), roles: ['customer'] });
+      const created = await usersRepo.create({ email: nextEmail(), roles: ['customer'] });
       const pair = await sessionsService.startSession({
         userId: created.user.id,
       });
@@ -208,7 +208,7 @@ describe('auth: users, roles, and device sessions against real Postgres', () => 
       // pass one; this proves the positive half of that guarantee, that the
       // token nonetheless carries every role the account actually holds.
       const created = await usersRepo.create({
-        phoneE164: nextPhone(),
+        email: nextEmail(),
         roles: ['customer', 'master'],
       });
 
@@ -221,7 +221,7 @@ describe('auth: users, roles, and device sessions against real Postgres', () => 
 
   describe('SessionsService.startSession refuses an account that may not open a session (issue #25 fix)', () => {
     it('throws AccountNotActiveError, and opens no session, for a suspended user', async () => {
-      const created = await usersRepo.create({ phoneE164: nextPhone(), roles: ['customer'] });
+      const created = await usersRepo.create({ email: nextEmail(), roles: ['customer'] });
       await db.update(users).set({ status: 'suspended' }).where(eq(users.id, created.user.id));
 
       await expect(sessionsService.startSession({ userId: created.user.id })).rejects.toThrow(
@@ -236,7 +236,7 @@ describe('auth: users, roles, and device sessions against real Postgres', () => 
     });
 
     it('throws AccountNotActiveError for a soft-deleted user', async () => {
-      const created = await usersRepo.create({ phoneE164: nextPhone(), roles: ['customer'] });
+      const created = await usersRepo.create({ email: nextEmail(), roles: ['customer'] });
       await db.update(users).set({ deletedAt: new Date() }).where(eq(users.id, created.user.id));
 
       await expect(sessionsService.startSession({ userId: created.user.id })).rejects.toThrow(
@@ -253,7 +253,7 @@ describe('auth: users, roles, and device sessions against real Postgres', () => 
 
   describe('sessions.updated_at (issue #25 fix: $onUpdate)', () => {
     it('moves strictly forward on an UPDATE, proving the column is actually maintained rather than frozen at insert time', async () => {
-      const created = await usersRepo.create({ phoneE164: nextPhone(), roles: ['customer'] });
+      const created = await usersRepo.create({ email: nextEmail(), roles: ['customer'] });
       await sessionsService.startSession({ userId: created.user.id });
 
       const [sessionRow] = await db
@@ -284,7 +284,7 @@ describe('auth: users, roles, and device sessions against real Postgres', () => 
 
   describe('refresh token redemption is atomic under real concurrency (issue #26)', () => {
     it('lets exactly one of many concurrent redemptions of the same refresh token succeed', async () => {
-      const created = await usersRepo.create({ phoneE164: nextPhone(), roles: ['customer'] });
+      const created = await usersRepo.create({ email: nextEmail(), roles: ['customer'] });
       const pair = await sessionsService.startSession({ userId: created.user.id });
       const parsed = tokens.parseRefreshToken(pair.refreshToken);
       expect(parsed).not.toBeNull();

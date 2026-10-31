@@ -47,10 +47,10 @@ const WAITS_OUT_THE_SEARCH_MS = 15_000;
  * and no master seeded at all.
  */
 
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99460${String(phoneCounter).padStart(7, '0')}`;
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
 const SEARCH_POINT = { latitude: 40.372613, longitude: 49.842717 };
@@ -139,7 +139,7 @@ describe('a search that ends with nobody (issue #144)', () => {
   it(
     'tells the customer, and only the customer',
     async () => {
-      const created = await usersRepo.create({ phoneE164: nextPhone(), roles: [] });
+      const created = await usersRepo.create({ email: nextEmail(), roles: [] });
       const pair = await sessionsService.startSession({ userId: created.user.id });
       const pushToken = `ExponentPushToken[${'g'.repeat(22)}]`;
       await devices.register(

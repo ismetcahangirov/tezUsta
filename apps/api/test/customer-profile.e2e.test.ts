@@ -34,11 +34,11 @@ import { createThrowawayDatabase } from './support/throwaway-database';
  * hit one row in Postgres.
  */
 
-/** `users.phone_e164` is unique among live rows — see `auth.session-endpoints.e2e.test.ts`. */
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99454${String(phoneCounter).padStart(7, '0')}`;
+/** `users.email` is unique among live rows — see `auth.session-endpoints.e2e.test.ts`. */
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
 /** A syntactically valid but never-issued uuid — well-formed, guaranteed absent. */
@@ -78,18 +78,18 @@ describe('customer profile endpoints over HTTP (issue #34)', () => {
   interface SignedIn {
     readonly userId: string;
     readonly accessToken: string;
-    readonly phoneE164: string;
+    readonly email: string;
   }
 
   async function signIn(roles: readonly UserRoleName[] = []): Promise<SignedIn> {
-    const phoneE164 = nextPhone();
-    const created = await usersRepo.create({ phoneE164, roles });
+    const email = nextEmail();
+    const created = await usersRepo.create({ email, roles });
     const pair = await sessionsService.startSession({ userId: created.user.id });
     // Sanity check on the harness itself, not the system under test: a
     // malformed access token here would make every 401 assertion below
     // meaningless because the token was never going to authenticate anyway.
     expect(tokens.verifyAccessToken(pair.accessToken).sub).toBe(created.user.id);
-    return { userId: created.user.id, accessToken: pair.accessToken, phoneE164 };
+    return { userId: created.user.id, accessToken: pair.accessToken, email };
   }
 
   function get(path: string, accessToken?: string) {
@@ -519,7 +519,7 @@ describe('customer profile endpoints over HTTP (issue #34)', () => {
       // The row is soft-deleted, not dropped (the same pattern `users.ts` uses
       // for accounts): a customer who deletes their profile and later signs
       // up again is the same customer, not a stranger who happens to hold the
-      // same phone number. A hard delete followed by a fresh insert would
+      // same email address. A hard delete followed by a fresh insert would
       // hand back a new id and would let a second `POST` slip past the
       // idempotency guarantee tested above by routing through the DELETE
       // first.

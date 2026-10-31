@@ -53,7 +53,7 @@ jest.mock('expo-router', () => ({
  */
 const SETTLED = { timeout: 10_000 };
 
-const PHONE = '+994501112233';
+const EMAIL = 'aysel@example.az';
 const CODE = '123456';
 
 const ACCESS_TOKEN = `header.${Buffer.from(
@@ -67,26 +67,29 @@ const PAIR = {
   refreshTokenExpiresAt: '2026-01-31T00:00:00.000Z',
 };
 
+let verifyBodies: unknown[] = [];
+
 /** Only `fetch` is faked; the real api slice, base query and reducers run. */
 function installTransport(verifyStatus: number): void {
-  global.fetch = ((input: Request | string): Promise<Response> => {
+  verifyBodies = [];
+
+  global.fetch = (async (input: Request | string): Promise<Response> => {
     const request = typeof input === 'string' ? new Request(input) : input;
 
     if (request.url.endsWith('/auth/otp/verify')) {
-      return Promise.resolve(
-        verifyStatus === 200
-          ? new Response(JSON.stringify(PAIR), {
-              status: 200,
-              headers: { 'Content-Type': 'application/json' },
-            })
-          : new Response(JSON.stringify({ error: { code: 'UNAUTHORIZED' } }), {
-              status: verifyStatus,
-              headers: { 'Content-Type': 'application/json' },
-            }),
-      );
+      verifyBodies.push(await request.json());
+      return verifyStatus === 200
+        ? new Response(JSON.stringify(PAIR), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' },
+          })
+        : new Response(JSON.stringify({ error: { code: 'UNAUTHORIZED' } }), {
+            status: verifyStatus,
+            headers: { 'Content-Type': 'application/json' },
+          });
     }
 
-    return Promise.reject(new Error(`Unexpected request to ${request.url}`));
+    throw new Error(`Unexpected request to ${request.url}`);
   }) as typeof fetch;
 }
 
@@ -103,14 +106,14 @@ async function mount(store: AppStore): Promise<void> {
 
 function storeAwaitingCode(): AppStore {
   const store = createTestStore();
-  store.dispatch(otpRequested(PHONE));
+  store.dispatch(otpRequested(EMAIL));
   return store;
 }
 
 // `fireEvent` is asynchronous in this version too: pressing before the typed
 // code has been committed presses a button that is still disabled.
 async function submitCode(): Promise<void> {
-  await fireEvent.changeText(screen.getByLabelText('SMS kodu'), CODE);
+  await fireEvent.changeText(screen.getByLabelText('Təsdiq kodu'), CODE);
   await fireEvent.press(screen.getByRole('button', { name: 'Təsdiqlə' }));
 }
 
@@ -124,6 +127,24 @@ describe('verifying an OTP code', () => {
     await tokenStore.clear();
   });
 
+  it('says which address the code went to', async () => {
+    installTransport(200);
+    await mount(storeAwaitingCode());
+
+    expect(screen.getByText(`Kod ${EMAIL} ünvanına göndərildi.`)).toBeOnTheScreen();
+  });
+
+  it('sends the code with the address it was sent to', async () => {
+    installTransport(200);
+    await mount(storeAwaitingCode());
+
+    await submitCode();
+
+    await waitFor(() => {
+      expect(verifyBodies).toEqual([{ email: EMAIL, code: CODE }]);
+    }, SETTLED);
+  });
+
   it('leaves the user signed in and out of the auth group, never back on sign-in', async () => {
     installTransport(200);
     const store = storeAwaitingCode();
@@ -135,7 +156,7 @@ describe('verifying an OTP code', () => {
       expect(selectAuthStatus(store.getState())).toBe('signed-in');
     }, SETTLED);
 
-    // The session cleared the pending number, which is what used to make this
+    // The session cleared the pending address, which is what used to make this
     // screen think it had been deep-linked into.
     expect(selectOtpRequestedFor(store.getState())).toBeNull();
     expect(mockRedirects).toEqual([]);
@@ -159,13 +180,13 @@ describe('verifying an OTP code', () => {
     }, SETTLED);
 
     expect(selectAuthStatus(store.getState())).not.toBe('signed-in');
-    // A failed verification is not a reason to lose the number that was
+    // A failed verification is not a reason to lose the address that was
     // entered — the user is meant to try the code again.
-    expect(selectOtpRequestedFor(store.getState())).toBe(PHONE);
+    expect(selectOtpRequestedFor(store.getState())).toBe(EMAIL);
     expect(mockRedirects).toEqual([]);
   });
 
-  it('still sends a deep link with no pending number back to sign-in', async () => {
+  it('still sends a deep link with no pending address back to sign-in', async () => {
     installTransport(200);
     // Nothing requested a code on this device: the screen has nothing to
     // verify, and the redirect it exists for must survive the fix above.

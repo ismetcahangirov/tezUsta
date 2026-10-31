@@ -30,10 +30,10 @@ import { createThrowawayDatabase } from './support/throwaway-database';
  * the app uses, so authorization is exercised against real profiles.
  */
 
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99458${String(phoneCounter).padStart(7, '0')}`;
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
 /** ADR-0042 § 9 — the real default, so the limit test proves the shipped number. */
@@ -90,7 +90,7 @@ describe('reviews on an order (issue #222)', () => {
   }
 
   async function signIn(): Promise<{ userId: string; token: string }> {
-    const created = await usersRepo.create({ phoneE164: nextPhone(), roles: [] });
+    const created = await usersRepo.create({ email: nextEmail(), roles: [] });
     const pair = await sessionsService.startSession({ userId: created.user.id });
     return { userId: created.user.id, token: pair.accessToken };
   }

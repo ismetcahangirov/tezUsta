@@ -255,11 +255,11 @@ describe.runIf(enabled)('portfolio & media pipeline benchmark (issue #317)', () 
    * after the first is a recent one. Returns their access token.
    */
   async function seedCustomerWithOrder(
-    phoneE164: string,
+    email: string,
     status: 'ACCEPTED' | 'COMPLETED',
   ): Promise<string> {
     const createdCustomerUser = await app.get(UsersRepository).create({
-      phoneE164,
+      email,
       roles: ['customer'],
     });
     const customerUserId = createdCustomerUser.user.id;
@@ -337,7 +337,7 @@ describe.runIf(enabled)('portfolio & media pipeline benchmark (issue #317)', () 
     masterId = randomUUID();
     const usersRepo = app.get(UsersRepository);
     const createdMasterUser = await usersRepo.create({
-      phoneE164: '+994770000001',
+      email: 'master@example.com',
       roles: ['master'],
     });
     const masterUserId = createdMasterUser.user.id;
@@ -404,8 +404,8 @@ describe.runIf(enabled)('portfolio & media pipeline benchmark (issue #317)', () 
     // whole table fits in two pages and a sequential scan is the right plan.
     await pool.query(
       `with u as (
-         insert into users (id, phone_e164)
-         select gen_random_uuid(), '+99455' || lpad(g::text, 7, '0')
+         insert into users (id, email)
+         select gen_random_uuid(), 'master-' || g || '@example.com'
            from generate_series(1, $1::int) as g
          returning id
        ), m as (
@@ -421,7 +421,7 @@ describe.runIf(enabled)('portfolio & media pipeline benchmark (issue #317)', () 
     );
     await pool.query('analyze portfolio_posts');
 
-    customerToken = await seedCustomerWithOrder('+994770000002', 'ACCEPTED');
+    customerToken = await seedCustomerWithOrder('customer-2@example.com', 'ACCEPTED');
 
     // Print environment banner
     const cpus = os.cpus();
@@ -703,8 +703,8 @@ describe.runIf(enabled)('portfolio & media pipeline benchmark (issue #317)', () 
     const readers = [
       customerToken,
       ...(await Promise.all(
-        ['+994770000011', '+994770000012', '+994770000013'].map((phone) =>
-          seedCustomerWithOrder(phone, 'COMPLETED'),
+        ['customer-11@example.com', 'customer-12@example.com', 'customer-13@example.com'].map(
+          (email) => seedCustomerWithOrder(email, 'COMPLETED'),
         ),
       )),
     ];

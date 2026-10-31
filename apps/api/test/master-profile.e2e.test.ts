@@ -35,11 +35,11 @@ import { createThrowawayDatabase } from './support/throwaway-database';
  * that is visible from a unit test of the service in isolation.
  */
 
-/** `users.phone_e164` is unique among live rows — see `customer-profile.e2e.test.ts`. */
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99456${String(phoneCounter).padStart(7, '0')}`;
+/** `users.email` is unique among live rows — see `customer-profile.e2e.test.ts`. */
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
 /** A syntactically valid but never-issued uuid — well-formed, guaranteed absent. */
@@ -95,8 +95,8 @@ describe('master profile and offered-service endpoints over HTTP (issue #37)', (
   }
 
   async function signIn(roles: readonly UserRoleName[] = []): Promise<SignedIn> {
-    const phoneE164 = nextPhone();
-    const created = await usersRepo.create({ phoneE164, roles });
+    const email = nextEmail();
+    const created = await usersRepo.create({ email, roles });
     const pair = await sessionsService.startSession({ userId: created.user.id });
     // Sanity check on the harness itself, not the system under test: a
     // malformed access token here would make every 401 assertion below
@@ -424,7 +424,7 @@ describe('master profile and offered-service endpoints over HTTP (issue #37)', (
         // The row is soft-deleted, not dropped — the same pattern
         // `customers` uses: a master who deletes their profile and later
         // signs up again is the same master, not a stranger who happens to
-        // hold the same phone number, and a `rejected` master cannot launder
+        // hold the same email address, and a `rejected` master cannot launder
         // the decision by deleting and re-registering.
         const caller = await signInAsMaster();
         const created = await get('/masters/me', caller.accessToken);

@@ -24,12 +24,12 @@ import { createThrowawayDatabase } from './support/throwaway-database';
  * Issue #63: a failed query used to write its own SQL **and every bound
  * parameter** into the server log, because `AllExceptionsFilter` logged
  * `exception.stack` and `drizzle-orm` builds a query error's message by
- * interpolating them. On the authentication path those parameters are phone
- * numbers, which CLAUDE.md §11 forbids logging outright.
+ * interpolating them. On the authentication path those parameters are email
+ * addresses, which CLAUDE.md §11 forbids logging outright.
  *
- * The number below is the recognisable value: it is bound as a parameter, it
+ * The address below is the recognisable value: it is bound as a parameter, it
  * is quoted back by PostgreSQL in the error's `detail` (`Key
- * (phone_e164)=(...) already exists.`), and it therefore has to be absent from
+ * (email)=(...) already exists.`), and it therefore has to be absent from
  * the log through two independent routes, not one.
  *
  * A unique violation on `users` is the vehicle because it is the failure that
@@ -37,7 +37,7 @@ import { createThrowawayDatabase } from './support/throwaway-database';
  * carries a value — the exact case the fix had to decide about rather than
  * inherit.
  */
-const RECOGNISABLE_PHONE = '+994507654321';
+const RECOGNISABLE_EMAIL = 'recognisable.person@example.com';
 
 /** SQLSTATE `unique_violation`, which the log must still name. */
 const EXPECTED_SQLSTATE = '23505';
@@ -52,10 +52,10 @@ class DuplicateInsertController {
   @Public()
   @Get('duplicate-insert')
   async explode(): Promise<never> {
-    const row = { phoneE164: RECOGNISABLE_PHONE, status: 'active' as const };
+    const row = { email: RECOGNISABLE_EMAIL, status: 'active' as const };
 
     await this.db.insert(users).values({ id: uuidV7(), ...row });
-    // `users_phone_e164_live_unique` — the second insert raises 23505, and
+    // `users_email_live_unique` — the second insert raises 23505, and
     // nothing catches it, so it travels the same route a genuine bug would.
     await this.db.insert(users).values({ id: uuidV7(), ...row });
 
@@ -90,7 +90,7 @@ describe('a failed query never writes its parameters to the log (issue #63)', ()
     })
       // Nest's `TestingLogger` has empty bodies for most levels, so without a
       // real one this suite would pass against a logger that prints nothing —
-      // and would pass identically if the filter printed every phone number it
+      // and would pass identically if the filter printed every email address it
       // ever saw. `auth.otp.e2e.test.ts` carries the same note.
       .setLogger(new ConsoleLogger())
       .compile();
@@ -143,7 +143,7 @@ describe('a failed query never writes its parameters to the log (issue #63)', ()
     // The failure is still diagnosable. Asserting this first matters: without
     // it, "log nothing at all" would satisfy every remaining expectation.
     expect(logged).toContain(EXPECTED_SQLSTATE);
-    expect(logged).toContain('users_phone_e164_live_unique');
+    expect(logged).toContain('users_email_live_unique');
     expect(logged).toContain('insert into "users"');
 
     // And it is correlated, so an on-call engineer can tie the line to the
@@ -154,7 +154,7 @@ describe('a failed query never writes its parameters to the log (issue #63)', ()
     // The three routes the number could have taken into the log:
     // the bound parameter, Drizzle's interpolated message, and the driver's
     // `detail`.
-    expect(logged).not.toContain(RECOGNISABLE_PHONE);
+    expect(logged).not.toContain(RECOGNISABLE_EMAIL);
     expect(logged).not.toContain('Failed query');
     expect(logged).not.toContain('already exists');
   });
@@ -166,7 +166,7 @@ describe('a failed query never writes its parameters to the log (issue #63)', ()
 
     const body = res.body as ErrorEnvelope;
     expect(body.error.code).toBe('INTERNAL_ERROR');
-    expect(body.error.message).not.toContain(RECOGNISABLE_PHONE);
+    expect(body.error.message).not.toContain(RECOGNISABLE_EMAIL);
     expect(JSON.stringify(res.body)).not.toContain('users');
   });
 });

@@ -38,10 +38,10 @@ import { grantTestSubscription } from './support/subscriptions';
  * not anything this file does.
  */
 
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99458${String(phoneCounter).padStart(7, '0')}`;
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
 const REPORTS_ALLOWED_PER_HOUR = 3;
@@ -68,9 +68,9 @@ describe('master location reporting is rate limited (issue #98)', () => {
   }
 
   /** A verified master who is switched on — the only state that may report. */
-  async function signInAsWorkingMaster(): Promise<{ accessToken: string; phoneE164: string }> {
-    const phoneE164 = nextPhone();
-    const created = await usersRepo.create({ phoneE164, roles: [] });
+  async function signInAsWorkingMaster(): Promise<{ accessToken: string; email: string }> {
+    const email = nextEmail();
+    const created = await usersRepo.create({ email, roles: [] });
     const pair = await sessionsService.startSession({ userId: created.user.id });
 
     const profile = await post('/masters', pair.accessToken).send({ displayName: 'Usta Rəşad' });
@@ -86,7 +86,7 @@ describe('master location reporting is rate limited (issue #98)', () => {
     });
     expect(online.status).toBe(200);
 
-    return { accessToken: pair.accessToken, phoneE164 };
+    return { accessToken: pair.accessToken, email };
   }
 
   beforeAll(async () => {
@@ -178,15 +178,15 @@ describe('master location reporting is rate limited (issue #98)', () => {
       }
     });
 
-    it('writes the trigger, and never the phone number, the IP or the coordinates', async () => {
+    it('writes the trigger, and never the email address, the IP or the coordinates', async () => {
       // `docs/engineering/security.md` § Logging requires rate-limit triggers
-      // to stay logged, and requires full phone numbers and precise
+      // to stay logged, and requires full email addresses and precise
       // coordinates never to be. Both halves are asserted here because only
       // the first makes the second mean anything: a suite that captured
       // nothing would satisfy "no coordinate was logged" perfectly.
       expectLoggerIsListening(sink, 'master-location.rate-limit.e2e.test');
 
-      const { accessToken, phoneE164 } = await signInAsWorkingMaster();
+      const { accessToken, email } = await signInAsWorkingMaster();
       for (let attempt = 0; attempt < REPORTS_ALLOWED_PER_HOUR; attempt += 1) {
         await post('/masters/me/location', accessToken).send(BAKU);
       }
@@ -203,8 +203,8 @@ describe('master location reporting is rate limited (issue #98)', () => {
       expect(logged).toContain('RATE_LIMITED');
 
       // The subject reaches the log only as its keyed digest.
-      expect(logged).not.toContain(phoneE164);
-      expect(logged).not.toContain(phoneE164.slice(-9));
+      expect(logged).not.toContain(email);
+      expect(logged).not.toContain(email.slice(0, email.lastIndexOf('@')));
       expect(logged).not.toContain(String(BAKU.latitude));
       expect(logged).not.toContain(String(BAKU.longitude));
     });

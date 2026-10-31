@@ -27,7 +27,7 @@ export const STUB_MEDIA_PUBLIC_BASE_URL = 'https://media.stub.invalid';
  * Thrown when the stub provider is constructed in production.
  *
  * The same mechanism, and the same reasoning, as
- * `StubSmsSender`: a runtime `if` would leave the service booting, accepting
+ * `StubEmailSender`: a runtime `if` would leave the service booting, accepting
  * uploads, telling masters their documents were received, and holding them in
  * a process's heap until the next deploy. Refusing to construct turns a
  * missing storage configuration into a deployment that fails immediately and
@@ -63,7 +63,7 @@ export interface StubPublicObject {
  * It exists so the whole upload path — presign, confirm, size cap, magic-byte
  * validation, ownership, audit trail — is exercisable and testable without a
  * storage account, and without standing up an S3 server in CI. That is the
- * same trade the SMS stub makes, for the same reason.
+ * same trade the email stub makes, for the same reason.
  *
  * **What it deliberately does not prove** is the SigV4 signature itself. It
  * returns a `stub://` URL that no HTTP client can use, because the client-side

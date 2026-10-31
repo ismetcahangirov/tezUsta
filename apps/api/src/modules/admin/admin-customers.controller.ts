@@ -4,7 +4,7 @@ import type {
   AdminCustomerSummary,
   AdminCustomerSuspension,
   AdminOrderSummary,
-  AdminPhoneReveal,
+  AdminEmailReveal,
   CursorPage,
 } from '@tezusta/types';
 
@@ -66,16 +66,16 @@ export class AdminCustomersController {
     return this.customers.orderHistory(params.id, query);
   }
 
-  /** The full number, with a mandatory reason (ADR-0043 § 6). */
+  /** The full address, with a mandatory reason (ADR-0043 § 6, ADR-0072 § 5). */
   @RequireAdminPermission('pii.read')
   @HttpCode(200)
-  @Post(':id/phone')
-  revealPhone(
+  @Post(':id/email')
+  revealEmail(
     @CurrentAdmin() admin: AdminActor,
     @Param() params: CustomerIdParamsDto,
     @Body() body: CustomerReasonDto,
-  ): Promise<AdminPhoneReveal> {
-    return this.customers.revealPhone(admin, params.id, body.reason);
+  ): Promise<AdminEmailReveal> {
+    return this.customers.revealEmail(admin, params.id, body.reason);
   }
 
   @RequireAdminPermission('customers.suspend')

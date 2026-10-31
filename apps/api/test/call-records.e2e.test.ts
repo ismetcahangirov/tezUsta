@@ -63,10 +63,10 @@ import { grantTestSubscription } from './support/subscriptions';
  * what a device actually hears.
  */
 
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99457${String(phoneCounter).padStart(7, '0')}`;
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
 const SEARCH_POINT = { latitude: 40.372613, longitude: 49.842717 };
@@ -79,7 +79,7 @@ const WEBHOOK_CONTENT_TYPE = 'application/webhook+json';
 interface Party {
   readonly userId: string;
   readonly accessToken: string;
-  readonly phone: string;
+  readonly email: string;
 }
 
 interface SeededMaster extends Party {
@@ -215,10 +215,10 @@ describe('call records, the LiveKit webhook and the reaper (issue #186)', () => 
   }
 
   async function signIn(): Promise<Party> {
-    const phone = nextPhone();
-    const created = await app.get(UsersRepository).create({ phoneE164: phone, roles: [] });
+    const email = nextEmail();
+    const created = await app.get(UsersRepository).create({ email, roles: [] });
     const pair = await app.get(SessionsService).startSession({ userId: created.user.id });
-    return { userId: created.user.id, accessToken: pair.accessToken, phone };
+    return { userId: created.user.id, accessToken: pair.accessToken, email };
   }
 
   async function dial(token: string): Promise<Socket> {
@@ -896,11 +896,11 @@ describe('call records, the LiveKit webhook and the reaper (issue #186)', () => 
     function expectNoPii(body: unknown, parties: readonly Party[]): void {
       const text = JSON.stringify(body);
       for (const party of parties) {
-        expect(text).not.toContain(party.phone);
-        expect(text).not.toContain(party.phone.slice(1));
+        expect(text).not.toContain(party.email);
+        expect(text).not.toContain(party.email.slice(0, party.email.lastIndexOf('@')));
         expect(text).not.toContain(party.userId);
       }
-      expect(text).not.toMatch(/token|phone/i);
+      expect(text).not.toMatch(/token|phone|email/i);
     }
 
     it(
@@ -1087,7 +1087,7 @@ describe('call records, the LiveKit webhook and the reaper (issue #186)', () => 
         );
         expect(backwards.status).toBe(422);
         expect((await get('/admin/calls?limit=101', adminToken)).status).toBe(422);
-        expect((await get('/admin/calls?phone=%2B994', adminToken)).status).toBe(422);
+        expect((await get('/admin/calls?email=ali%40example.com', adminToken)).status).toBe(422);
       },
       TEST_TIMEOUT_MS * 2,
     );

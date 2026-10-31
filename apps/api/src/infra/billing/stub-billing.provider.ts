@@ -16,7 +16,7 @@ import type {
 
 /**
  * Thrown from the provider factory, so a production deploy left on the stub
- * fails at boot naming the variable — as `StubSmsSender` does — rather than
+ * fails at boot naming the variable — as `StubEmailSender` does — rather than
  * handing masters a checkout page that does not exist.
  */
 export class StubBillingProviderInProductionError extends Error {

@@ -73,7 +73,7 @@ async function mount(): Promise<void> {
 }
 
 /**
- * The gate between a signed-in phone and the customer area (issue #94).
+ * The gate between a signed-in account and the customer area (issue #94).
  *
  * The behaviours under test are the ones the issue's acceptance criteria name:
  * a brand-new account can get a profile without a manual API call, a returning

@@ -97,7 +97,7 @@ describe('no token value ever appears in logs (issue #25)', () => {
 
   it('logs nothing containing the access token, refresh token, or refresh secret across a full startSession call and a deliberately failing verifyAccessToken', async () => {
     const created = await usersRepo.create({
-      phoneE164: '+994501111111',
+      email: 'token-logging@example.com',
       roles: ['customer'],
     });
 

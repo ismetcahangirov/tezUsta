@@ -46,17 +46,19 @@ Review the master  ←──────────→  the master reviews you
 
 ### Sign in
 
-**Phone number + SMS OTP** ([ADR-0008](../decisions/ADR-0008-otp-delivery.md)).
-One step: enter the number, enter the code, signed in. For a customer there is
+**Email address + a one-time code sent by email**
+([ADR-0072](../decisions/ADR-0072-email-one-time-code-sign-in.md)). One step:
+enter the address, enter the code from the email, signed in. There is no
+password, and the app never asks for a phone number. For a customer there is
 no other sign-in path — the admin panel has its own, on a different application
 ([ADR-0014](../decisions/ADR-0014-admin-authentication.md)).
 
-The SMS provider is still open, and it blocks this entirely — nothing can be
+The email provider is still open, and it blocks this entirely — nothing can be
 signed into without it.
 
 ### Say what to call you — first run only
 
-A code proves a phone number and nothing else, so a brand-new account has no
+A code proves an email address and nothing else, so a brand-new account has no
 name and no customer profile. On first entering the customer area the app asks
 one question — _what should we call you?_ — and that answer creates the profile
 every customer surface is addressed against
@@ -100,8 +102,8 @@ its long edge capped at 2560 px (#319). An iPhone's default HEIC is accepted
 this way, although the server's allow-list stays JPEG, PNG and WebP. The aim
 for a 12 MP photo is about a megabyte of mobile data instead of four to six.
 
-The storage **provider** is still open and blocks this step, exactly as the SMS
-provider blocks sign-in.
+The storage **provider** is still open and blocks this step, exactly as the
+email provider blocks sign-in.
 
 **OPEN:** maximum photo count.
 

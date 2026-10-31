@@ -132,18 +132,18 @@ describe('role switching', () => {
   });
 });
 
-describe('the pending OTP number', () => {
+describe('the pending OTP address', () => {
   it('is remembered between the two sign-in screens', () => {
     const store = createTestStore();
 
-    store.dispatch(otpRequested('+994501234567'));
+    store.dispatch(otpRequested('aysel@example.az'));
 
-    expect(selectOtpRequestedFor(store.getState())).toBe('+994501234567');
+    expect(selectOtpRequestedFor(store.getState())).toBe('aysel@example.az');
   });
 
   it('is dropped once the session starts', () => {
     const store = createTestStore();
-    store.dispatch(otpRequested('+994501234567'));
+    store.dispatch(otpRequested('aysel@example.az'));
 
     store.dispatch(signedIn({ userId: 'user-1', roles: ['customer'] }));
 
@@ -152,7 +152,7 @@ describe('the pending OTP number', () => {
 
   it('is dropped on sign-out', () => {
     const store = createTestStore();
-    store.dispatch(otpRequested('+994501234567'));
+    store.dispatch(otpRequested('aysel@example.az'));
 
     store.dispatch(signedOut());
 

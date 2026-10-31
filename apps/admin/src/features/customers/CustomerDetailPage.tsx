@@ -14,7 +14,7 @@ import { useCustomerDetailQuery, useCustomerOrdersInfiniteQuery } from './api';
 import { customersCopy } from './copy';
 import { type CustomerStatusAction, CustomerStatusDialog } from './CustomerStatusDialog';
 import { CustomerStatusBadge } from './CustomerStatusBadge';
-import { RevealCustomerPhoneDialog } from './RevealCustomerPhoneDialog';
+import { RevealCustomerEmailDialog } from './RevealCustomerEmailDialog';
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -83,7 +83,7 @@ type Outcome = { action: 'suspend'; suspension: AdminCustomerSuspension } | { ac
 function CustomerFile({ customer }: { customer: AdminCustomerDetail }) {
   const me = useSignedInAdmin();
   const canChangeStatus = me.permissions.includes('customers.suspend');
-  const canRevealPhone = me.permissions.includes('pii.read');
+  const canRevealEmail = me.permissions.includes('pii.read');
   const canOpenMaster = me.permissions.includes('masters.read');
   const [pending, setPending] = useState<CustomerStatusAction | null>(null);
   const [revealing, setRevealing] = useState(false);
@@ -112,7 +112,7 @@ function CustomerFile({ customer }: { customer: AdminCustomerDetail }) {
 
       {outcome !== null && <OutcomeBanner outcome={outcome} />}
 
-      {(canChangeStatus && action !== null) || canRevealPhone ? (
+      {(canChangeStatus && action !== null) || canRevealEmail ? (
         <div role="group" aria-label={customersCopy.actions} className="flex flex-wrap gap-3">
           {canChangeStatus && action !== null && (
             <Button
@@ -124,9 +124,9 @@ function CustomerFile({ customer }: { customer: AdminCustomerDetail }) {
               }}
             />
           )}
-          {canRevealPhone && (
+          {canRevealEmail && (
             <Button
-              label={customersCopy.revealNumber}
+              label={customersCopy.revealEmail}
               variant="secondary"
               onClick={() => setRevealing(true)}
             />
@@ -137,7 +137,7 @@ function CustomerFile({ customer }: { customer: AdminCustomerDetail }) {
       <Section title={customersCopy.profile}>
         <dl className="grid grid-cols-2 gap-x-8 gap-y-3 rounded-md border-hairline border-border bg-surface p-4 lg:grid-cols-4">
           <Fact label={customersCopy.joined}>{formatDateTime(customer.createdAt)}</Fact>
-          <Fact label={customersCopy.phone}>{customer.phoneMasked}</Fact>
+          <Fact label={customersCopy.email}>{customer.emailMasked}</Fact>
           <Fact label={customersCopy.ratings}>{String(customer.ratingCount)}</Fact>
           <Fact label={customersCopy.masterProfile}>
             {customer.masterProfile === null ? (
@@ -208,7 +208,7 @@ function CustomerFile({ customer }: { customer: AdminCustomerDetail }) {
         />
       )}
       {revealing && (
-        <RevealCustomerPhoneDialog
+        <RevealCustomerEmailDialog
           customerId={customer.id}
           name={customer.displayName}
           onClose={() => setRevealing(false)}

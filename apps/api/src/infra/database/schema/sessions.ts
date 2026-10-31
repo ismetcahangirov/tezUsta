@@ -24,7 +24,7 @@ export const sessionRevokedReason = pgEnum('session_revoked_reason', [
 /**
  * Which client a session was opened from
  * ([ADR-0061](docs/decisions/ADR-0061-master-web-subscription-page.md)).
- * `app` is the mobile app's phone-and-code session; `web` is the master's
+ * `app` is the mobile app's email-and-code session; `web` is the master's
  * subscription page, whose tokens carry their own audience and reach only the
  * routes that opt in. One table, so the master sees and can revoke a web
  * session from the app, and a suspension ends it with the rest.

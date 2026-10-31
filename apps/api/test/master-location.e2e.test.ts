@@ -53,11 +53,11 @@ import { grantTestSubscription } from './support/subscriptions';
  * `ConfigModule` reads `process.env` exactly once, at instantiation.
  */
 
-/** `users.phone_e164` is unique among live rows — see `master-profile.e2e.test.ts`. */
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99457${String(phoneCounter).padStart(7, '0')}`;
+/** `users.email` is unique among live rows — see `master-profile.e2e.test.ts`. */
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
 /**
@@ -134,7 +134,7 @@ describe('master location reporting over HTTP (issue #98)', () => {
   }
 
   async function signIn(roles: readonly UserRoleName[] = []): Promise<SignedIn> {
-    const created = await usersRepo.create({ phoneE164: nextPhone(), roles });
+    const created = await usersRepo.create({ email: nextEmail(), roles });
     const pair = await sessionsService.startSession({ userId: created.user.id });
     return { userId: created.user.id, accessToken: pair.accessToken };
   }

@@ -11,12 +11,12 @@ import { AppModule } from '../src/app.module';
 import type { ErrorEnvelope } from '../src/common/errors/error-envelope.types';
 import { parseEnv } from '../src/infra/config/parse-env';
 import { runMigrations } from '../src/infra/database/migrate';
+import type { EmailSender, OutboundEmail } from '../src/infra/email/email-sender.types';
+import { EMAIL_SENDER } from '../src/infra/email/email-sender.types';
+import { StubEmailSender } from '../src/infra/email/stub-email-sender';
 import type { RateLimitConfig, RateLimitPolicy } from '../src/infra/rate-limit/rate-limit.config';
 import { RATE_LIMIT_CONFIG } from '../src/infra/rate-limit/rate-limit.tokens';
 import { RateLimiterService } from '../src/infra/rate-limit/rate-limiter.service';
-import type { OutboundSms, SmsSender } from '../src/infra/sms/sms-sender.types';
-import { SMS_SENDER } from '../src/infra/sms/sms-sender.types';
-import { StubSmsSender } from '../src/infra/sms/stub-sms-sender';
 import type { OtpConfig } from '../src/modules/auth/otp.config';
 import { OTP_CONFIG } from '../src/modules/auth/otp.tokens';
 import type { ThrowawayDatabase } from './support/throwaway-database';
@@ -56,7 +56,7 @@ function unreachablePolicy(): RateLimitPolicy {
 }
 
 /**
- * Every per-phone and per-IP limit set far above anything this file could
+ * Every per-address and per-IP limit set far above anything this file could
  * possibly send. This suite is about the aggregate cap alone — the per-caller
  * limits are `auth.rate-limit.e2e.test.ts` and `auth.otp.e2e.test.ts`'s
  * concern, and a limit that fired here by accident would make a 429 look like
@@ -102,23 +102,20 @@ const testOtpConfig: OtpConfig = Object.freeze({
   ttlMs: 300_000,
   maxAttempts: 5,
   globalDailyCap: GLOBAL_DAILY_CAP,
-  // The #390 controls behind it, out of reach: every number here is in one
-  // range, this suite clears only the daily counter between tests, and it is
-  // about the daily cap alone.
+  // The #390 controls behind it, out of reach: this suite clears only the
+  // daily counter between tests, and it is about the daily cap alone.
   globalHourlyCap: 1_000,
-  prefixHourlyCap: 1_000,
-  rangeHourlyCap: 1_000,
   breakerMinSends: 10,
   breakerMinSuccessPercent: 0,
 });
 
-/** Wraps the real stub sender so a test can see exactly which numbers it was asked to send to. */
-class CountingSmsSender implements SmsSender {
+/** Wraps the real stub sender so a test can see exactly which addresses it was asked to send to. */
+class CountingEmailSender implements EmailSender {
   readonly sentTo: string[] = [];
 
-  constructor(private readonly inner: SmsSender) {}
+  constructor(private readonly inner: EmailSender) {}
 
-  async send(message: OutboundSms): Promise<void> {
+  async send(message: OutboundEmail): Promise<void> {
     this.sentTo.push(message.to);
     await this.inner.send(message);
   }
@@ -127,19 +124,19 @@ class CountingSmsSender implements SmsSender {
 let app: NestFastifyApplication;
 let database: ThrowawayDatabase;
 let originalDatabaseUrl: string | undefined;
-let sms: CountingSmsSender;
+let mail: CountingEmailSender;
 let limiter: RateLimiterService;
 
-let phoneCounter = 0;
+let emailCounter = 0;
 
-/** A fresh, valid Azerbaijani number per call — `users.phone_e164` is unique among live rows. */
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99451${String(phoneCounter).padStart(7, '0')}`;
+/** A fresh, valid address per call — `users.email` is unique among live rows. */
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
-function postRequest(phone: string) {
-  return request(app.getHttpServer()).post('/auth/otp/request').send({ phone });
+function postRequest(email: string) {
+  return request(app.getHttpServer()).post('/auth/otp/request').send({ email });
 }
 
 async function resetGlobalDailyCounter(): Promise<void> {
@@ -159,25 +156,25 @@ beforeAll(async () => {
     .useValue(testRateLimits)
     .overrideProvider(OTP_CONFIG)
     .useValue(testOtpConfig)
-    .overrideProvider(SMS_SENDER)
-    .useValue(new CountingSmsSender(new StubSmsSender('test')))
+    .overrideProvider(EMAIL_SENDER)
+    .useValue(new CountingEmailSender(new StubEmailSender('test')))
     .compile();
 
   app = moduleRef.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
   await app.init();
   await app.getHttpAdapter().getInstance().ready();
 
-  sms = app.get<CountingSmsSender>(SMS_SENDER);
+  mail = app.get<CountingEmailSender>(EMAIL_SENDER);
   limiter = app.get(RateLimiterService);
 });
 
 afterEach(async () => {
   vi.restoreAllMocks();
   await resetGlobalDailyCounter();
-  // `sms` is one `CountingSmsSender` shared by every test in this file — its
+  // `mail` is one `CountingEmailSender` shared by every test in this file — its
   // `sentTo` is cumulative unless cleared, and an absolute-length assertion in
   // one test would otherwise be counting sends a PREVIOUS test made too.
-  sms.sentTo.length = 0;
+  mail.sentTo.length = 0;
 });
 
 afterAll(async () => {
@@ -193,15 +190,15 @@ afterAll(async () => {
 describe('the (cap + 1)th send in a window is refused without calling the sender', () => {
   it('serves exactly the capped number of requests, then answers the generic delivery error', async () => {
     for (let i = 0; i < GLOBAL_DAILY_CAP; i += 1) {
-      const phone = nextPhone();
-      const response = await postRequest(phone);
+      const email = nextEmail();
+      const response = await postRequest(email);
       expect(response.status).toBe(200);
-      expect(sms.sentTo).toContain(phone);
+      expect(mail.sentTo).toContain(email);
     }
 
-    const refusedPhone = nextPhone();
-    const sentBeforeRefusal = sms.sentTo.length;
-    const refused = await postRequest(refusedPhone);
+    const refusedEmail = nextEmail();
+    const sentBeforeRefusal = mail.sentTo.length;
+    const refused = await postRequest(refusedEmail);
 
     // The same generic answer ADR-0008 already gives for a provider outage —
     // an attacker must not be able to tell "the cap tripped" from "the
@@ -214,17 +211,17 @@ describe('the (cap + 1)th send in a window is refused without calling the sender
     );
 
     // The sender was never reached for the refused request.
-    expect(sms.sentTo).toHaveLength(sentBeforeRefusal);
-    expect(sms.sentTo).not.toContain(refusedPhone);
+    expect(mail.sentTo).toHaveLength(sentBeforeRefusal);
+    expect(mail.sentTo).not.toContain(refusedEmail);
   });
 });
 
 describe('concurrent requests at the boundary cannot overshoot the cap', () => {
   it('lets exactly the capped number of simultaneous requests through', async () => {
     const extra = 3;
-    const phones = Array.from({ length: GLOBAL_DAILY_CAP + extra }, () => nextPhone());
+    const emails = Array.from({ length: GLOBAL_DAILY_CAP + extra }, () => nextEmail());
 
-    const responses = await Promise.all(phones.map((phone) => postRequest(phone)));
+    const responses = await Promise.all(emails.map((email) => postRequest(email)));
 
     const succeeded = responses.filter((response) => response.status === 200);
     const refused = responses.filter((response) => response.status === 503);
@@ -241,36 +238,36 @@ describe('concurrent requests at the boundary cannot overshoot the cap', () => {
     }
 
     // The sender was asked to send exactly once per successful response —
-    // never more (double-send) and never for a phone that was refused.
-    expect(sms.sentTo).toHaveLength(GLOBAL_DAILY_CAP);
-    expect(new Set(sms.sentTo).size).toBe(GLOBAL_DAILY_CAP);
+    // never more (double-send) and never for an address that was refused.
+    expect(mail.sentTo).toHaveLength(GLOBAL_DAILY_CAP);
+    expect(new Set(mail.sentTo).size).toBe(GLOBAL_DAILY_CAP);
   });
 });
 
-describe('the trip is logged once per window, without a phone number', () => {
+describe('the trip is logged once per window, without an email address', () => {
   it('logs at error level exactly once, on the first refusal past the cap', async () => {
     // Spied directly on the `Logger` class method, the way
     // `auth.rate-limit.e2e.test.ts` asserts its own security-event logging —
     // this intercepts every call regardless of which sink the active logger
     // implementation (Nest's `TestingLogger` here) ultimately writes to.
     const errorSpy = vi.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);
-    const phones: string[] = [];
+    const emails: string[] = [];
 
     for (let i = 0; i < GLOBAL_DAILY_CAP; i += 1) {
-      const phone = nextPhone();
-      phones.push(phone);
-      expect((await postRequest(phone)).status).toBe(200);
+      const email = nextEmail();
+      emails.push(email);
+      expect((await postRequest(email)).status).toBe(200);
     }
 
     // Two refusals past the cap: the trip line must appear for the first one
     // only, not the second — `AllExceptionsFilter` also logs an `error` line
     // for every 5xx it sees, so this counts occurrences of the DISTINCT trip
     // message rather than every `error` call.
-    const firstRefusedPhone = nextPhone();
-    const secondRefusedPhone = nextPhone();
-    phones.push(firstRefusedPhone, secondRefusedPhone);
-    expect((await postRequest(firstRefusedPhone)).status).toBe(503);
-    expect((await postRequest(secondRefusedPhone)).status).toBe(503);
+    const firstRefusedEmail = nextEmail();
+    const secondRefusedEmail = nextEmail();
+    emails.push(firstRefusedEmail, secondRefusedEmail);
+    expect((await postRequest(firstRefusedEmail)).status).toBe(503);
+    expect((await postRequest(secondRefusedEmail)).status).toBe(503);
 
     const allErrorText = errorSpy.mock.calls
       .flat()
@@ -284,11 +281,11 @@ describe('the trip is logged once per window, without a phone number', () => {
     expect(trips).toHaveLength(1);
     expect(trips[0]).toContain(`cap=${String(GLOBAL_DAILY_CAP)}`);
 
-    // No phone number anywhere in what was logged at error level — this
-    // counter has no per-caller subject, and none of the phones used to reach
-    // it may leak either.
-    for (const phone of phones) {
-      expect(allErrorText).not.toContain(phone);
+    // No email address anywhere in what was logged at error level — this
+    // counter has no per-caller subject, and none of the addresses used to
+    // reach it may leak either.
+    for (const email of emails) {
+      expect(allErrorText).not.toContain(email);
     }
   });
 
@@ -296,7 +293,7 @@ describe('the trip is logged once per window, without a phone number', () => {
     const errorSpy = vi.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);
 
     for (let i = 0; i < GLOBAL_DAILY_CAP; i += 1) {
-      expect((await postRequest(nextPhone())).status).toBe(200);
+      expect((await postRequest(nextEmail())).status).toBe(200);
     }
 
     const trips = errorSpy.mock.calls

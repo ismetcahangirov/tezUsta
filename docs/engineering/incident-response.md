@@ -24,7 +24,7 @@ provider-specific commands here and keep the rest.
 | Severity | Meaning                                                                                 | Example                                                            |
 | -------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
 | **SEV1** | Personal data or server authority is exposed now, or someone is physically at risk      | Committed `DATABASE_URL`; a master sees other customers' addresses |
-| **SEV2** | An abuse vector is being used, or a secret leaked that grants billing power but no data | SMS budget draining; `GOOGLE_MAPS_SERVER_API_KEY` published        |
+| **SEV2** | An abuse vector is being used, or a secret leaked that grants billing power but no data | OTP mail flood; `GOOGLE_MAPS_SERVER_API_KEY` published             |
 | **SEV3** | A weakness nobody is known to be using                                                  | A missing rate limit found in review                               |
 
 SEV1 and SEV2 are handled now. SEV3 becomes a normal `type:security` issue,
@@ -40,23 +40,23 @@ it**, then clean history if you want to.
 
 What rotating each secret does. Know this before you do it:
 
-| Secret                                      | Rotating it…                                                                                                                                                                                           |
-| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `JWT_ACCESS_SECRET`                         | Invalidates every access token at once. Clients refresh transparently, so users barely notice.                                                                                                         |
-| `JWT_REFRESH_SECRET`                        | Refresh-token hashes are keyed by it (`sessions.ts`), so **every user is signed out** and needs a new OTP. Also invalidate access tokens.                                                              |
-| `JWT_ADMIN_ACCESS_SECRET`                   | Every admin is signed out of the panel.                                                                                                                                                                |
-| `OTP_CODE_PEPPER`                           | OTP challenges in flight fail; users request a new code. Harmless.                                                                                                                                     |
-| `RATE_LIMIT_KEY_SECRET`                     | Resets every rate-limit counter. Rotate it outside an ongoing abuse campaign if you can.                                                                                                               |
-| `ADMIN_TOTP_ENCRYPTION_KEY`                 | Stored TOTP secrets become unreadable. **Every admin must re-enrol** a second factor (`reset-second-factor`, then setup link).                                                                         |
-| `DATABASE_URL` credentials                  | Change the Postgres role's password, update the env, restart every API and worker instance.                                                                                                            |
-| `S3_ACCESS_KEY_ID` / `S3_SECRET_ACCESS_KEY` | Create a new R2 token, deploy it, then delete the old one in Cloudflare. The token covers both buckets, private and public media. Presigned URLs already issued die with the old key.                  |
-| `CLOUDFLARE_PURGE_API_TOKEN`                | Create a new token with Zone → Cache Purge on the media zone only, deploy it, then delete the old one. Deletions purge nothing until it is deployed, and the sweeps retry.                             |
-| `GOOGLE_MAPS_SERVER_API_KEY`                | Create a new key in Google Cloud, deploy, delete the old one. Check billing for usage while it was exposed.                                                                                            |
-| `LIVEKIT_API_KEY` / `LIVEKIT_API_SECRET`    | New key pair in LiveKit; the webhook signature also changes. Calls in progress drop.                                                                                                                   |
-| `EXPO_ACCESS_TOKEN`                         | Revoke it in the Expo dashboard and issue a new one. Pushes fail until it is deployed.                                                                                                                 |
-| `PLIVO_AUTH_TOKEN` / `TWILIO_AUTH_TOKEN`    | Regenerate it in that provider's console and deploy it. Until then sign-in goes through the other provider if `SMS_FALLBACK_PROVIDER` names it. Check the console's spend for the time it was exposed. |
-| `BILLING_TOKEN_ENCRYPTION_KEY`              | Every saved card becomes unreadable and is no longer charged. Masters renew by hand, and their next purchase with auto-renewal saves the card again.                                                   |
-| `EXPO_PUBLIC_GOOGLE_MAPS_*`                 | Not a secret (security.md). Check the key's bundle-id and API restrictions are still in place.                                                                                                         |
+| Secret                                      | Rotating it…                                                                                                                                                                                |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `JWT_ACCESS_SECRET`                         | Invalidates every access token at once. Clients refresh transparently, so users barely notice.                                                                                              |
+| `JWT_REFRESH_SECRET`                        | Refresh-token hashes are keyed by it (`sessions.ts`), so **every user is signed out** and needs a new OTP. Also invalidate access tokens.                                                   |
+| `JWT_ADMIN_ACCESS_SECRET`                   | Every admin is signed out of the panel.                                                                                                                                                     |
+| `OTP_CODE_PEPPER`                           | OTP challenges in flight fail; users request a new code. Harmless.                                                                                                                          |
+| `RATE_LIMIT_KEY_SECRET`                     | Resets every rate-limit counter. Rotate it outside an ongoing abuse campaign if you can.                                                                                                    |
+| `ADMIN_TOTP_ENCRYPTION_KEY`                 | Stored TOTP secrets become unreadable. **Every admin must re-enrol** a second factor (`reset-second-factor`, then setup link).                                                              |
+| `DATABASE_URL` credentials                  | Change the Postgres role's password, update the env, restart every API and worker instance.                                                                                                 |
+| `S3_ACCESS_KEY_ID` / `S3_SECRET_ACCESS_KEY` | Create a new R2 token, deploy it, then delete the old one in Cloudflare. The token covers both buckets, private and public media. Presigned URLs already issued die with the old key.       |
+| `CLOUDFLARE_PURGE_API_TOKEN`                | Create a new token with Zone → Cache Purge on the media zone only, deploy it, then delete the old one. Deletions purge nothing until it is deployed, and the sweeps retry.                  |
+| `GOOGLE_MAPS_SERVER_API_KEY`                | Create a new key in Google Cloud, deploy, delete the old one. Check billing for usage while it was exposed.                                                                                 |
+| `LIVEKIT_API_KEY` / `LIVEKIT_API_SECRET`    | New key pair in LiveKit; the webhook signature also changes. Calls in progress drop.                                                                                                        |
+| `EXPO_ACCESS_TOKEN`                         | Revoke it in the Expo dashboard and issue a new one. Pushes fail until it is deployed.                                                                                                      |
+| Email provider credential                   | No provider is chosen yet (ADR-0072 § 6). Once one is: regenerate it in the provider's console and deploy it; sign-in fails until it is deployed. Check what was sent while it was exposed. |
+| `BILLING_TOKEN_ENCRYPTION_KEY`              | Every saved card becomes unreadable and is no longer charged. Masters renew by hand, and their next purchase with auto-renewal saves the card again.                                        |
+| `EXPO_PUBLIC_GOOGLE_MAPS_*`                 | Not a secret (security.md). Check the key's bundle-id and API restrictions are still in place.                                                                                              |
 
 Every secret is validated at boot by `apps/api/src/infra/config/env.schema.ts`.
 If a rotated value is missing, the process refuses to start instead of starting
@@ -99,33 +99,29 @@ Every rate limit is an environment variable in `env.schema.ts` (`*_RATE_LIMIT_*`
 backed by Redis, so tightening one means changing the value and restarting.
 You do not need a code change.
 
-- **SMS cost attack:** lower `OTP_RATE_LIMIT_PER_IP_HOUR` and
-  `OTP_RATE_LIMIT_PER_PHONE_HOUR`. `OTP_GLOBAL_DAILY_CAP` bounds the day's
-  total spend however the attack is spread. When it trips, an `error` line says
+- **OTP mail flood** (codes requested for addresses nobody owns, which hurts
+  the sending domain's reputation): lower `OTP_RATE_LIMIT_PER_IP_HOUR` and
+  `OTP_RATE_LIMIT_PER_EMAIL_HOUR`. `OTP_GLOBAL_DAILY_CAP` bounds the day's
+  total sends however the attack is spread. When it trips, an `error` line says
   so and **every** sign-in fails until the window resets. Lower it to cap the
-  bill during an attack, or raise it if the traffic turns out to be real (see
-  [security.md](security.md)). If the attack continues, pause sending at the
-  provider (ADR-0059). Plivo's console is the primary, and Twilio's is the
-  fallback. Pausing one only moves the traffic to the other, so pause both or
-  unset `SMS_FALLBACK_PROVIDER`. A paused provider stops all sign-in, so that
-  is a decision for the owner.
+  sending during an attack, or raise it if the traffic turns out to be real
+  (see [security.md](security.md)). If the attack continues, pause sending at
+  the email provider once one exists (ADR-0072). A paused provider stops all
+  sign-in, so that is a decision for the owner.
 - **An OTP fraud control tripped** (#390): one `error` line names it. The
-  hourly cap (`otp-global-hourly`), the per-prefix and per-range caps, and
-  the circuit breaker (`otp circuit breaker open: N of M codes entered`) all
-  answer callers with the same generic 503 as the daily cap.
-  - The hourly caps clear at the next clock hour.
+  hourly cap (`otp-global-hourly`) and the circuit breaker
+  (`otp circuit breaker open: N of M codes entered`) both answer callers with
+  the same generic 503 as the daily cap.
+  - The hourly cap clears at the next clock hour.
   - The breaker closes on its own once the bad hour ages out, over one to two
     hours.
   - If the traffic was real, for example a launch spike of customers slow to
     type, raise the cap, or set `OTP_BREAKER_MIN_SUCCESS_PERCENT=0` to turn
     the breaker off and redeploy.
-  - If it was pumping, leave it shut and pause the provider (below).
-- **Before SMS goes live** (ADR-0059), set up both consoles:
-  - restrict each one to Azerbaijan, in Plivo's geo permissions and Twilio's
-    SMS geo permissions;
-  - set a daily spend alert below `OTP_GLOBAL_DAILY_CAP` times the Nar price;
-  - turn on Plivo's SMS pumping protection, which is reported to be on by
-    default.
+  - If it was abuse, leave it shut and pause the provider (above).
+- **Before email sign-in goes live** (ADR-0072), set up the provider and the
+  sending domain: SPF, DKIM and DMARC records, and a bounce and complaint
+  alert in the provider's console.
 - **Spam orders:** lower `ORDER_CREATE_RATE_LIMIT_PER_USER_HOUR` and suspend
   the accounts involved.
 - **Location spoofing or offer grabbing by a master:** suspend the master.
@@ -156,7 +152,7 @@ You do not need a code change.
 | What happened to an order?      | `order_status_history`, and the admin order screen                      |
 | Which request caused an error?  | The `requestId` on the log line and in the client's error response      |
 
-Logs never contain tokens, OTP codes, full phone numbers or coordinates
+Logs never contain tokens, OTP codes, full email addresses or coordinates
 (security.md § Logging). If you find one that does, that is a second incident.
 
 ## After the incident

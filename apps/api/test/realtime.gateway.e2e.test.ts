@@ -44,10 +44,10 @@ import { createThrowawayDatabase } from './support/throwaway-database';
  * `init()`ed has never bound a port for a client to dial.
  */
 
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99450${String(1_000_000 + phoneCounter).slice(-7)}`;
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
 /** The one message every refusal carries. See `socket.authenticator.ts`. */
@@ -73,7 +73,7 @@ describe('realtime gateway: who may hold a connection (issue #166)', () => {
   }
 
   async function signIn(roles: readonly UserRoleName[] = ['customer']): Promise<SignedIn> {
-    const created = await usersRepo.create({ phoneE164: nextPhone(), roles });
+    const created = await usersRepo.create({ email: nextEmail(), roles });
     const pair = await sessionsService.startSession({ userId: created.user.id });
     const claims = tokens.verifyAccessToken(pair.accessToken);
 

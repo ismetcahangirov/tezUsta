@@ -152,8 +152,8 @@ const config: RateLimitConfig = {
   },
 };
 
-/** A realistic Azerbaijani mobile number in E.164 — the PII under test. */
-const PHONE = '+994501112233';
+/** A realistic, already-normalised email address — the PII under test. */
+const EMAIL = 'ali.veli@example.com';
 
 let redis: Redis;
 let limiter: RateLimiterService;
@@ -184,7 +184,7 @@ async function consume(request: RateLimitRequest) {
 function limitFor(overrides: Partial<RateLimitRequest> & { scope: string }): RateLimitRequest {
   return {
     dimension: 'identifier',
-    subject: PHONE,
+    subject: EMAIL,
     limit: 3,
     windowMs: 60_000,
     backoffCeilingMs: 60_000,
@@ -267,7 +267,7 @@ describe('RateLimiterService — the limit itself', () => {
 
   it('enforces the per-identifier and per-IP limits independently', async () => {
     const scope = scopeFor('dimensions');
-    const byPhone: RateLimitRequest = limitFor({ scope, dimension: 'identifier', limit: 2 });
+    const byEmail: RateLimitRequest = limitFor({ scope, dimension: 'identifier', limit: 2 });
     const byIp: RateLimitRequest = limitFor({
       scope,
       dimension: 'ip',
@@ -275,14 +275,14 @@ describe('RateLimiterService — the limit itself', () => {
       limit: 2,
     });
 
-    // Spend the phone budget to exhaustion.
-    await consume(byPhone);
-    await consume(byPhone);
-    expect((await consume(byPhone)).allowed).toBe(false);
+    // Spend the address budget to exhaustion.
+    await consume(byEmail);
+    await consume(byEmail);
+    expect((await consume(byEmail)).allowed).toBe(false);
 
     // The IP budget must be untouched — a caller who exhausted one axis has
     // not spent the other, or the two limits are really one limit with two
-    // names and the per-IP protection against number-rotation is imaginary.
+    // names and the per-IP protection against address-rotation is imaginary.
     const firstFromIp = await consume(byIp);
     expect(firstFromIp.allowed).toBe(true);
     expect(firstFromIp.remaining).toBe(1);
@@ -422,29 +422,29 @@ describe('RateLimiterService — atomicity and shared state', () => {
 });
 
 describe('RateLimiterService — the subject never reaches Redis in the clear', () => {
-  it('puts no part of the phone number in the Redis key', async () => {
+  it('puts no part of the email address in the Redis key', async () => {
     const scope = scopeFor('privacy');
-    await consume(limitFor({ scope, subject: PHONE, windowMs: 60_000 }));
+    await consume(limitFor({ scope, subject: EMAIL, windowMs: 60_000 }));
 
     const keys = await scanKeys(redis, `rl:v1:${scope}:*`);
     expect(keys).toHaveLength(1);
 
     for (const key of keys) {
-      // The whole number, and the national part without the country code —
-      // a key containing `501112233` is just as much a stored phone number.
-      expect(key).not.toContain(PHONE);
-      expect(key).not.toContain('501112233');
+      // The whole address, and the local part without the domain — a key
+      // containing `ali.veli` is just as much a stored email address.
+      expect(key).not.toContain(EMAIL);
+      expect(key).not.toContain('ali.veli');
       // Nothing but the scope, the dimension and hex.
       expect(key).toMatch(new RegExp(`^rl:v1:${scope}:identifier:[0-9a-f]{32}$`));
     }
   });
 
-  it('reports a digest for logging that reveals neither the number nor which policy it reused', async () => {
+  it('reports a digest for logging that reveals neither the address nor which policy it reused', async () => {
     const scopeA = scopeFor('digest-a');
     const scopeB = scopeFor('digest-b');
 
-    const underA = await consume(limitFor({ scope: scopeA, subject: PHONE, windowMs: 60_000 }));
-    const underB = await consume(limitFor({ scope: scopeB, subject: PHONE, windowMs: 60_000 }));
+    const underA = await consume(limitFor({ scope: scopeA, subject: EMAIL, windowMs: 60_000 }));
+    const underB = await consume(limitFor({ scope: scopeB, subject: EMAIL, windowMs: 60_000 }));
 
     expect(underA.subjectDigest).not.toContain('501112233');
     expect(underA.subjectDigest).toMatch(/^[0-9a-f]{12}$/);
@@ -457,7 +457,7 @@ describe('RateLimiterService — the subject never reaches Redis in the clear', 
     // Stable within a policy, or the digest would be useless for correlating
     // repeated abuse from one source.
     const againUnderA = await consume(
-      limitFor({ scope: scopeA, subject: PHONE, windowMs: 60_000 }),
+      limitFor({ scope: scopeA, subject: EMAIL, windowMs: 60_000 }),
     );
     expect(againUnderA.subjectDigest).toBe(underA.subjectDigest);
   });
@@ -509,7 +509,7 @@ describe('RateLimiterService — the attempt cap (the primitive issue #29 consum
       await attempt(scope, firstCode, 5);
     }
 
-    // The subject is the challenge id, not the phone number, precisely so
+    // The subject is the challenge id, not the email address, precisely so
     // that burning one code's attempts cannot lock out the next one the user
     // legitimately requests.
     const freshCode = await attempt(scope, secondCode, 5);
@@ -544,13 +544,13 @@ describe('RateLimiterService — the attempt cap (the primitive issue #29 consum
     expect((await attempt(scope, challengeId, 2)).used).toBe(1);
   });
 
-  it('keeps the phone number out of the attempt key as well', async () => {
+  it('keeps the email address out of the attempt key as well', async () => {
     const scope = scopeFor('attempts-privacy');
-    await attempt(scope, PHONE, 5);
+    await attempt(scope, EMAIL, 5);
 
     const keys = await scanKeys(redis, `rl:v1:${scope}:*`);
     expect(keys).toHaveLength(1);
-    expect(keys[0]).not.toContain('501112233');
+    expect(keys[0]).not.toContain('ali.veli');
     expect(keys[0]).toMatch(new RegExp(`^rl:v1:${scope}:attempt:[0-9a-f]{32}$`));
   });
 });

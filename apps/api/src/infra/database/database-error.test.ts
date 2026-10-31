@@ -9,30 +9,30 @@ import { databaseErrorCode, describeDatabaseFailure, isUniqueViolation } from '.
  * `pg`'s `DatabaseError` carries the SQLSTATE and a `detail` that quotes the
  * failing row; `drizzle-orm@0.45.2` wraps it and builds its own message by
  * interpolating the bound parameters (`pg-core/session.js` →
- * `errors.js`). Between them they put a phone number in three places, which is
+ * `errors.js`). Between them they put an email address in three places, which is
  * why `all-exceptions.filter.ts` may not simply log `exception.stack`
  * (issue #63) and why a `catch` may not read `code` off the throwable
  * (issue #70).
  */
-const PHONE = '+994501112233';
+const EMAIL = 'ali.veli@example.com';
 
 function driverError(code: string, overrides: Record<string, string> = {}): Error {
   return Object.assign(new Error(`duplicate key value violates unique constraint "users_x"`), {
     code,
     severity: 'ERROR',
-    detail: `Key (phone_e164)=(${PHONE}) already exists.`,
+    detail: `Key (email)=(${EMAIL}) already exists.`,
     schema: 'public',
     table: 'users',
-    constraint: 'users_phone_e164_live_unique',
+    constraint: 'users_email_live_unique',
     routine: '_bt_check_unique',
     ...overrides,
   });
 }
 
 function wrapped(cause: Error): Error {
-  const query = 'insert into "users" ("id", "phone_e164") values ($1, $2)';
-  const wrapper = new Error(`Failed query: ${query}\nparams: ${PHONE}`, { cause });
-  return Object.assign(wrapper, { query, params: ['01a0', PHONE] });
+  const query = 'insert into "users" ("id", "email") values ($1, $2)';
+  const wrapper = new Error(`Failed query: ${query}\nparams: ${EMAIL}`, { cause });
+  return Object.assign(wrapper, { query, params: ['01a0', EMAIL] });
 }
 
 describe('databaseErrorCode', () => {
@@ -81,16 +81,16 @@ describe('describeDatabaseFailure', () => {
     const text = description ?? '';
 
     // The parameter, the wrapper's interpolated message, and the driver's
-    // `detail` are three separate routes to the same phone number. All three
+    // `detail` are three separate routes to the same email address. All three
     // are closed.
-    expect(text).not.toContain(PHONE);
+    expect(text).not.toContain(EMAIL);
     expect(text).not.toContain('Failed query');
     expect(text).not.toContain('already exists');
 
     // And the failure is still diagnosable: which error, which constraint,
     // which statement.
     expect(text).toContain('23505');
-    expect(text).toContain('users_phone_e164_live_unique');
+    expect(text).toContain('users_email_live_unique');
     expect(text).toContain('insert into "users"');
   });
 
@@ -110,7 +110,7 @@ describe('describeDatabaseFailure', () => {
 
     expect(text).toContain('23514');
     expect(text).toContain('services_pricing_shape');
-    expect(text).not.toContain(PHONE);
+    expect(text).not.toContain(EMAIL);
   });
 
   it('returns null for an error that is not a database error', () => {

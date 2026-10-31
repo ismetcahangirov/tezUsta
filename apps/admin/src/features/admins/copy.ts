@@ -34,7 +34,7 @@ export const adminsCopy = {
   },
 
   roleHints: {
-    support: 'Live orders, disputes, phone reveal, calls; reads masters',
+    support: 'Live orders, disputes, email reveal, calls; reads masters',
     moderator: 'Master verification and suspension, reviews',
     finance: 'Dispute outcomes; reads orders',
     super_admin: 'Everything, including the catalogue, the audit log and admins',

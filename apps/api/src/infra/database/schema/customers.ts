@@ -86,9 +86,9 @@ export const customers = pgTable(
   (table) => [
     /**
      * Unique across **all** rows, not only live ones — deliberately unlike
-     * `users_phone_e164_live_unique`.
+     * `users_email_live_unique`.
      *
-     * The partial index on `users` exists because a phone number can be
+     * The partial index on `users` exists because an email address can be
      * reassigned to a different person, so a dead row must not block a new
      * account. A user id cannot be reassigned: the same account coming back
      * is the same person, and the only sensible answer to "create my customer
