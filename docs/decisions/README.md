@@ -113,6 +113,7 @@ its provider interface lives.
 | [0070](ADR-0070-inter-typeface-and-type-scale.md)                  | Every surface is set in Inter, on a larger type scale                                    | Accepted                                                                 |
 | [0071](ADR-0071-hosting-provider-and-region.md)                    | Hosting: DigitalOcean Frankfurt, once a lawyer clears hosting abroad                     | Proposed                                                                 |
 | [0072](ADR-0072-email-one-time-code-sign-in.md)                    | Sign-in is email + a one-time code; the phone number is removed                          | Accepted (email provider and account recovery pending)                   |
+| [0073](ADR-0073-becoming-a-master-in-the-app.md)                   | Becoming a master in the app: first-launch choice and "Usta ol" in Settings              | Accepted (entry points by delegation; copy the owner's)                  |
 
 ## Template
 

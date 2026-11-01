@@ -4,8 +4,16 @@ import { Text } from 'react-native';
 import { Provider } from 'react-redux';
 
 import { createTestStore } from '../../test/support/test-store';
+import { MASTER_ONBOARDING_COPY as roleCopy } from '../master-onboarding/master-onboarding-copy';
+import type { AppRole } from '../store/session-slice';
+import { signedIn } from '../store/session-slice';
 import { CustomerProfileGate } from './CustomerProfileGate';
 import { CUSTOMERS_COPY as copy } from './customers-copy';
+
+const mockPush = jest.fn();
+jest.mock('expo-router', () => ({
+  router: { push: (...args: unknown[]) => mockPush(...args) },
+}));
 
 jest.mock('expo-secure-store', () => ({
   getItemAsync: jest.fn(() => Promise.resolve(null)),
@@ -61,15 +69,32 @@ function installTransport(): void {
   }) as typeof fetch;
 }
 
-async function mount(): Promise<void> {
+/**
+ * `roles` are the grants the token carries. A brand-new account has none
+ * (sign-in grants no role), which is what makes the gate ask which side it is
+ * on before the name question (#490).
+ */
+async function mount(roles: readonly AppRole[] = []): Promise<void> {
   installTransport();
+  const store = createTestStore();
+  if (roles.length > 0) {
+    store.dispatch(signedIn({ userId: 'user-1', roles }));
+  }
   await render(
-    <Provider store={createTestStore()}>
+    <Provider store={store}>
       <CustomerProfileGate>
         <Text>{CUSTOMER_AREA}</Text>
       </CustomerProfileGate>
     </Provider>,
   );
+}
+
+/** Answers the brand-new account's first question with "I want to order". */
+async function chooseCustomer(): Promise<void> {
+  await waitFor(() => {
+    expect(screen.getByText(roleCopy.choiceCustomer)).toBeOnTheScreen();
+  });
+  await fireEvent.press(screen.getByText(roleCopy.choiceCustomer));
 }
 
 /**
@@ -84,6 +109,7 @@ describe('CustomerProfileGate', () => {
   beforeEach(() => {
     replies = {};
     requests.length = 0;
+    mockPush.mockClear();
   });
 
   it('announces that it is checking while the first request is in flight', async () => {
@@ -121,6 +147,7 @@ describe('CustomerProfileGate', () => {
     };
     replies[routeKey('POST', '/customers')] = { status: 201, body: PROFILE };
     await mount();
+    await chooseCustomer();
 
     await waitFor(() => {
       expect(screen.getByText(copy.setupTitle)).toBeOnTheScreen();
@@ -145,6 +172,7 @@ describe('CustomerProfileGate', () => {
     replies[routeKey('GET', '/customers/me')] = { status: 404, body: {} };
     replies[routeKey('POST', '/customers')] = { status: 201, body: PROFILE };
     await mount();
+    await chooseCustomer();
 
     await waitFor(() => {
       expect(screen.getByText(copy.setupTitle)).toBeOnTheScreen();
@@ -163,6 +191,7 @@ describe('CustomerProfileGate', () => {
   it('will not submit an empty or whitespace-only name', async () => {
     replies[routeKey('GET', '/customers/me')] = { status: 404, body: {} };
     await mount();
+    await chooseCustomer();
 
     await waitFor(() => {
       expect(screen.getByText(copy.setupTitle)).toBeOnTheScreen();
@@ -217,6 +246,7 @@ describe('CustomerProfileGate', () => {
       },
     };
     await mount();
+    await chooseCustomer();
 
     await waitFor(() => {
       expect(screen.getByText(copy.setupTitle)).toBeOnTheScreen();
@@ -236,6 +266,7 @@ describe('CustomerProfileGate', () => {
     replies[routeKey('GET', '/customers/me')] = { status: 404, body: {} };
     replies[routeKey('POST', '/customers')] = { transportError: true };
     await mount();
+    await chooseCustomer();
 
     await waitFor(() => {
       expect(screen.getByText(copy.setupTitle)).toBeOnTheScreen();
@@ -256,6 +287,7 @@ describe('CustomerProfileGate', () => {
     replies[routeKey('GET', '/customers/me')] = { status: 404, body: {} };
     replies[routeKey('POST', '/customers')] = { status: 200, body: PROFILE };
     await mount();
+    await chooseCustomer();
 
     await waitFor(() => {
       expect(screen.getByText(copy.setupTitle)).toBeOnTheScreen();
@@ -268,4 +300,40 @@ describe('CustomerProfileGate', () => {
       expect(screen.getByText(CUSTOMER_AREA)).toBeOnTheScreen();
     });
   }, 15_000);
+
+  describe('the first question a brand-new account answers (#490)', () => {
+    it('asks whether the account wants to order or to work before asking a name', async () => {
+      replies[routeKey('GET', '/customers/me')] = { status: 404, body: {} };
+      await mount();
+
+      await waitFor(() => {
+        expect(screen.getByText(roleCopy.choiceTitle)).toBeOnTheScreen();
+      });
+      expect(screen.getByText(roleCopy.choiceMaster)).toBeOnTheScreen();
+      expect(screen.queryByText(copy.setupTitle)).not.toBeOnTheScreen();
+    });
+
+    it('opens the master onboarding, without creating a customer profile', async () => {
+      replies[routeKey('GET', '/customers/me')] = { status: 404, body: {} };
+      await mount();
+
+      await waitFor(() => {
+        expect(screen.getByText(roleCopy.choiceMaster)).toBeOnTheScreen();
+      });
+      await fireEvent.press(screen.getByText(roleCopy.choiceMaster));
+
+      expect(mockPush).toHaveBeenCalledWith('/(shared)/become-master');
+      expect(requests.some((r) => r.method === 'POST' && r.pathname === '/customers')).toBe(false);
+    });
+
+    it('goes straight to the name for an account that already holds a role', async () => {
+      replies[routeKey('GET', '/customers/me')] = { status: 404, body: {} };
+      await mount(['master']);
+
+      await waitFor(() => {
+        expect(screen.getByText(copy.setupTitle)).toBeOnTheScreen();
+      });
+      expect(screen.queryByText(roleCopy.choiceTitle)).not.toBeOnTheScreen();
+    });
+  });
 });

@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1436,
-    "tests": 431,
+    "files": 1449,
+    "tests": 433,
     "violations": 0
   },
   "byWorkspace": {
@@ -360,8 +360,8 @@
       ]
     },
     "apps/mobile": {
-      "files": 546,
-      "tests": 181,
+      "files": 559,
+      "tests": 183,
       "untested": [
         "apps/mobile/.storybook/main.ts",
         "apps/mobile/.storybook/preview.tsx",
@@ -386,6 +386,7 @@
         "apps/mobile/app/(master)/services.tsx",
         "apps/mobile/app/(master)/subscription.tsx",
         "apps/mobile/app/(shared)/_layout.tsx",
+        "apps/mobile/app/(shared)/become-master.tsx",
         "apps/mobile/app/(shared)/reviews.tsx",
         "apps/mobile/app/(shared)/settings.tsx",
         "apps/mobile/app/_layout.tsx",
@@ -470,6 +471,13 @@
         "apps/mobile/src/master-jobs/index.ts",
         "apps/mobile/src/master-jobs/master-jobs-endpoints.ts",
         "apps/mobile/src/master-jobs/useOwnPosition.ts",
+        "apps/mobile/src/master-onboarding/RoleChoice.tsx",
+        "apps/mobile/src/master-onboarding/VerificationNotice.tsx",
+        "apps/mobile/src/master-onboarding/index.ts",
+        "apps/mobile/src/master-onboarding/master-onboarding-endpoints.ts",
+        "apps/mobile/src/master-onboarding/useBecomeMaster.ts",
+        "apps/mobile/src/master-onboarding/useDocumentUpload.ts",
+        "apps/mobile/src/master-onboarding/useOpenMasterArea.ts",
         "apps/mobile/src/master-services/index.ts",
         "apps/mobile/src/master-services/master-services-endpoints.ts",
         "apps/mobile/src/master-subscription/index.ts",
@@ -20770,6 +20778,7 @@
         "apps/mobile/src/components/index.ts",
         "apps/mobile/src/master-availability/index.ts",
         "apps/mobile/src/master-jobs/index.ts",
+        "apps/mobile/src/master-onboarding/index.ts",
         "apps/mobile/src/master-subscription/index.ts",
         "apps/mobile/src/portfolio/index.ts",
         "apps/mobile/src/settings/index.ts",
@@ -20866,6 +20875,17 @@
       "module": "apps/mobile/app/(shared)",
       "isTest": false,
       "dependsOn": [],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/app/(shared)/become-master.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile/app/(shared)",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/master-onboarding/index.ts"
+      ],
       "dependedOnBy": [],
       "coveredByTests": [],
       "orphan": false
@@ -21364,6 +21384,7 @@
         "apps/mobile/src/addresses/AddressForm.tsx",
         "apps/mobile/src/addresses/Addresses.tsx",
         "apps/mobile/src/addresses/addresses-errors.test.ts",
+        "apps/mobile/src/master-onboarding/MasterOnboarding.tsx",
         "apps/mobile/src/orders/CreateOrder.tsx"
       ],
       "coveredByTests": [
@@ -21475,6 +21496,7 @@
         "apps/mobile/src/master-jobs/MasterWorkProvider.test.tsx",
         "apps/mobile/src/master-jobs/MasterWorkProvider.tsx",
         "apps/mobile/src/master-jobs/master-jobs-endpoints.ts",
+        "apps/mobile/src/master-onboarding/master-onboarding-endpoints.ts",
         "apps/mobile/src/master-services/master-services-endpoints.ts",
         "apps/mobile/src/master-subscription/master-subscription-endpoints.ts",
         "apps/mobile/src/notifications/devices-endpoints.ts",
@@ -21927,6 +21949,7 @@
         "apps/mobile/src/auth/refresh.test.ts",
         "apps/mobile/src/auth/useRestoreSession.test.tsx",
         "apps/mobile/src/auth/useRestoreSession.ts",
+        "apps/mobile/src/master-onboarding/useBecomeMaster.ts",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.tsx",
@@ -23633,6 +23656,7 @@
         "apps/mobile/src/components/index.ts",
         "apps/mobile/src/components/index.ts",
         "apps/mobile/src/master-availability/AvailabilityToggle.tsx",
+        "apps/mobile/src/master-onboarding/MasterOnboarding.tsx",
         "apps/mobile/src/master-subscription/SubscriptionCard.tsx",
         "apps/mobile/src/master-subscription/SubscriptionDetails.tsx",
         "apps/mobile/src/master-subscription/describe-subscription.ts",
@@ -23946,6 +23970,9 @@
         "apps/mobile/src/master-jobs/JobMapCard.tsx",
         "apps/mobile/src/master-jobs/MasterWork.tsx",
         "apps/mobile/src/master-jobs/OfferFeed.tsx",
+        "apps/mobile/src/master-onboarding/MasterOnboarding.tsx",
+        "apps/mobile/src/master-onboarding/RoleChoice.tsx",
+        "apps/mobile/src/master-onboarding/VerificationNotice.tsx",
         "apps/mobile/src/master-services/MasterServices.tsx",
         "apps/mobile/src/order-search/SearchRadarCard.stories.tsx",
         "apps/mobile/src/order-search/SearchRadarCard.tsx",
@@ -24594,6 +24621,9 @@
       "dependsOn": [
         "apps/mobile/src/customers/CustomerProfileGate.tsx",
         "apps/mobile/src/customers/customers-copy.ts",
+        "apps/mobile/src/master-onboarding/master-onboarding-copy.ts",
+        "apps/mobile/src/store/session-slice.ts",
+        "apps/mobile/src/store/session-slice.ts",
         "apps/mobile/test/support/test-store.ts",
         "packages/types/src/index.ts"
       ],
@@ -24610,7 +24640,10 @@
         "apps/mobile/src/customers/ProfileSetup.tsx",
         "apps/mobile/src/customers/customer-profile-state.ts",
         "apps/mobile/src/customers/customers-copy.ts",
-        "apps/mobile/src/customers/customers-endpoints.ts"
+        "apps/mobile/src/customers/customers-endpoints.ts",
+        "apps/mobile/src/master-onboarding/index.ts",
+        "apps/mobile/src/store/hooks.ts",
+        "apps/mobile/src/store/session-slice.ts"
       ],
       "dependedOnBy": [
         "apps/mobile/src/customers/CustomerProfileGate.test.tsx",
@@ -24784,6 +24817,7 @@
         "apps/mobile/src/conversation/useMessagePhotos.ts",
         "apps/mobile/src/conversation/useSendMessage.ts",
         "apps/mobile/src/lib/cached-files.test.ts",
+        "apps/mobile/src/master-onboarding/useDocumentUpload.ts",
         "apps/mobile/src/orders/useOrderPhotos.ts",
         "apps/mobile/src/portfolio/useAvatarUpload.ts",
         "apps/mobile/src/portfolio/usePortfolioUpload.ts"
@@ -24874,6 +24908,7 @@
       "dependedOnBy": [
         "apps/mobile/src/conversation/useMessagePhotos.ts",
         "apps/mobile/src/lib/prepare-photo.test.ts",
+        "apps/mobile/src/master-onboarding/useDocumentUpload.ts",
         "apps/mobile/src/orders/useOrderPhotos.ts",
         "apps/mobile/src/portfolio/useAvatarUpload.ts",
         "apps/mobile/src/portfolio/usePortfolioUpload.ts"
@@ -25725,6 +25760,8 @@
         "apps/mobile/src/master-jobs/OfferFeed.tsx",
         "apps/mobile/src/master-jobs/index.ts",
         "apps/mobile/src/master-jobs/index.ts",
+        "apps/mobile/src/master-onboarding/MasterOnboarding.tsx",
+        "apps/mobile/src/master-onboarding/VerificationNotice.tsx",
         "apps/mobile/src/portfolio/NewPost.tsx",
         "apps/mobile/src/portfolio/OwnProfile.tsx",
         "apps/mobile/src/portfolio/OwnProfileEntry.tsx",
@@ -25811,6 +25848,216 @@
       ],
       "dependedOnBy": [
         "apps/mobile/src/master-jobs/JobDetail.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/master-onboarding/MasterOnboarding.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/master-onboarding/MasterOnboarding.tsx",
+        "apps/mobile/src/master-onboarding/master-onboarding-copy.ts",
+        "apps/mobile/test/support/test-store.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/master-onboarding/MasterOnboarding.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/addresses/addresses-errors.ts",
+        "apps/mobile/src/components/StatusPill.tsx",
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/master-jobs/master-jobs-endpoints.ts",
+        "apps/mobile/src/master-onboarding/master-onboarding-copy.ts",
+        "apps/mobile/src/master-onboarding/master-onboarding-endpoints.ts",
+        "apps/mobile/src/master-onboarding/onboarding-state.ts",
+        "apps/mobile/src/master-onboarding/useBecomeMaster.ts",
+        "apps/mobile/src/master-onboarding/useDocumentUpload.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/master-onboarding/MasterOnboarding.test.tsx",
+        "apps/mobile/src/master-onboarding/index.ts",
+        "apps/mobile/src/master-onboarding/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/master-onboarding/MasterOnboarding.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/master-onboarding/RoleChoice.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/master-onboarding/master-onboarding-copy.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/master-onboarding/index.ts",
+        "apps/mobile/src/master-onboarding/index.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/master-onboarding/VerificationNotice.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/master-jobs/master-jobs-endpoints.ts",
+        "apps/mobile/src/master-onboarding/master-onboarding-copy.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/master-onboarding/index.ts",
+        "apps/mobile/src/master-onboarding/index.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/master-onboarding/index.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/master-onboarding/MasterOnboarding.tsx",
+        "apps/mobile/src/master-onboarding/MasterOnboarding.tsx",
+        "apps/mobile/src/master-onboarding/RoleChoice.tsx",
+        "apps/mobile/src/master-onboarding/RoleChoice.tsx",
+        "apps/mobile/src/master-onboarding/VerificationNotice.tsx",
+        "apps/mobile/src/master-onboarding/VerificationNotice.tsx",
+        "apps/mobile/src/master-onboarding/master-onboarding-copy.ts",
+        "apps/mobile/src/master-onboarding/useOpenMasterArea.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/app/(master)/index.tsx",
+        "apps/mobile/app/(shared)/become-master.tsx",
+        "apps/mobile/src/customers/CustomerProfileGate.tsx",
+        "apps/mobile/src/settings/Settings.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/master-onboarding/master-onboarding-copy.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/master-onboarding/onboarding-state.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/customers/CustomerProfileGate.test.tsx",
+        "apps/mobile/src/master-onboarding/MasterOnboarding.test.tsx",
+        "apps/mobile/src/master-onboarding/MasterOnboarding.tsx",
+        "apps/mobile/src/master-onboarding/RoleChoice.tsx",
+        "apps/mobile/src/master-onboarding/VerificationNotice.tsx",
+        "apps/mobile/src/master-onboarding/index.ts",
+        "apps/mobile/src/settings/settings-entry.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/customers/CustomerProfileGate.test.tsx",
+        "apps/mobile/src/master-onboarding/MasterOnboarding.test.tsx",
+        "apps/mobile/src/settings/settings-entry.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/master-onboarding/master-onboarding-endpoints.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/api/api-slice.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/master-onboarding/MasterOnboarding.tsx",
+        "apps/mobile/src/master-onboarding/useBecomeMaster.ts",
+        "apps/mobile/src/master-onboarding/useDocumentUpload.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/master-onboarding/onboarding-state.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/master-onboarding/onboarding-state.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/master-onboarding/onboarding-state.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/master-onboarding/MasterOnboarding.tsx",
+        "apps/mobile/src/master-onboarding/master-onboarding-copy.ts",
+        "apps/mobile/src/master-onboarding/onboarding-state.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/master-onboarding/onboarding-state.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/master-onboarding/useBecomeMaster.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/auth/refresh.ts",
+        "apps/mobile/src/master-onboarding/master-onboarding-endpoints.ts",
+        "apps/mobile/src/store/hooks.ts",
+        "apps/mobile/src/store/session-slice.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/master-onboarding/MasterOnboarding.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/master-onboarding/useDocumentUpload.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/lib/cached-files.ts",
+        "apps/mobile/src/lib/prepare-photo.ts",
+        "apps/mobile/src/master-onboarding/master-onboarding-endpoints.ts",
+        "apps/mobile/src/portfolio/put-with-progress.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/master-onboarding/MasterOnboarding.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/master-onboarding/useOpenMasterArea.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/store/hooks.ts",
+        "apps/mobile/src/store/session-slice.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/master-onboarding/index.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -28146,6 +28393,7 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/mobile/src/master-onboarding/useDocumentUpload.ts",
         "apps/mobile/src/portfolio/put-with-progress.test.ts",
         "apps/mobile/src/portfolio/useAvatarUpload.ts",
         "apps/mobile/src/portfolio/usePortfolioUpload.ts"
@@ -29490,6 +29738,7 @@
       "dependsOn": [
         "apps/mobile/src/auth/index.ts",
         "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/master-onboarding/index.ts",
         "apps/mobile/src/notifications/index.ts",
         "apps/mobile/src/reviews/reviews-copy.ts",
         "apps/mobile/src/settings/settings-copy.ts",
@@ -29552,7 +29801,9 @@
       "dependsOn": [
         "apps/mobile/app/(customer)/(tabs)/settings.tsx",
         "apps/mobile/app/(master)/index.tsx",
+        "apps/mobile/src/master-onboarding/master-onboarding-copy.ts",
         "apps/mobile/src/settings/settings-copy.ts",
+        "apps/mobile/src/store/session-slice.ts",
         "apps/mobile/test/support/test-store.ts"
       ],
       "dependedOnBy": [],
@@ -29582,11 +29833,14 @@
         "apps/mobile/src/calls/usePresentIncomingCall.ts",
         "apps/mobile/src/conversation/Conversation.tsx",
         "apps/mobile/src/conversation/useSendMessage.ts",
+        "apps/mobile/src/customers/CustomerProfileGate.tsx",
         "apps/mobile/src/location/useLocationReporter.ts",
         "apps/mobile/src/master-availability/AvailabilityCard.tsx",
         "apps/mobile/src/master-jobs/JobDetail.tsx",
         "apps/mobile/src/master-jobs/MasterWork.tsx",
         "apps/mobile/src/master-jobs/MasterWorkProvider.tsx",
+        "apps/mobile/src/master-onboarding/useBecomeMaster.ts",
+        "apps/mobile/src/master-onboarding/useOpenMasterArea.ts",
         "apps/mobile/src/master-subscription/useSubscriptionFreshness.ts",
         "apps/mobile/src/notifications/useNotificationRouting.ts",
         "apps/mobile/src/notifications/usePushRegistration.ts",
@@ -29752,9 +30006,14 @@
         "apps/mobile/src/calls/useIncomingCallRouting.test.tsx",
         "apps/mobile/src/conversation/Conversation.test.tsx",
         "apps/mobile/src/conversation/unread-badges.test.tsx",
+        "apps/mobile/src/customers/CustomerProfileGate.test.tsx",
+        "apps/mobile/src/customers/CustomerProfileGate.test.tsx",
+        "apps/mobile/src/customers/CustomerProfileGate.tsx",
         "apps/mobile/src/master-jobs/last-job-slice.test.ts",
         "apps/mobile/src/master-jobs/last-job-slice.ts",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
+        "apps/mobile/src/master-onboarding/useBecomeMaster.ts",
+        "apps/mobile/src/master-onboarding/useOpenMasterArea.ts",
         "apps/mobile/src/notifications/RingNotificationDismissal.test.tsx",
         "apps/mobile/src/notifications/notification-destination.ts",
         "apps/mobile/src/notifications/useNotificationRouting.test.tsx",
@@ -29769,6 +30028,7 @@
         "apps/mobile/src/realtime/session-recovery.ts",
         "apps/mobile/src/reviews/ReceivedReviews.test.tsx",
         "apps/mobile/src/settings/Settings.tsx",
+        "apps/mobile/src/settings/settings-entry.test.tsx",
         "apps/mobile/src/store/index.ts",
         "apps/mobile/src/store/remembered-role.test.ts",
         "apps/mobile/src/store/remembered-role.ts",
@@ -29792,6 +30052,8 @@
         "apps/mobile/src/calls/useIncomingCallRouting.test.tsx",
         "apps/mobile/src/conversation/Conversation.test.tsx",
         "apps/mobile/src/conversation/unread-badges.test.tsx",
+        "apps/mobile/src/customers/CustomerProfileGate.test.tsx",
+        "apps/mobile/src/customers/CustomerProfileGate.test.tsx",
         "apps/mobile/src/master-jobs/last-job-slice.test.ts",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/notifications/RingNotificationDismissal.test.tsx",
@@ -29802,6 +30064,7 @@
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/realtime/session-recovery.test.ts",
         "apps/mobile/src/reviews/ReceivedReviews.test.tsx",
+        "apps/mobile/src/settings/settings-entry.test.tsx",
         "apps/mobile/src/store/remembered-role.test.ts",
         "apps/mobile/src/store/session-slice.test.ts",
         "apps/mobile/src/tracking/order-tracking.test.tsx"
@@ -30646,6 +30909,7 @@
         "apps/mobile/src/master-jobs/last-job-slice.test.ts",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/master-jobs/master-jobs.test.tsx",
+        "apps/mobile/src/master-onboarding/MasterOnboarding.test.tsx",
         "apps/mobile/src/master-services/MasterServices.test.tsx",
         "apps/mobile/src/master-subscription/subscription-surfaces.test.tsx",
         "apps/mobile/src/master-subscription/useSubscriptionFreshness.test.tsx",
@@ -30709,6 +30973,7 @@
         "apps/mobile/src/master-jobs/last-job-slice.test.ts",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/master-jobs/master-jobs.test.tsx",
+        "apps/mobile/src/master-onboarding/MasterOnboarding.test.tsx",
         "apps/mobile/src/master-services/MasterServices.test.tsx",
         "apps/mobile/src/master-subscription/subscription-surfaces.test.tsx",
         "apps/mobile/src/master-subscription/useSubscriptionFreshness.test.tsx",
@@ -31776,6 +32041,13 @@
         "apps/mobile/src/master-jobs/master-jobs-copy.ts",
         "apps/mobile/src/master-jobs/master-jobs-endpoints.ts",
         "apps/mobile/src/master-jobs/master-jobs.test.tsx",
+        "apps/mobile/src/master-onboarding/MasterOnboarding.test.tsx",
+        "apps/mobile/src/master-onboarding/MasterOnboarding.tsx",
+        "apps/mobile/src/master-onboarding/master-onboarding-copy.ts",
+        "apps/mobile/src/master-onboarding/master-onboarding-endpoints.ts",
+        "apps/mobile/src/master-onboarding/onboarding-state.test.ts",
+        "apps/mobile/src/master-onboarding/onboarding-state.ts",
+        "apps/mobile/src/master-onboarding/useDocumentUpload.ts",
         "apps/mobile/src/master-services/MasterServices.test.tsx",
         "apps/mobile/src/master-services/MasterServices.tsx",
         "apps/mobile/src/master-services/master-services-endpoints.ts",
@@ -31983,6 +32255,8 @@
         "apps/mobile/src/master-jobs/job-steps.test.ts",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/master-jobs/master-jobs.test.tsx",
+        "apps/mobile/src/master-onboarding/MasterOnboarding.test.tsx",
+        "apps/mobile/src/master-onboarding/onboarding-state.test.ts",
         "apps/mobile/src/master-services/MasterServices.test.tsx",
         "apps/mobile/src/master-subscription/describe-subscription.test.ts",
         "apps/mobile/src/master-subscription/subscription-surfaces.test.tsx",

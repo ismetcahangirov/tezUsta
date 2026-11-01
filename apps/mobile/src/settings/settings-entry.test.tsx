@@ -4,6 +4,8 @@ import { Provider } from 'react-redux';
 import CustomerSettingsScreen from '../../app/(customer)/(tabs)/settings';
 import MasterHomeScreen from '../../app/(master)/index';
 import { createTestStore } from '../../test/support/test-store';
+import { MASTER_ONBOARDING_COPY } from '../master-onboarding/master-onboarding-copy';
+import { signedIn } from '../store/session-slice';
 import { SETTINGS_COPY } from './settings-copy';
 
 /**
@@ -94,5 +96,41 @@ describe('reaching settings', () => {
     await fireEvent.press(screen.getByRole('button', { name: SETTINGS_COPY.openLabel }));
 
     expect(mockPush).toHaveBeenCalledWith('/(shared)/settings');
+  });
+});
+
+/**
+ * Issue #490: a customer who wants to work finds the way in under Settings.
+ * Once the master grant exists, the role switch is the way there instead.
+ */
+describe('becoming a master from settings', () => {
+  it('offers "Usta ol" to a customer, and opens the onboarding', async () => {
+    const store = createTestStore();
+    store.dispatch(signedIn({ userId: 'user-1', roles: ['customer'] }));
+    await render(
+      <Provider store={store}>
+        <CustomerSettingsScreen />
+      </Provider>,
+    );
+
+    await fireEvent.press(
+      screen.getByRole('button', { name: MASTER_ONBOARDING_COPY.settingsEntry }),
+    );
+
+    expect(mockPush).toHaveBeenCalledWith('/(shared)/become-master');
+  });
+
+  it('does not offer it to someone who is already a master', async () => {
+    const store = createTestStore();
+    store.dispatch(signedIn({ userId: 'user-1', roles: ['customer', 'master'] }));
+    await render(
+      <Provider store={store}>
+        <CustomerSettingsScreen />
+      </Provider>,
+    );
+
+    expect(
+      screen.queryByRole('button', { name: MASTER_ONBOARDING_COPY.settingsEntry }),
+    ).not.toBeOnTheScreen();
   });
 });

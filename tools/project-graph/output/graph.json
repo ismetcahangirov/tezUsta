@@ -94329,6 +94329,23 @@
         },
         {
           "dynamic": false,
+          "module": "../../src/master-onboarding",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/master-onboarding/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../../src/master-subscription",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -94597,6 +94614,31 @@
     {
       "source": "apps/mobile/app/(shared)/_layout.tsx",
       "dependencies": [],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/app/(shared)/become-master.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../src/master-onboarding",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/master-onboarding/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
       "dependents": [],
       "orphan": false,
       "valid": true
@@ -96359,6 +96401,7 @@
         "apps/mobile/src/addresses/AddressForm.tsx",
         "apps/mobile/src/addresses/Addresses.tsx",
         "apps/mobile/src/addresses/addresses-errors.test.ts",
+        "apps/mobile/src/master-onboarding/MasterOnboarding.tsx",
         "apps/mobile/src/orders/CreateOrder.tsx"
       ],
       "orphan": false,
@@ -96796,6 +96839,7 @@
         "apps/mobile/src/master-jobs/MasterWorkProvider.test.tsx",
         "apps/mobile/src/master-jobs/MasterWorkProvider.tsx",
         "apps/mobile/src/master-jobs/master-jobs-endpoints.ts",
+        "apps/mobile/src/master-onboarding/master-onboarding-endpoints.ts",
         "apps/mobile/src/master-services/master-services-endpoints.ts",
         "apps/mobile/src/master-subscription/master-subscription-endpoints.ts",
         "apps/mobile/src/notifications/devices-endpoints.ts",
@@ -98629,6 +98673,7 @@
         "apps/mobile/src/auth/refresh.test.ts",
         "apps/mobile/src/auth/useRestoreSession.test.tsx",
         "apps/mobile/src/auth/useRestoreSession.ts",
+        "apps/mobile/src/master-onboarding/useBecomeMaster.ts",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.tsx",
         "apps/mobile/src/realtime/session-recovery.test.ts",
@@ -104987,6 +105032,7 @@
         "apps/mobile/src/components/StatusPill.test.tsx",
         "apps/mobile/src/components/index.ts",
         "apps/mobile/src/master-availability/AvailabilityToggle.tsx",
+        "apps/mobile/src/master-onboarding/MasterOnboarding.tsx",
         "apps/mobile/src/master-subscription/SubscriptionCard.tsx",
         "apps/mobile/src/master-subscription/SubscriptionDetails.tsx",
         "apps/mobile/src/master-subscription/describe-subscription.ts",
@@ -106228,6 +106274,9 @@
         "apps/mobile/src/master-jobs/JobMapCard.tsx",
         "apps/mobile/src/master-jobs/MasterWork.tsx",
         "apps/mobile/src/master-jobs/OfferFeed.tsx",
+        "apps/mobile/src/master-onboarding/MasterOnboarding.tsx",
+        "apps/mobile/src/master-onboarding/RoleChoice.tsx",
+        "apps/mobile/src/master-onboarding/VerificationNotice.tsx",
         "apps/mobile/src/master-services/MasterServices.tsx",
         "apps/mobile/src/order-search/SearchRadarCard.stories.tsx",
         "apps/mobile/src/order-search/SearchRadarCard.tsx",
@@ -109132,6 +109181,58 @@
         },
         {
           "dynamic": false,
+          "module": "../master-onboarding/master-onboarding-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/master-onboarding/master-onboarding-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../store/session-slice",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/session-slice.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../store/session-slice",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/session-slice.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../../test/support/test-store",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -109251,6 +109352,57 @@
             "import"
           ],
           "resolved": "apps/mobile/src/customers/customers-endpoints.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../master-onboarding",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/master-onboarding/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../store/hooks",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/hooks.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../store/session-slice",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/session-slice.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -109771,6 +109923,7 @@
         "apps/mobile/src/conversation/useMessagePhotos.ts",
         "apps/mobile/src/conversation/useSendMessage.ts",
         "apps/mobile/src/lib/cached-files.test.ts",
+        "apps/mobile/src/master-onboarding/useDocumentUpload.ts",
         "apps/mobile/src/orders/useOrderPhotos.ts",
         "apps/mobile/src/portfolio/useAvatarUpload.ts",
         "apps/mobile/src/portfolio/usePortfolioUpload.ts"
@@ -109879,6 +110032,7 @@
       "dependents": [
         "apps/mobile/src/conversation/useMessagePhotos.ts",
         "apps/mobile/src/lib/prepare-photo.test.ts",
+        "apps/mobile/src/master-onboarding/useDocumentUpload.ts",
         "apps/mobile/src/orders/useOrderPhotos.ts",
         "apps/mobile/src/portfolio/useAvatarUpload.ts",
         "apps/mobile/src/portfolio/usePortfolioUpload.ts"
@@ -113844,6 +113998,8 @@
         "apps/mobile/src/master-jobs/MasterWorkProvider.tsx",
         "apps/mobile/src/master-jobs/OfferFeed.tsx",
         "apps/mobile/src/master-jobs/index.ts",
+        "apps/mobile/src/master-onboarding/MasterOnboarding.tsx",
+        "apps/mobile/src/master-onboarding/VerificationNotice.tsx",
         "apps/mobile/src/portfolio/NewPost.tsx",
         "apps/mobile/src/portfolio/OwnProfile.tsx",
         "apps/mobile/src/portfolio/OwnProfileEntry.tsx",
@@ -114174,6 +114330,913 @@
       ],
       "dependents": [
         "apps/mobile/src/master-jobs/JobDetail.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/master-onboarding/MasterOnboarding.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./MasterOnboarding",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/master-onboarding/MasterOnboarding.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./master-onboarding-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/master-onboarding/master-onboarding-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/test-store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/test-store.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/master-onboarding/MasterOnboarding.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../addresses/addresses-errors",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/addresses/addresses-errors.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../components/StatusPill",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/StatusPill.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../components",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../master-jobs/master-jobs-endpoints",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/master-jobs/master-jobs-endpoints.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./master-onboarding-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/master-onboarding/master-onboarding-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./master-onboarding-endpoints",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/master-onboarding/master-onboarding-endpoints.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./onboarding-state",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/master-onboarding/onboarding-state.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./useBecomeMaster",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/master-onboarding/useBecomeMaster.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./useDocumentUpload",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/master-onboarding/useDocumentUpload.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/master-onboarding/MasterOnboarding.test.tsx",
+        "apps/mobile/src/master-onboarding/index.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/master-onboarding/RoleChoice.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../components",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./master-onboarding-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/master-onboarding/master-onboarding-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/master-onboarding/index.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/master-onboarding/VerificationNotice.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../components",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../master-jobs/master-jobs-endpoints",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/master-jobs/master-jobs-endpoints.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./master-onboarding-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/master-onboarding/master-onboarding-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/master-onboarding/index.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/master-onboarding/index.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./MasterOnboarding",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/master-onboarding/MasterOnboarding.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./MasterOnboarding",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/master-onboarding/MasterOnboarding.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./RoleChoice",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/master-onboarding/RoleChoice.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./RoleChoice",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/master-onboarding/RoleChoice.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./VerificationNotice",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/master-onboarding/VerificationNotice.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./VerificationNotice",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/master-onboarding/VerificationNotice.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./master-onboarding-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/master-onboarding/master-onboarding-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./useOpenMasterArea",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/master-onboarding/useOpenMasterArea.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/app/(master)/index.tsx",
+        "apps/mobile/app/(shared)/become-master.tsx",
+        "apps/mobile/src/customers/CustomerProfileGate.tsx",
+        "apps/mobile/src/settings/Settings.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/master-onboarding/master-onboarding-copy.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./onboarding-state",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/master-onboarding/onboarding-state.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/customers/CustomerProfileGate.test.tsx",
+        "apps/mobile/src/master-onboarding/MasterOnboarding.test.tsx",
+        "apps/mobile/src/master-onboarding/MasterOnboarding.tsx",
+        "apps/mobile/src/master-onboarding/RoleChoice.tsx",
+        "apps/mobile/src/master-onboarding/VerificationNotice.tsx",
+        "apps/mobile/src/master-onboarding/index.ts",
+        "apps/mobile/src/settings/settings-entry.test.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/master-onboarding/master-onboarding-endpoints.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../api/api-slice",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/api/api-slice.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/master-onboarding/MasterOnboarding.tsx",
+        "apps/mobile/src/master-onboarding/useBecomeMaster.ts",
+        "apps/mobile/src/master-onboarding/useDocumentUpload.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/master-onboarding/onboarding-state.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./onboarding-state",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/master-onboarding/onboarding-state.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/master-onboarding/onboarding-state.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/master-onboarding/MasterOnboarding.tsx",
+        "apps/mobile/src/master-onboarding/master-onboarding-copy.ts",
+        "apps/mobile/src/master-onboarding/onboarding-state.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/master-onboarding/useBecomeMaster.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../auth/refresh",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/auth/refresh.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./master-onboarding-endpoints",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/master-onboarding/master-onboarding-endpoints.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../store/hooks",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/hooks.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../store/session-slice",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/session-slice.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/master-onboarding/MasterOnboarding.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/master-onboarding/useDocumentUpload.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../lib/cached-files",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/lib/cached-files.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../lib/prepare-photo",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/lib/prepare-photo.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./master-onboarding-endpoints",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/master-onboarding/master-onboarding-endpoints.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../portfolio/put-with-progress",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/portfolio/put-with-progress.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/master-onboarding/MasterOnboarding.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/master-onboarding/useOpenMasterArea.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../store/hooks",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/hooks.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../store/session-slice",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/session-slice.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/master-onboarding/index.ts"
       ],
       "orphan": false,
       "valid": true
@@ -124929,6 +125992,7 @@
       "source": "apps/mobile/src/portfolio/put-with-progress.ts",
       "dependencies": [],
       "dependents": [
+        "apps/mobile/src/master-onboarding/useDocumentUpload.ts",
         "apps/mobile/src/portfolio/put-with-progress.test.ts",
         "apps/mobile/src/portfolio/useAvatarUpload.ts",
         "apps/mobile/src/portfolio/usePortfolioUpload.ts"
@@ -130375,6 +131439,23 @@
         },
         {
           "dynamic": false,
+          "module": "../master-onboarding",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/master-onboarding/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../notifications",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -130583,6 +131664,23 @@
         },
         {
           "dynamic": false,
+          "module": "../master-onboarding/master-onboarding-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/master-onboarding/master-onboarding-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./settings-copy",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -130591,6 +131689,23 @@
             "import"
           ],
           "resolved": "apps/mobile/src/settings/settings-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../store/session-slice",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/session-slice.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -130658,11 +131773,14 @@
         "apps/mobile/src/calls/usePresentIncomingCall.ts",
         "apps/mobile/src/conversation/Conversation.tsx",
         "apps/mobile/src/conversation/useSendMessage.ts",
+        "apps/mobile/src/customers/CustomerProfileGate.tsx",
         "apps/mobile/src/location/useLocationReporter.ts",
         "apps/mobile/src/master-availability/AvailabilityCard.tsx",
         "apps/mobile/src/master-jobs/JobDetail.tsx",
         "apps/mobile/src/master-jobs/MasterWork.tsx",
         "apps/mobile/src/master-jobs/MasterWorkProvider.tsx",
+        "apps/mobile/src/master-onboarding/useBecomeMaster.ts",
+        "apps/mobile/src/master-onboarding/useOpenMasterArea.ts",
         "apps/mobile/src/master-subscription/useSubscriptionFreshness.ts",
         "apps/mobile/src/notifications/useNotificationRouting.ts",
         "apps/mobile/src/notifications/usePushRegistration.ts",
@@ -131029,9 +132147,13 @@
         "apps/mobile/src/calls/useIncomingCallRouting.test.tsx",
         "apps/mobile/src/conversation/Conversation.test.tsx",
         "apps/mobile/src/conversation/unread-badges.test.tsx",
+        "apps/mobile/src/customers/CustomerProfileGate.test.tsx",
+        "apps/mobile/src/customers/CustomerProfileGate.tsx",
         "apps/mobile/src/master-jobs/last-job-slice.test.ts",
         "apps/mobile/src/master-jobs/last-job-slice.ts",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
+        "apps/mobile/src/master-onboarding/useBecomeMaster.ts",
+        "apps/mobile/src/master-onboarding/useOpenMasterArea.ts",
         "apps/mobile/src/notifications/RingNotificationDismissal.test.tsx",
         "apps/mobile/src/notifications/notification-destination.ts",
         "apps/mobile/src/notifications/useNotificationRouting.test.tsx",
@@ -131046,6 +132168,7 @@
         "apps/mobile/src/realtime/session-recovery.ts",
         "apps/mobile/src/reviews/ReceivedReviews.test.tsx",
         "apps/mobile/src/settings/Settings.tsx",
+        "apps/mobile/src/settings/settings-entry.test.tsx",
         "apps/mobile/src/store/index.ts",
         "apps/mobile/src/store/remembered-role.test.ts",
         "apps/mobile/src/store/remembered-role.ts",
@@ -133644,6 +134767,7 @@
         "apps/mobile/src/master-jobs/last-job-slice.test.ts",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/master-jobs/master-jobs.test.tsx",
+        "apps/mobile/src/master-onboarding/MasterOnboarding.test.tsx",
         "apps/mobile/src/master-services/MasterServices.test.tsx",
         "apps/mobile/src/master-subscription/subscription-surfaces.test.tsx",
         "apps/mobile/src/master-subscription/useSubscriptionFreshness.test.tsx",
@@ -136114,6 +137238,13 @@
         "apps/mobile/src/master-jobs/master-jobs-copy.ts",
         "apps/mobile/src/master-jobs/master-jobs-endpoints.ts",
         "apps/mobile/src/master-jobs/master-jobs.test.tsx",
+        "apps/mobile/src/master-onboarding/MasterOnboarding.test.tsx",
+        "apps/mobile/src/master-onboarding/MasterOnboarding.tsx",
+        "apps/mobile/src/master-onboarding/master-onboarding-copy.ts",
+        "apps/mobile/src/master-onboarding/master-onboarding-endpoints.ts",
+        "apps/mobile/src/master-onboarding/onboarding-state.test.ts",
+        "apps/mobile/src/master-onboarding/onboarding-state.ts",
+        "apps/mobile/src/master-onboarding/useDocumentUpload.ts",
         "apps/mobile/src/master-services/MasterServices.test.tsx",
         "apps/mobile/src/master-services/MasterServices.tsx",
         "apps/mobile/src/master-services/master-services-endpoints.ts",
@@ -136718,8 +137849,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 1436,
-    "totalDependenciesCruised": 6845,
+    "totalCruised": 1449,
+    "totalDependenciesCruised": 6901,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

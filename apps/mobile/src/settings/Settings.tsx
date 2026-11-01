@@ -4,11 +4,13 @@ import { ScrollView, View } from 'react-native';
 import { useSignOut, useSignOutEverywhere } from '../auth';
 import { Button, Divider, SegmentedControl, Text } from '../components';
 import { NotificationPreferences } from '../notifications';
+import { BECOME_MASTER_ROUTE, MASTER_ONBOARDING_COPY } from '../master-onboarding';
 import { REVIEWS_COPY } from '../reviews/reviews-copy';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import {
   roleSelected,
   selectCanSwitchRole,
+  selectGrantedRoles,
   selectRole,
   type AppRole,
 } from '../store/session-slice';
@@ -60,6 +62,7 @@ export function Settings(): React.JSX.Element {
   const dispatch = useAppDispatch();
   const role = useAppSelector(selectRole);
   const canSwitchRole = useAppSelector(selectCanSwitchRole);
+  const grantedRoles = useAppSelector(selectGrantedRoles);
 
   // Both hooks retire this device from the push registry before they revoke
   // anything, which is an ordering the server requires rather than a courtesy
@@ -140,6 +143,22 @@ export function Settings(): React.JSX.Element {
               router.push('/(shared)/reviews');
             }}
           />
+          {/*
+            The way in for someone who signed up as a customer and now wants
+            to work (#490, ADR-0073). Hidden once the master grant exists:
+            from then on the role switch above is how they get there, and an
+            unfinished onboarding is reached from the master home.
+          */}
+          {!grantedRoles.includes('master') && (
+            <Button
+              label={MASTER_ONBOARDING_COPY.settingsEntry}
+              variant="secondary"
+              fullWidth
+              onPress={() => {
+                router.push(BECOME_MASTER_ROUTE);
+              }}
+            />
+          )}
         </View>
 
         {/*
