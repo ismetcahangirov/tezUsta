@@ -48,6 +48,13 @@ EPIC 12 — Payments  retired by ADR-0046: the platform never touches order
 EPIC 18 — In-Order Messaging & Calls  needs EPIC 8 (an assigned master) and
                                       EPIC 9 (authorized socket rooms, #167)
 
+EPIC 19 — Master Public Profile        needs EPIC 5 and EPIC 13 (moderation);
+          & Work Portfolio             off the critical path
+EPIC 20 — Admin Panel: Operations      needs EPIC 13; serving it in production
+          Before Launch                waits for hosting (EPIC 17)
+EPIC 21 — Live Search Radar            needs EPIC 7 and EPIC 9
+          & Arrival Promise
+
    ╔═══════════════════════════════════════════════════════════════╗
    ║  EPIC 15 — Security & Abuse Prevention       ── continuous ──  ║
    ║  EPIC 16 — Performance & Scalability         ── continuous ──  ║
@@ -106,6 +113,9 @@ order creation, matching, and lifecycle. EPIC 5 is on the path because
 | 16  | Performance & Scalability     | continuous | —                                                                                                                                                            |
 | 17  | Production Deployment         | 8          | Hosting / cloud provider                                                                                                                                     |
 | 18  | In-Order Messaging & Calls    | 8, 9       | LiveKit on Expo 57 / RN 0.86 is unproven — the Epic opens with a build spike ([ADR-0034](../decisions/ADR-0034-in-app-voice-calls.md))                       |
+| 19  | Master Profile & Portfolio    | 5, 13      | Video only: ADR-0045 § 7 ships photos at launch and defers video to a new ADR (#306, #316)                                                                   |
+| 20  | Admin Operations              | 13         | Hosting / cloud provider, for serving the panel in production                                                                                                |
+| 21  | Live Search Radar             | 7, 9       | —                                                                                                                                                            |
 
 ## Decisions settled
 
@@ -191,38 +201,57 @@ you" stays visible rather than being quietly invented.
 
 ## Where the repository actually is
 
-**EPIC 1 through EPIC 5 are delivered.** Every sub-issue of each is closed and
-merged to `main`. The critical path is therefore at **EPIC 6 — order creation**.
+Checked against GitHub on 1 November 2026. **The marketplace works end to end
+on `main`**: a customer signs in by email and orders, a nearby master is offered
+the job, accepts, travels with live tracking and completes it; both sides
+review each other and talk in the order's conversation, and an admin can oversee
+all of it. **Nothing open can be finished by code alone.** Every open item
+waits on an owner decision, a real device, or a deferred feature.
 
-| Epic                                | State                   | What is actually on `main`                                                                                                                                                                                                                                                           |
-| ----------------------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **1** Project Foundation            | **Done**                | `apps/api` (NestJS on Fastify) with health endpoints, `apps/mobile` (Expo SDK 57), Docker Compose for Postgres + PostGIS and Redis, Drizzle with migrations, Zod-validated env parsing that fails at startup, CI running the full gate, the design system and the Storybook workshop |
-| **2** Authentication & User Roles   | **Built, not finished** | Token issuance, refresh rotation with reuse detection, authentication / role / ownership guards, Redis-backed rate limiting, email + OTP endpoints, mobile secure storage and route guards. **Nobody can actually sign in** — see below                                              |
-| **3** Service Catalog               | **Done**                | `service_categories` and `services` with the launch seed, public cached read endpoints, and the catalogue rendered in the app                                                                                                                                                        |
-| **4** Customer Profile & Address    | **Done**                | `customers`, `addresses` with Azerbaijani structured detail and a PostGIS point, geocoding behind a provider interface with a licence-bounded Postgres cache                                                                                                                         |
-| **5** Master Profile & Verification | **Done**                | `masters` and `master_services`, verification documents through presigned URLs, append-only verification history, the admin review surface, and the availability toggle backed by Redis presence                                                                                     |
-| **6** Order Creation                | **Next**                | Nothing yet                                                                                                                                                                                                                                                                          |
+| Epic                                       | State                   | What still keeps it open                                                                                                             |
+| ------------------------------------------ | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| **1** Project Foundation                   | **Done**                | —                                                                                                                                    |
+| **2** Authentication & User Roles          | **Built, not finished** | 🔴 The email provider and sending domain. Every sub-issue is closed; no real user can sign in until real email is sent               |
+| **3** Service Catalog                      | **Done**                | —                                                                                                                                    |
+| **4** Customer Profile & Address           | **Done**                | —                                                                                                                                    |
+| **5** Master Profile & Verification        | **Done**                | —                                                                                                                                    |
+| **6** Order Creation                       | **Built**               | #319: an iPhone HEIC photo, which needs an iPhone to confirm                                                                         |
+| **7** Master Matching                      | **Done**                | —                                                                                                                                    |
+| **8** Order Lifecycle                      | **Built**               | #412 / #464: the inspection price and the hand-back window, built (ADR-0060, ADR-0068) and waiting for the device check              |
+| **9** Realtime Tracking                    | **Built**               | #173: battery drain measured on a real mid-range Android                                                                             |
+| **10** Notifications                       | **Built**               | The owner's push infrastructure, and the "master nearby" kind, which has no issue                                                    |
+| **11** Reviews & Ratings                   | **Done**                | —                                                                                                                                    |
+| **12** Payments                            | **Retired**             | ADR-0046                                                                                                                             |
+| **13** Admin Panel                         | **Done**                | —                                                                                                                                    |
+| **14** Master Subscriptions                | **Built, not live**     | The billing provider, launch prices, trial and grace. Billing runs behind a provider port with a stub (#323)                         |
+| **15** Security & Abuse Prevention         | Continuous              | Two audits done (`security-audit-2026-09.md`, `security-audit-2026-10.md`); the next is due when a real billing provider is wired in |
+| **16** Performance & Scalability           | Continuous              | #293: cold start on a real mid-range Android                                                                                         |
+| **17** Production Deployment               | **Blocked**             | The hosting / cloud provider decision (#467)                                                                                         |
+| **18** In-Order Messaging & Calls          | **Messaging done**      | Voice calls: #183, the LiveKit spike on two real phones, gates #187–#189                                                             |
+| **19** Master Profile & Portfolio          | **Photos done**         | Video, deferred by ADR-0045 § 7 (#306, #316), and #317, measured on a real Android                                                   |
+| **20** Admin Operations Before Launch      | **Built**               | Serving the panel in production, which waits for hosting                                                                             |
+| **21** Live Search Radar & Arrival Promise | **Done**                | —                                                                                                                                    |
 
-**EPIC 2 is the one that needs care.** Its implementation is complete and every
-sub-issue is closed, but the email provider is still open, `EMAIL_PROVIDER=stub`
-refuses to run under `NODE_ENV=production`, and no real user can enter the app.
-Built and finished are not the same thing here, and calling it done would hide
-the single highest-priority launch blocker.
+**EPIC 2 is still the one that needs care.** Email plus a one-time code is the
+only way in (ADR-0072), `EMAIL_PROVIDER=stub` refuses to run under
+`NODE_ENV=production`, and no real user can enter the app. Built and finished
+are not the same thing here, and calling it done would hide the single
+highest-priority launch blocker.
 
 ### Packages
 
-`packages/types` exists — it reached its second consumer in EPIC 3, when
-`apps/mobile` began importing the catalogue's response shapes, and it has since
-grown the customer, address, master, master-document and availability contracts.
-`packages/eslint-config` and `packages/typescript-config` exist.
+`apps/api`, `apps/mobile`, `apps/admin` (the admin panel, EPIC 13) and
+`apps/web` (the subscription page, EPIC 14) exist. In `packages/`, `types`,
+`eslint-config` and `typescript-config` exist; `packages/types` reached its
+second consumer in EPIC 3.
 
-`apps/admin`, `packages/validation`, `packages/config`, `packages/api-client`
-and `packages/ui` still do not. Per
+`packages/validation`, `packages/config`, `packages/api-client` and
+`packages/ui` still do not. Per
 [ADR-0016](../decisions/ADR-0016-shared-package-timing.md) a package is created
 when a second workspace imports it; until then that code lives in its single
 consumer — `apps/api/src/infra/...` for providers and runtime config,
-`apps/api/src/**/*.schema.ts` for Zod schemas, and `apps/mobile/src/theme` plus
-`apps/mobile/src/components` for the design system.
+`apps/api/src/**/*.schema.ts` for Zod schemas, and each app's own `theme` and
+`components` for the design system.
 
 ### One thing that landed outside the Epic that owned it
 
@@ -235,35 +264,22 @@ EPIC 2 shipped without it, and EPIC 5 (#39) is where that cycle bit. The layer
 was built there instead: `admin_users`, `admin_sessions`, the append-only
 `admin_audit_log`, a separate token family with its own key and audience, and a
 guard that authenticates every route under `/admin` by path rather than by
-decorator.
-
-**EPIC 13 has since landed** (#237–#251, ADR-0043): credentials (scrypt +
-TOTP, invitation links, the bootstrap command), cookie sessions, the four-role
-permission model, account management, the audit log, catalogue editing, order
-oversight and the dispute queue, the operational dashboard, and `apps/admin`
-with a screen for each. What it left behind on purpose: `REFUNDED` stays
-withheld, because the platform never holds order money to refund (ADR-0046),
-and acting on reports about a party waits for a way to report one.
-
-**EPIC 13's remaining scope was smaller than its issue implied.** The
-authorization layer is done; what is left is credential issuance (email,
-password, mandatory TOTP), the granular permission model, and `apps/admin`
-itself.
+decorator. EPIC 13 (#237–#251, ADR-0043) then built the rest on top of it.
 
 ## The next increment
 
-1. **EPIC 6 — order creation.** All three prerequisites (3, 4 and 5) are merged,
-   and ADR-0024 resolved the object-storage question that would otherwise have
-   blocked problem photos. The state machine goes in first, in one table, before
-   anything writes a status.
-2. **EPIC 7 — matching.** The `master_services (service_id, master_id)` index it
-   needs is already in place and already proved against four thousand masters
-   with `EXPLAIN`. The accept guard is the piece to get right.
-3. **EPIC 8 — order lifecycle**, at which point the marketplace works end to end
-   and six further Epics unblock at once.
+Nothing is waiting on engineering alone. In order of what it unblocks:
 
-**In parallel, and not something engineering can unblock:** the email provider
-decision, which is what turns EPIC 2 from built into finished.
+1. **The email provider and sending domain** (owner). Turns EPIC 2 from built
+   into finished; without it nobody can sign in.
+2. **Hosting** (owner, #467). Unblocks EPIC 17 and the production half of
+   EPIC 20.
+3. **The billing provider, launch prices, trial and grace** (owner). Takes
+   EPIC 14 live.
+4. **Device sessions.** One Android: #464 (the inspection price and hand-back
+   window), #173 (battery), #293 (cold start). Two phones: #183, which unblocks
+   voice calls (#187–#189). An iPhone: #319.
+5. **Video** (owner, a new ADR). Reopens #306, #316 and #317.
 
 ## Rules
 
