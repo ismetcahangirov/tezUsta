@@ -467,11 +467,13 @@ describe('the request endpoint is not a user-enumeration oracle', () => {
   });
 
   it('rejects something that is not an email address, without saying why', async () => {
-    const responses = await Promise.all(
-      ['ali', 'ali@', '@example.com', 'ali@example', 'ali @example.com'].map((email) =>
-        request(app.getHttpServer()).post('/auth/otp/request').send({ email }),
-      ),
-    );
+    // One at a time: five concurrent supertest calls against a server that is
+    // not listening each open their own ephemeral listener, and on CI that
+    // intermittently ends in `ECONNRESET` before any assertion runs.
+    const responses = [];
+    for (const email of ['ali', 'ali@', '@example.com', 'ali@example', 'ali @example.com']) {
+      responses.push(await request(app.getHttpServer()).post('/auth/otp/request').send({ email }));
+    }
 
     for (const response of responses) {
       expect(response.status).toBe(422);
