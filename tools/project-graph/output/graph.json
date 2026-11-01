@@ -99025,6 +99025,24 @@
         },
         {
           "dynamic": false,
+          "module": "../store/session-slice",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/session-slice.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../../test/support/test-store",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -99075,6 +99093,23 @@
             "import"
           ],
           "resolved": "apps/mobile/src/store/hooks.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../store/remembered-role",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/remembered-role.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -109885,6 +109920,8 @@
         "apps/mobile/src/auth/token-store.test.ts",
         "apps/mobile/src/auth/token-store.ts",
         "apps/mobile/src/lib/secure-store.test.ts",
+        "apps/mobile/src/store/remembered-role.test.ts",
+        "apps/mobile/src/store/remembered-role.ts",
         "apps/mobile/src/theme/scheme-preference.test.tsx",
         "apps/mobile/src/theme/scheme-preference.ts"
       ],
@@ -130728,6 +130765,23 @@
         },
         {
           "dynamic": false,
+          "module": "./remembered-role",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/remembered-role.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./session-slice",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -130777,6 +130831,128 @@
         "apps/mobile/src/store/hooks.ts",
         "apps/mobile/src/tracking/order-tracking.test.tsx",
         "apps/mobile/test/support/test-store.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/store/remembered-role.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../lib/secure-store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/lib/secure-store.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./remembered-role",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/remembered-role.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./session-slice",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/session-slice.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/test-store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/test-store.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/store/remembered-role.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../lib/secure-store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/lib/secure-store.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./session-slice",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/session-slice.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/auth/useRestoreSession.ts",
+        "apps/mobile/src/store/index.ts",
+        "apps/mobile/src/store/remembered-role.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -130871,6 +131047,8 @@
         "apps/mobile/src/reviews/ReceivedReviews.test.tsx",
         "apps/mobile/src/settings/Settings.tsx",
         "apps/mobile/src/store/index.ts",
+        "apps/mobile/src/store/remembered-role.test.ts",
+        "apps/mobile/src/store/remembered-role.ts",
         "apps/mobile/src/store/session-slice.test.ts",
         "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
@@ -133496,6 +133674,7 @@
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
         "apps/mobile/src/settings/settings-entry.test.tsx",
+        "apps/mobile/src/store/remembered-role.test.ts",
         "apps/mobile/src/store/session-slice.test.ts",
         "apps/mobile/src/theme/scheme-preference.test.tsx",
         "apps/mobile/src/tracking/order-tracking.test.tsx",
@@ -136539,8 +136718,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 1434,
-    "totalDependenciesCruised": 6836,
+    "totalCruised": 1436,
+    "totalDependenciesCruised": 6845,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

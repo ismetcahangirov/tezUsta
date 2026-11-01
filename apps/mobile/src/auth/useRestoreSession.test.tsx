@@ -4,7 +4,8 @@ import { Provider } from 'react-redux';
 
 import { createTestStore } from '../../test/support/test-store';
 import type { AppStore } from '../store';
-import { selectAuthStatus, selectGrantedRoles } from '../store/session-slice';
+import type { AppRole } from '../store/session-slice';
+import { selectAuthStatus, selectGrantedRoles, selectRole } from '../store/session-slice';
 
 import type { RefreshCoordinator, RefreshOutcome } from './refresh';
 import { useRestoreSession } from './useRestoreSession';
@@ -23,9 +24,15 @@ function coordinatorReturning(
   };
 }
 
-async function mount(store: AppStore, coordinator: RefreshCoordinator): Promise<void> {
+const nothingRemembered = (): Promise<AppRole | null> => Promise.resolve(null);
+
+async function mount(
+  store: AppStore,
+  coordinator: RefreshCoordinator,
+  readRole: (userId: string | null) => Promise<AppRole | null> = nothingRemembered,
+): Promise<void> {
   function Probe(): React.JSX.Element {
-    useRestoreSession(coordinator);
+    useRestoreSession(coordinator, readRole);
     return <View testID="probe" />;
   }
 
@@ -88,5 +95,63 @@ describe('restoring a session at launch', () => {
       expect(selectAuthStatus(store.getState())).toBe('signed-out');
     });
     expect(coordinator.calls()).toBe(1);
+  });
+
+  it('reopens a two-role user in the role they last chose', async () => {
+    const store = createTestStore();
+    const asked: (string | null)[] = [];
+
+    await mount(
+      store,
+      coordinatorReturning({
+        status: 'refreshed',
+        identity: { userId: 'user-1', roles: ['customer', 'master'] },
+      }),
+      (userId) => {
+        asked.push(userId);
+        return Promise.resolve('master');
+      },
+    );
+
+    await waitFor(() => {
+      expect(selectAuthStatus(store.getState())).toBe('signed-in');
+    });
+    expect(selectRole(store.getState())).toBe('master');
+    expect(asked).toEqual(['user-1']);
+  });
+
+  it('drops a remembered role the user no longer holds', async () => {
+    const store = createTestStore();
+
+    await mount(
+      store,
+      coordinatorReturning({
+        status: 'refreshed',
+        identity: { userId: 'user-1', roles: ['customer'] },
+      }),
+      () => Promise.resolve('master'),
+    );
+
+    await waitFor(() => {
+      expect(selectAuthStatus(store.getState())).toBe('signed-in');
+    });
+    expect(selectRole(store.getState())).toBe('customer');
+  });
+
+  it('opens in the customer role when nothing was remembered', async () => {
+    const store = createTestStore();
+
+    await mount(
+      store,
+      coordinatorReturning({
+        status: 'refreshed',
+        identity: { userId: 'user-1', roles: ['customer', 'master'] },
+      }),
+    );
+
+    await waitFor(() => {
+      expect(selectAuthStatus(store.getState())).toBe('signed-in');
+    });
+    expect(selectRole(store.getState())).toBe('customer');
   });
 });

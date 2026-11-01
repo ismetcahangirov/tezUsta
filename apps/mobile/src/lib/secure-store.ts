@@ -32,6 +32,12 @@ export type SecureKey = (typeof SECURE_KEYS)[keyof typeof SECURE_KEYS];
  */
 export const DEVICE_SETTING_KEYS = {
   colorScheme: 'tezusta.color-scheme',
+  /**
+   * The role a two-role user last chose, stored with that user's id so it
+   * never carries over to the next account on the phone
+   * (`store/remembered-role.ts`).
+   */
+  activeRole: 'tezusta.active-role',
 } as const;
 
 type DeviceSettingKey = (typeof DEVICE_SETTING_KEYS)[keyof typeof DEVICE_SETTING_KEYS];

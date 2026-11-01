@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1434,
-    "tests": 430,
+    "files": 1436,
+    "tests": 431,
     "violations": 0
   },
   "byWorkspace": {
@@ -360,8 +360,8 @@
       ]
     },
     "apps/mobile": {
-      "files": 544,
-      "tests": 180,
+      "files": 546,
+      "tests": 181,
       "untested": [
         "apps/mobile/.storybook/main.ts",
         "apps/mobile/.storybook/preview.tsx",
@@ -22063,6 +22063,7 @@
         "apps/mobile/src/auth/useRestoreSession.ts",
         "apps/mobile/src/store/index.ts",
         "apps/mobile/src/store/session-slice.ts",
+        "apps/mobile/src/store/session-slice.ts",
         "apps/mobile/test/support/test-store.ts"
       ],
       "dependedOnBy": [],
@@ -22076,6 +22077,7 @@
       "dependsOn": [
         "apps/mobile/src/auth/refresh.ts",
         "apps/mobile/src/store/hooks.ts",
+        "apps/mobile/src/store/remembered-role.ts",
         "apps/mobile/src/store/session-slice.ts"
       ],
       "dependedOnBy": [
@@ -24903,6 +24905,8 @@
         "apps/mobile/src/auth/token-store.test.ts",
         "apps/mobile/src/auth/token-store.ts",
         "apps/mobile/src/lib/secure-store.test.ts",
+        "apps/mobile/src/store/remembered-role.test.ts",
+        "apps/mobile/src/store/remembered-role.ts",
         "apps/mobile/src/theme/scheme-preference.test.tsx",
         "apps/mobile/src/theme/scheme-preference.ts"
       ],
@@ -24911,6 +24915,7 @@
         "apps/mobile/src/auth/refresh.test.ts",
         "apps/mobile/src/auth/token-store.test.ts",
         "apps/mobile/src/lib/secure-store.test.ts",
+        "apps/mobile/src/store/remembered-role.test.ts",
         "apps/mobile/src/theme/scheme-preference.test.tsx"
       ],
       "orphan": false
@@ -29604,6 +29609,7 @@
         "apps/mobile/src/conversation/outbox-slice.ts",
         "apps/mobile/src/master-jobs/last-job-slice.ts",
         "apps/mobile/src/realtime/connection-slice.ts",
+        "apps/mobile/src/store/remembered-role.ts",
         "apps/mobile/src/store/session-slice.ts"
       ],
       "dependedOnBy": [
@@ -29669,6 +29675,38 @@
       ],
       "orphan": false
     },
+    "apps/mobile/src/store/remembered-role.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/lib/secure-store.ts",
+        "apps/mobile/src/store/remembered-role.ts",
+        "apps/mobile/src/store/session-slice.ts",
+        "apps/mobile/test/support/test-store.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/store/remembered-role.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/lib/secure-store.ts",
+        "apps/mobile/src/store/session-slice.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/auth/useRestoreSession.ts",
+        "apps/mobile/src/store/index.ts",
+        "apps/mobile/src/store/remembered-role.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/store/remembered-role.test.ts"
+      ],
+      "orphan": false
+    },
     "apps/mobile/src/store/session-slice.test.ts": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
@@ -29704,6 +29742,7 @@
         "apps/mobile/src/auth/useAuthGuard.test.tsx",
         "apps/mobile/src/auth/useAuthGuard.ts",
         "apps/mobile/src/auth/useRestoreSession.test.tsx",
+        "apps/mobile/src/auth/useRestoreSession.test.tsx",
         "apps/mobile/src/auth/useRestoreSession.ts",
         "apps/mobile/src/auth/useSignOut.test.tsx",
         "apps/mobile/src/calls/CallRoutes.tsx",
@@ -29731,6 +29770,8 @@
         "apps/mobile/src/reviews/ReceivedReviews.test.tsx",
         "apps/mobile/src/settings/Settings.tsx",
         "apps/mobile/src/store/index.ts",
+        "apps/mobile/src/store/remembered-role.test.ts",
+        "apps/mobile/src/store/remembered-role.ts",
         "apps/mobile/src/store/session-slice.test.ts",
         "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
@@ -29742,6 +29783,7 @@
         "apps/mobile/src/auth/auth-endpoints.test.ts",
         "apps/mobile/src/auth/route-guard.test.ts",
         "apps/mobile/src/auth/useAuthGuard.test.tsx",
+        "apps/mobile/src/auth/useRestoreSession.test.tsx",
         "apps/mobile/src/auth/useRestoreSession.test.tsx",
         "apps/mobile/src/auth/useSignOut.test.tsx",
         "apps/mobile/src/calls/CallSurfaces.test.tsx",
@@ -29760,6 +29802,7 @@
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/realtime/session-recovery.test.ts",
         "apps/mobile/src/reviews/ReceivedReviews.test.tsx",
+        "apps/mobile/src/store/remembered-role.test.ts",
         "apps/mobile/src/store/session-slice.test.ts",
         "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
@@ -30633,6 +30676,7 @@
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
         "apps/mobile/src/settings/settings-entry.test.tsx",
+        "apps/mobile/src/store/remembered-role.test.ts",
         "apps/mobile/src/store/session-slice.test.ts",
         "apps/mobile/src/theme/scheme-preference.test.tsx",
         "apps/mobile/src/tracking/order-tracking.test.tsx",
@@ -30695,6 +30739,7 @@
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
         "apps/mobile/src/settings/settings-entry.test.tsx",
+        "apps/mobile/src/store/remembered-role.test.ts",
         "apps/mobile/src/store/session-slice.test.ts",
         "apps/mobile/src/theme/scheme-preference.test.tsx",
         "apps/mobile/src/tracking/order-tracking.test.tsx",
