@@ -6,6 +6,7 @@ import { outboxReducer } from '../conversation/outbox-slice';
 import { lastJobReducer } from '../master-jobs/last-job-slice';
 import { realtimeReducer } from '../realtime/connection-slice';
 
+import { createRememberedRoleMiddleware } from './remembered-role';
 import { sessionReducer } from './session-slice';
 
 /**
@@ -40,8 +41,10 @@ export function createAppStore() {
     },
     // RTK Query's middleware is what runs the cache lifetime, the polling and
     // the invalidation. Without it the api slice holds data forever and
-    // nothing is ever refetched.
-    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(api.middleware),
+    // nothing is ever refetched. The remembered-role listener saves a two-role
+    // user's choice so the next launch opens in it (`remembered-role.ts`).
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware().prepend(createRememberedRoleMiddleware()).concat(api.middleware),
   });
 }
 
