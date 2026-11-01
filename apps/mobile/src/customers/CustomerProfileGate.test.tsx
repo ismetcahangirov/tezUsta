@@ -12,7 +12,11 @@ import { CUSTOMERS_COPY as copy } from './customers-copy';
 
 const mockPush = jest.fn();
 jest.mock('expo-router', () => ({
-  router: { push: (...args: unknown[]) => mockPush(...args) },
+  router: {
+    push: (...args: unknown[]) => {
+      mockPush(...args);
+    },
+  },
 }));
 
 jest.mock('expo-secure-store', () => ({
