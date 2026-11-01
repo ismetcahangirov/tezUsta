@@ -86,12 +86,12 @@ describe('ServiceList', () => {
     expect(screen.getByText('Su qızdırıcısı')).toBeOnTheScreen();
   });
 
-  it('ends every row in a chevron, so a service reads as something to tap', async () => {
+  it('ends every row in a pencil, so a service reads as something to tap', async () => {
     await render(<ServiceList services={[FIXED, INSPECTION]} onSelect={jest.fn()} />);
 
     // A row with only a price on its right looks like a price list; the
-    // chevron is the same one a category row carries.
-    expect(countGlyphs(screen.toJSON(), 'lucide-chevron-right')).toBe(2);
+    // pencil says that tapping it starts writing an order (#494).
+    expect(countGlyphs(screen.toJSON(), 'lucide-pencil')).toBe(2);
   });
 
   it('hands back the whole service when a row is pressed', async () => {

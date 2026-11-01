@@ -1,7 +1,7 @@
 import type { Service } from '@tezusta/types';
 import { View } from 'react-native';
 
-import { ChevronRightIcon, Divider, ListRow, Text } from '../components';
+import { Divider, ListRow, PencilIcon, Text } from '../components';
 import { formatServicePrice } from './format-service-price';
 
 export interface ServiceListProps {
@@ -25,8 +25,9 @@ export interface ServiceListProps {
  * driven by the response's discriminant, so there is no state in which a
  * missing amount silently renders as nothing.
  *
- * Each row ends in the same chevron as a category row: without it a service
- * reads as a price list, and nothing says that tapping one starts an order.
+ * Each row ends in a pencil: without a mark a service reads as a price list,
+ * and nothing says that tapping one starts writing an order. The owner chose
+ * the pencil over a chevron after the device check (#494).
  */
 export function ServiceList({ services, onSelect }: ServiceListProps): React.JSX.Element {
   return (
@@ -40,7 +41,7 @@ export function ServiceList({ services, onSelect }: ServiceListProps): React.JSX
                 <Text variant="caption" tone="muted">
                   {formatServicePrice(service.pricing)}
                 </Text>
-                <ChevronRightIcon tone="text-muted" />
+                <PencilIcon tone="text-muted" />
               </View>
             }
             onPress={() => {
