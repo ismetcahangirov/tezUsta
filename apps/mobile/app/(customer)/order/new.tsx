@@ -34,7 +34,17 @@ export default function NewOrderScreen(): React.JSX.Element | null {
       <CreateOrder
         serviceId={serviceId}
         onClose={() => {
-          router.replace('/(customer)');
+          // **`back`, not `replace`.** The catalogue's category drill-down is
+          // local state on the home screen, which stays mounted under this
+          // one. Going back lands on the service list the customer tapped
+          // from; a `replace` remounted home and dropped them on the category
+          // list instead (#496). With nothing to go back to — a deep link —
+          // home is the only place left.
+          if (router.canGoBack()) {
+            router.back();
+          } else {
+            router.replace('/(customer)');
+          }
         }}
         onCreated={(order) => {
           // **`replace`, not `push`.** The flow is finished and its steps are
