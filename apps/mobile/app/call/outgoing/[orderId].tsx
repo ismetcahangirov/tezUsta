@@ -1,4 +1,5 @@
 import { router, useLocalSearchParams } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -39,6 +40,9 @@ export default function OutgoingCallScreen(): React.JSX.Element | null {
   return (
     <FixedScheme scheme={CALL_SURFACE_SCHEME} className="flex-1 bg-inverse-surface">
       <SafeAreaView className="flex-1">
+        {/* Dark in both schemes, so the status bar is light in both: the root
+            layout's scheme-following bar would draw dark icons on this surface. */}
+        <StatusBar style="light" />
         <OutgoingCallRoute orderId={orderId} onClose={onClose} />
       </SafeAreaView>
     </FixedScheme>
