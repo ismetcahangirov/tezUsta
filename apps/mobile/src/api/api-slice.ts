@@ -67,6 +67,10 @@ const KEEP_UNUSED_FOR_SECONDS = 300;
  * `'MasterService'` is the master's own services and prices (ADR-0063,
  * `src/master-services/master-services-endpoints.ts`): adding, repricing,
  * pausing and removing invalidate it and the profile.
+ *
+ * `'MasterDocument'` is the caller's own verification documents (#490,
+ * `src/master-onboarding/master-onboarding-endpoints.ts`): a confirmed upload
+ * invalidates the list, so each document row shows what the server holds.
  */
 export const api = createApi({
   reducerPath: 'api',
@@ -79,6 +83,7 @@ export const api = createApi({
     'Address',
     'Conversation',
     'Customer',
+    'MasterDocument',
     'MasterJob',
     'MasterOffer',
     'MasterProfile',

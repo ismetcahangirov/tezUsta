@@ -40,8 +40,15 @@ Review the customer, and receive the customer's review
 
 ### Registration and verification
 
-A master cannot accept work before being verified. Verification requirements are
-**OPEN** and block EPIC 5 — see [`user-roles.md`](user-roles.md).
+A master cannot accept work before being verified. What is collected is settled
+by [ADR-0023](../decisions/ADR-0023-master-verification-policy.md): the ID card
+front and back, and a selfie holding it.
+
+**Registering happens in the app** ([ADR-0073](../decisions/ADR-0073-becoming-a-master-in-the-app.md)).
+A brand-new account is asked first whether it wants to order or to work; an
+existing customer finds "Usta ol" in Settings. Both lead to the same screen: a
+name and optional bio, then the three photos. Once all three are confirmed, a
+new profile is in review.
 
 The app must make the current state obvious: what was submitted, what is still
 needed, and what is being waited on. An opaque "pending" state with no
@@ -62,8 +69,10 @@ different screens:
 One asks for an action the master can take; the other must not pretend there is
 one.
 
-The verification document upload depends on the object storage provider, which is
-still open ([ADR-0005](../decisions/ADR-0005-object-storage.md)).
+Documents are uploaded on the presigned path of
+[ADR-0024](../decisions/ADR-0024-presigned-upload-mechanism.md). For now they are
+picked from the photo library; taking them with the camera inside the app waits
+for a native build (ADR-0073 § 4).
 
 ### Services and pricing
 
