@@ -208,29 +208,29 @@ review each other and talk in the order's conversation, and an admin can oversee
 all of it. **Nothing open can be finished by code alone.** Every open item
 waits on an owner decision, a real device, or a deferred feature.
 
-| Epic                                       | State                   | What still keeps it open                                                                                                             |
-| ------------------------------------------ | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| **1** Project Foundation                   | **Done**                | —                                                                                                                                    |
-| **2** Authentication & User Roles          | **Built, not finished** | 🔴 The email provider and sending domain. Every sub-issue is closed; no real user can sign in until real email is sent               |
-| **3** Service Catalog                      | **Done**                | —                                                                                                                                    |
-| **4** Customer Profile & Address           | **Done**                | —                                                                                                                                    |
-| **5** Master Profile & Verification        | **Done**                | —                                                                                                                                    |
-| **6** Order Creation                       | **Built**               | #319: an iPhone HEIC photo, which needs an iPhone to confirm                                                                         |
-| **7** Master Matching                      | **Done**                | —                                                                                                                                    |
-| **8** Order Lifecycle                      | **Built**               | #412 / #464: the inspection price and the hand-back window, built (ADR-0060, ADR-0068) and waiting for the device check              |
-| **9** Realtime Tracking                    | **Built**               | #173: battery drain measured on a real mid-range Android                                                                             |
-| **10** Notifications                       | **Built**               | The owner's push infrastructure, and the "master nearby" kind, which has no issue                                                    |
-| **11** Reviews & Ratings                   | **Done**                | —                                                                                                                                    |
-| **12** Payments                            | **Retired**             | ADR-0046                                                                                                                             |
-| **13** Admin Panel                         | **Done**                | —                                                                                                                                    |
-| **14** Master Subscriptions                | **Built, not live**     | The billing provider, launch prices, trial and grace. Billing runs behind a provider port with a stub (#323)                         |
-| **15** Security & Abuse Prevention         | Continuous              | Two audits done (`security-audit-2026-09.md`, `security-audit-2026-10.md`); the next is due when a real billing provider is wired in |
-| **16** Performance & Scalability           | Continuous              | #293: cold start on a real mid-range Android                                                                                         |
-| **17** Production Deployment               | **Blocked**             | The hosting / cloud provider decision (#467)                                                                                         |
-| **18** In-Order Messaging & Calls          | **Messaging done**      | Voice calls: #183, the LiveKit spike on two real phones, gates #187–#189                                                             |
-| **19** Master Profile & Portfolio          | **Photos done**         | Video, deferred by ADR-0045 § 7 (#306, #316), and #317, measured on a real Android                                                   |
-| **20** Admin Operations Before Launch      | **Built**               | Serving the panel in production, which waits for hosting                                                                             |
-| **21** Live Search Radar & Arrival Promise | **Done**                | —                                                                                                                                    |
+| Epic                                       | State                     | What still keeps it open                                                                                                             |
+| ------------------------------------------ | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| **1** Project Foundation                   | **Done**                  | —                                                                                                                                    |
+| **2** Authentication & User Roles          | **Built, not finished**   | 🔴 The email provider and sending domain. Every sub-issue is closed; no real user can sign in until real email is sent               |
+| **3** Service Catalog                      | **Done**                  | —                                                                                                                                    |
+| **4** Customer Profile & Address           | **Done**                  | —                                                                                                                                    |
+| **5** Master Profile & Verification        | **API done, no app path** | #490: the app cannot create a master profile, upload the ADR-0023 documents or submit them; waiting on where the path starts (owner) |
+| **6** Order Creation                       | **Built**                 | #319: an iPhone HEIC photo, which needs an iPhone to confirm                                                                         |
+| **7** Master Matching                      | **Done**                  | —                                                                                                                                    |
+| **8** Order Lifecycle                      | **Built**                 | #412 / #464: the inspection price and the hand-back window, built (ADR-0060, ADR-0068) and waiting for the device check              |
+| **9** Realtime Tracking                    | **Built**                 | #173: battery drain measured on a real mid-range Android                                                                             |
+| **10** Notifications                       | **Built**                 | The owner's push infrastructure, and the "master nearby" kind, which has no issue                                                    |
+| **11** Reviews & Ratings                   | **Done**                  | —                                                                                                                                    |
+| **12** Payments                            | **Retired**               | ADR-0046                                                                                                                             |
+| **13** Admin Panel                         | **Done**                  | —                                                                                                                                    |
+| **14** Master Subscriptions                | **Built, not live**       | The billing provider, launch prices, trial and grace. Billing runs behind a provider port with a stub (#323)                         |
+| **15** Security & Abuse Prevention         | Continuous                | Two audits done (`security-audit-2026-09.md`, `security-audit-2026-10.md`); the next is due when a real billing provider is wired in |
+| **16** Performance & Scalability           | Continuous                | #293: cold start on a real mid-range Android                                                                                         |
+| **17** Production Deployment               | **Blocked**               | The hosting / cloud provider decision (#467)                                                                                         |
+| **18** In-Order Messaging & Calls          | **Messaging done**        | Voice calls: #183, the LiveKit spike on two real phones, gates #187–#189                                                             |
+| **19** Master Profile & Portfolio          | **Photos done**           | Video, deferred by ADR-0045 § 7 (#306, #316), and #317, measured on a real Android                                                   |
+| **20** Admin Operations Before Launch      | **Built**                 | Serving the panel in production, which waits for hosting                                                                             |
+| **21** Live Search Radar & Arrival Promise | **Done**                  | —                                                                                                                                    |
 
 **EPIC 2 is still the one that needs care.** Email plus a one-time code is the
 only way in (ADR-0072), `EMAIL_PROVIDER=stub` refuses to run under
@@ -272,14 +272,17 @@ Nothing is waiting on engineering alone. In order of what it unblocks:
 
 1. **The email provider and sending domain** (owner). Turns EPIC 2 from built
    into finished; without it nobody can sign in.
-2. **Hosting** (owner, #467). Unblocks EPIC 17 and the production half of
+2. **Where master onboarding starts in the app** (owner, #490). Without it no
+   real master can join, so there is no supply at launch; the build itself is
+   engineering work once the entry point is chosen.
+3. **Hosting** (owner, #467). Unblocks EPIC 17 and the production half of
    EPIC 20.
-3. **The billing provider, launch prices, trial and grace** (owner). Takes
+4. **The billing provider, launch prices, trial and grace** (owner). Takes
    EPIC 14 live.
-4. **Device sessions.** One Android: #464 (the inspection price and hand-back
+5. **Device sessions.** One Android: #464 (the inspection price and hand-back
    window), #173 (battery), #293 (cold start). Two phones: #183, which unblocks
    voice calls (#187–#189). An iPhone: #319.
-5. **Video** (owner, a new ADR). Reopens #306, #316 and #317.
+6. **Video** (owner, a new ADR). Reopens #306, #316 and #317.
 
 ## Rules
 
