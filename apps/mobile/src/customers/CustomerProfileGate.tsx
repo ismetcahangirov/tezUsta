@@ -1,7 +1,11 @@
-import type { ReactNode } from 'react';
+import { router } from 'expo-router';
+import { useState, type ReactNode } from 'react';
 import { View } from 'react-native';
 
 import { Button, EmptyState, Skeleton } from '../components';
+import { BECOME_MASTER_ROUTE, RoleChoice } from '../master-onboarding';
+import { useAppSelector } from '../store/hooks';
+import { selectGrantedRoles } from '../store/session-slice';
 import { customerProfileState } from './customer-profile-state';
 import { CUSTOMERS_COPY as copy } from './customers-copy';
 import { useGetOwnCustomerQuery } from './customers-endpoints';
@@ -36,9 +40,21 @@ import { ProfileSetup } from './ProfileSetup';
  * that structural instead of a condition somebody has to remember — the master
  * group and `(shared)` never render it, so no `POST /customers` can be
  * provoked for an account that did not ask to be one.
+ *
+ * ## A brand-new account is asked which side it is on first
+ *
+ * An account with no profile **and no role grant** has never answered
+ * anything, and lands here only because `customer` is the default role. It is
+ * asked whether it wants to order or to work before the name question (#490,
+ * ADR-0073): "work" opens the master onboarding instead, so a master is never
+ * made to create a customer profile first. An account that already holds a
+ * role — a master who opens the customer side, say — goes straight to the
+ * name question, as before.
  */
 export function CustomerProfileGate({ children }: { children: ReactNode }): React.JSX.Element {
   const profile = useGetOwnCustomerQuery();
+  const grantedRoles = useAppSelector(selectGrantedRoles);
+  const [choseCustomer, setChoseCustomer] = useState(false);
 
   const state = customerProfileState({
     // `currentData`, not `data`: `data` keeps the previous argument's result
@@ -56,6 +72,18 @@ export function CustomerProfileGate({ children }: { children: ReactNode }): Reac
   }
 
   if (state === 'missing') {
+    if (grantedRoles.length === 0 && !choseCustomer) {
+      return (
+        <RoleChoice
+          onCustomer={() => {
+            setChoseCustomer(true);
+          }}
+          onMaster={() => {
+            router.push(BECOME_MASTER_ROUTE);
+          }}
+        />
+      );
+    }
     return <ProfileSetup />;
   }
 

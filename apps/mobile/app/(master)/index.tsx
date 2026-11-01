@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { IconButton, SettingsIcon, Text } from '../../src/components';
 import { AvailabilityCard } from '../../src/master-availability';
 import { MasterWork } from '../../src/master-jobs';
+import { BECOME_MASTER_ROUTE, VerificationNotice } from '../../src/master-onboarding';
 import { OwnProfileEntry } from '../../src/portfolio';
 import { refreshMySubscription, SubscriptionCard } from '../../src/master-subscription';
 import { useAppDispatch } from '../../src/store/hooks';
@@ -86,6 +87,12 @@ export default function MasterHomeScreen(): React.JSX.Element {
               />
             </View>
           </View>
+
+          <VerificationNotice
+            onOpen={() => {
+              router.push(BECOME_MASTER_ROUTE);
+            }}
+          />
 
           <SubscriptionCard onOpen={openSubscription} />
 
