@@ -1,4 +1,5 @@
 import { router } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -57,6 +58,9 @@ export default function SignInScreen(): React.JSX.Element {
 
   return (
     <SafeAreaView className="flex-1 bg-inverse-surface dark:bg-bg">
+      {/* Dark in both schemes, so the status bar is light in both: the root
+          layout's scheme-following bar would draw dark icons on this surface. */}
+      <StatusBar style="light" />
       <View className="flex-1 justify-between p-6">
         <View className="items-center pt-6">
           <Wordmark tone="on-accent" width={160} />
