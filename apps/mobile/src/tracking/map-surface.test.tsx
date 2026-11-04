@@ -2,7 +2,8 @@ import { act, fireEvent, render, screen } from '@testing-library/react-native';
 
 import { valueOf } from '../../test/support/fake-map-surface';
 import { camera, mapRenders } from '../../test/support/react-native-maps-stub';
-import { MapSurface } from './map-surface';
+import { canMountNativeMap, MapSurface } from './map-surface';
+import { MapSurfacePlaceholder } from './map-surface-placeholder';
 import { MARKER_TICK_MS } from './tracking-policy';
 
 /**
@@ -197,5 +198,45 @@ describe('MapSurface', () => {
     expect(map.props.zoomEnabled).toBe(false);
     expect(map.props.rotateEnabled).toBe(false);
     expect(map.props.pitchEnabled).toBe(false);
+  });
+});
+
+/**
+ * An Android build without its Maps key must not mount a `MapView`: the SDK
+ * throws `API key not found` and the whole app goes down with it (#500).
+ */
+describe('canMountNativeMap', () => {
+  it('refuses an Android build whose config says it has no key', () => {
+    expect(canMountNativeMap('android', { googleMapsAndroid: false })).toBe(false);
+    expect(canMountNativeMap('android', {})).toBe(false);
+    expect(canMountNativeMap('android', undefined)).toBe(false);
+  });
+
+  it('allows an Android build with its key', () => {
+    expect(canMountNativeMap('android', { googleMapsAndroid: true })).toBe(true);
+  });
+
+  it('always allows iOS, which falls back to Apple Maps without a key', () => {
+    expect(canMountNativeMap('ios', undefined)).toBe(true);
+    expect(canMountNativeMap('ios', { googleMapsAndroid: false })).toBe(true);
+  });
+});
+
+describe('MapSurfacePlaceholder', () => {
+  it('names every marker without mounting a map', async () => {
+    await render(
+      <MapSurfacePlaceholder
+        destination={{ point: HOME, label: 'Home' }}
+        master={{ point: MASTER, label: 'Master', appearance: 'live' }}
+        frame={[HOME, MASTER]}
+        scheme="light"
+        accessibilityLabel="Map"
+      />,
+    );
+
+    expect(screen.getByLabelText('Map')).toBeOnTheScreen();
+    expect(screen.getByText('Home')).toBeOnTheScreen();
+    expect(screen.getByText('Master')).toBeOnTheScreen();
+    expect(screen.queryByTestId('vendor-map')).toBeNull();
   });
 });
