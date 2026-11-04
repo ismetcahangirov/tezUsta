@@ -17,6 +17,7 @@ import type {
   MapSurfaceProps,
   MasterMarkerSpec,
 } from './map-surface.types';
+import { MapSurfacePlaceholder } from './map-surface-placeholder';
 import { useGlidingPosition } from './useGlidingPosition';
 
 /**
@@ -44,17 +45,21 @@ import { useGlidingPosition } from './useGlidingPosition';
  * records the exception as development-only, and `app.config.js` refuses an
  * EAS `production` profile without it.
  *
- * Android has no such fork: Google is its only provider, and without a key it
- * draws blank tiles, which is the honest failure for a misconfigured build.
+ * Android has no such fork: Google is its only provider, and without a key the
+ * Maps SDK throws `API key not found` as the `MapView` mounts, which takes the
+ * whole app down (#500, seen on a Galaxy A36). So a keyless Android build draws
+ * the placeholder instead (`map-surface-placeholder.tsx`), and the screen
+ * around it keeps working.
  *
  * **Read from the embedded app config, not from `process.env`.** The pod is
  * decided when the native project is generated; a Metro-inlined
  * `EXPO_PUBLIC_*` is decided when the JavaScript is bundled, and the two can
  * come from different environments (a local `.env` against a CI build, an
- * update bundled elsewhere). `app.config.js` writes one boolean,
- * `extra.googleMapsIos`, from the same evaluation that configures the plugin,
- * so the provider asked for and the SDK installed agree. Only the boolean is
- * written — the key itself is never copied into `extra`.
+ * update bundled elsewhere). `app.config.js` writes two booleans,
+ * `extra.googleMapsIos` and `extra.googleMapsAndroid`, from the same
+ * evaluation that configures the plugin, so what this file asks for and what
+ * the native project holds agree. Only the booleans are written — the keys
+ * themselves are never copied into `extra`.
  */
 const PROVIDER: Provider =
   Platform.OS === 'ios' && Constants.expoConfig?.extra?.['googleMapsIos'] !== true
@@ -62,6 +67,19 @@ const PROVIDER: Provider =
       // library's `PROVIDER_DEFAULT`, which is exported as `any`.
       undefined
     : PROVIDER_GOOGLE;
+
+/**
+ * Whether this build can mount a native map at all. Only an Android build
+ * without its key cannot (#500); iOS always has Apple Maps to fall back to.
+ * Exported, with the platform and the config as arguments, so the rule is
+ * tested on its own rather than through a module re-import per platform.
+ */
+export function canMountNativeMap(
+  os: typeof Platform.OS,
+  extra: Record<string, unknown> | undefined,
+): boolean {
+  return os !== 'android' || extra?.['googleMapsAndroid'] === true;
+}
 
 /**
  * The margin the camera keeps around the points it frames.
@@ -98,7 +116,7 @@ const MAP_STYLE = { flex: 1 } as const;
  * arrives, the state changes or the theme does — never on a glide tick, which
  * re-renders the master's marker alone.
  */
-export const MapSurface = memo(function MapSurface({
+const NativeMapSurface = memo(function NativeMapSurface({
   destination,
   master,
   frame,
@@ -194,6 +212,18 @@ export const MapSurface = memo(function MapSurface({
     </View>
   );
 });
+
+/**
+ * Chosen once, at module load: whether the build holds a key cannot change
+ * while the app runs, and picking the component here rather than branching
+ * inside it keeps the native map's hooks unconditional.
+ */
+export const MapSurface: React.ComponentType<MapSurfaceProps> = canMountNativeMap(
+  Platform.OS,
+  Constants.expoConfig?.extra,
+)
+  ? NativeMapSurface
+  : MapSurfacePlaceholder;
 
 /**
  * Whether a custom-view marker should keep re-snapshotting its children.

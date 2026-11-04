@@ -1,9 +1,3 @@
-import { View } from 'react-native';
-
-import { Text } from '../components';
-import { cn } from '../lib/cn';
-import type { MapSurfaceProps } from './map-surface.types';
-
 /**
  * The web stand-in for `map-surface.tsx` (issue #172).
  *
@@ -15,60 +9,8 @@ import type { MapSurfaceProps } from './map-surface.types';
  * build. Vite and Metro both resolve `.web.tsx` ahead of `.tsx`
  * (`vite-plugin-rnw`'s extension list), which is the whole of the wiring.
  *
- * **It draws the same two markers with the same tokens**, in a list rather than
- * on a map, so a reviewer in Storybook sees exactly what the native map is
- * told: which markers exist, and whether the master's is live or stale. The
- * app ships no web build of the customer screens, so this never reaches a
- * customer.
+ * It is the same placeholder a keyless Android build draws
+ * (`map-surface-placeholder.tsx`, #500). The app ships no web build of the
+ * customer screens, so this never reaches a customer.
  */
-export function MapSurface({
-  destination,
-  master,
-  accessibilityLabel,
-  ring = null,
-  cells = [],
-}: MapSurfaceProps): React.JSX.Element {
-  return (
-    <View
-      accessible
-      accessibilityLabel={accessibilityLabel}
-      className="aspect-square w-full justify-end gap-2 rounded-md bg-surface-alt p-4"
-    >
-      {ring !== null && (
-        <Text variant="caption" tone="muted">
-          {`${String(Math.round(ring.radiusM / 100) / 10)} km`}
-        </Text>
-      )}
-      {cells.map((cell) => (
-        <View
-          key={`${String(cell.point.latitude)},${String(cell.point.longitude)}`}
-          className="flex-row items-center gap-2"
-        >
-          <View className="h-3 w-3 rounded-full border-2 border-text-muted bg-surface-alt" />
-          <Text variant="caption">{cell.label}</Text>
-        </View>
-      ))}
-      {destination !== null && (
-        <View className="flex-row items-center gap-2">
-          <View className="h-avatar-sm w-avatar-sm items-center justify-center rounded-full border-2 border-surface bg-inverse-surface">
-            <View className="h-2 w-2 rounded-full bg-on-inverse" />
-          </View>
-          <Text variant="caption">{destination.label}</Text>
-        </View>
-      )}
-      {master !== null && (
-        <View className="flex-row items-center gap-2">
-          <View
-            className={cn(
-              'h-avatar-sm w-avatar-sm rounded-full border-2',
-              master.appearance === 'live'
-                ? 'border-on-accent bg-accent'
-                : 'border-text-muted bg-surface-alt',
-            )}
-          />
-          <Text variant="caption">{master.label}</Text>
-        </View>
-      )}
-    </View>
-  );
-}
+export { MapSurfacePlaceholder as MapSurface } from './map-surface-placeholder';

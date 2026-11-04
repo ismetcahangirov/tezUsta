@@ -191,7 +191,10 @@ package name and scoped to the Maps SDK. No key is committed or invented.
 Without an iOS key the plugin does not install the Google Maps SDK pod, so a
 development build falls back to Apple Maps rather than drawing an error; that
 fallback is **development-only** and a release build must set both keys.
-Without an Android key Android draws blank tiles.
+Without an Android key the Maps SDK throws `API key not found` as a map
+mounts and crashes the app, so `map-surface.tsx` draws its placeholder
+instead, chosen from `extra.googleMapsAndroid` (#500). That is also
+development-only.
 
 The iOS provider is chosen from `extra.googleMapsIos` in the **embedded** app
 config — a boolean written by the same `app.config.js` evaluation that

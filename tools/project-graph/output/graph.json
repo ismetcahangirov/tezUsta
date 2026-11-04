@@ -106311,7 +106311,7 @@
         "apps/mobile/src/settings/Settings.tsx",
         "apps/mobile/src/tracking/MasterTrackingCard.stories.tsx",
         "apps/mobile/src/tracking/MasterTrackingCard.tsx",
-        "apps/mobile/src/tracking/map-surface.web.tsx"
+        "apps/mobile/src/tracking/map-surface-placeholder.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -109982,8 +109982,8 @@
         "apps/mobile/src/portfolio/MediaGrid.tsx",
         "apps/mobile/src/portfolio/MediaViewer.tsx",
         "apps/mobile/src/portfolio/PortfolioPhoto.tsx",
-        "apps/mobile/src/tracking/map-surface.tsx",
-        "apps/mobile/src/tracking/map-surface.web.tsx"
+        "apps/mobile/src/tracking/map-surface-placeholder.tsx",
+        "apps/mobile/src/tracking/map-surface.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -133508,8 +133508,89 @@
       "valid": true
     },
     {
+      "source": "apps/mobile/src/tracking/map-surface-placeholder.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../components",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../lib/cn",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/lib/cn.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./map-surface.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/tracking/map-surface.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/tracking/map-surface.test.tsx",
+        "apps/mobile/src/tracking/map-surface.tsx",
+        "apps/mobile/src/tracking/map-surface.web.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/mobile/src/tracking/map-surface.test.tsx",
       "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./map-surface-placeholder",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/tracking/map-surface-placeholder.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
         {
           "dynamic": false,
           "module": "./map-surface",
@@ -133622,6 +133703,23 @@
         },
         {
           "dynamic": false,
+          "module": "./map-surface-placeholder",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/tracking/map-surface-placeholder.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./map-surface.types",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -133694,8 +133792,8 @@
         "apps/mobile/src/tracking/MasterTracking.tsx",
         "apps/mobile/src/tracking/MasterTrackingCard.tsx",
         "apps/mobile/src/tracking/index.ts",
+        "apps/mobile/src/tracking/map-surface-placeholder.tsx",
         "apps/mobile/src/tracking/map-surface.tsx",
-        "apps/mobile/src/tracking/map-surface.web.tsx",
         "apps/mobile/src/tracking/tracking-policy.ts",
         "apps/mobile/src/tracking/useGlidingPosition.ts",
         "apps/mobile/test/support/fake-map-surface.tsx"
@@ -133708,49 +133806,14 @@
       "dependencies": [
         {
           "dynamic": false,
-          "module": "../components",
+          "module": "./map-surface-placeholder",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "export"
           ],
-          "resolved": "apps/mobile/src/components/index.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "../lib/cn",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/mobile/src/lib/cn.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "./map-surface.types",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "resolved": "apps/mobile/src/tracking/map-surface.types.ts",
+          "resolved": "apps/mobile/src/tracking/map-surface-placeholder.tsx",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -137849,8 +137912,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 1449,
-    "totalDependenciesCruised": 6901,
+    "totalCruised": 1450,
+    "totalDependenciesCruised": 6904,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

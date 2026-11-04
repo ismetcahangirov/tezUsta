@@ -14,12 +14,14 @@ const brand = tokens.color.light.accent;
 const notificationTint = brand;
 
 // The two platform-restricted client map keys (#172, ADR-0035). Read once, so
-// the config plugin below and `extra.googleMapsIos` come from one evaluation.
+// the config plugin below and the two `extra.googleMaps*` flags come from one
+// evaluation.
 const googleMapsAndroidKey = process.env.EXPO_PUBLIC_GOOGLE_MAPS_ANDROID_API_KEY || undefined;
 const googleMapsIosKey = process.env.EXPO_PUBLIC_GOOGLE_MAPS_IOS_API_KEY || undefined;
 
-// A store build without a map key ships a map that cannot draw: blank tiles on
-// Android, and on iOS Apple Maps where ADR-0004 requires Google. EAS sets
+// A store build without a map key ships a map that cannot draw: a placeholder
+// on Android (the Maps SDK would otherwise crash the app, #500), and on iOS
+// Apple Maps where ADR-0004 requires Google. EAS sets
 // `EAS_BUILD_PROFILE` on its build workers, so a `production` profile fails
 // here, at config evaluation, before a binary exists. No other environment is
 // refused — a development build without keys is how the app runs today, and
@@ -222,9 +224,11 @@ module.exports = {
     // build time and never written here — `GOOGLE_MAPS_SERVER_API_KEY` is a
     // different, billable key and must never appear in this file.
     //
-    // Unset, both are omitted rather than written as empty strings: Android
-    // then draws blank tiles and iOS falls back to Apple Maps in a development
-    // build (`src/tracking/map-surface.tsx`). A release build must set both.
+    // Unset, both are omitted rather than written as empty strings. Android
+    // then has no key in its manifest, and the Maps SDK would throw as a map
+    // mounts, so `src/tracking/map-surface.tsx` draws a placeholder (#500).
+    // iOS falls back to Apple Maps in a development build. A release build
+    // must set both.
     [
       'react-native-maps',
       {
@@ -242,5 +246,9 @@ module.exports = {
     // pick the provider, so JavaScript and the native project cannot disagree.
     // A boolean on purpose: the key itself is never copied into `extra`.
     googleMapsIos: Boolean(googleMapsIosKey),
+    // Whether this build wrote the Android key into its manifest. Without it
+    // the Maps SDK throws as a map mounts and takes the app down, so
+    // `map-surface.tsx` draws a placeholder instead (#500).
+    googleMapsAndroid: Boolean(googleMapsAndroidKey),
   },
 };
