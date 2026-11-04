@@ -223,17 +223,17 @@ in-process rate-limit counters, a local queue.
 Measured on 25 September 2026 (#292). Each figure is the median of three runs
 or more, on an otherwise idle machine, one benchmark at a time.
 
-| Metric                   | Budget                     | Measured p50 / p95 / p99 | Load                                           | Status             |
-| ------------------------ | -------------------------- | ------------------------ | ---------------------------------------------- | ------------------ |
-| Nearby-masters query     | < 100 ms p95               | 11.6 / 13.6 / 15.4 ms    | 10 000 live masters, serial                    | Within budget      |
-| Location ingest          | < 200 ms p95               | 28.7 / 51.8 / 79.1 ms    | 2 000 masters at the reporting floor (~32 rps) | Within budget      |
-| Order creation           | < 300 ms p95               | 87.9 / 134.2 / 197.3 ms  | 10 in flight (five runs)                       | Within budget      |
-| Standard API read        | < 200 ms p95               | 27.3 / 46.8 / 59.5 ms    | 10 in flight, 50 000-order history             | Within budget      |
-| WebSocket event delivery | < 1 s p95                  | 3.5 / 6.7 / 9.0 ms       | 500 clients on two instances, cross-instance   | Within budget      |
-| Portfolio feed read      | < 200 ms p95               | 29.4 / 36.9 / 40.7 ms    | 60 posts × 10 photos, serial (#317)            | Within budget      |
-| Photo renditions         | < 1.5 s p95                | 795.8 / 882.7 ms / —     | One 2560 px textured JPEG at a time (#317)     | Within budget      |
-| App cold start           | < 3 s on mid-range Android | —                        | —                                              | Not measured: #293 |
-| Screen transition        | 60 fps, no dropped frames  | —                        | —                                              | Not measured: #293 |
+| Metric                   | Budget                     | Measured p50 / p95 / p99                           | Load                                                | Status                                                      |
+| ------------------------ | -------------------------- | -------------------------------------------------- | --------------------------------------------------- | ----------------------------------------------------------- |
+| Nearby-masters query     | < 100 ms p95               | 11.6 / 13.6 / 15.4 ms                              | 10 000 live masters, serial                         | Within budget                                               |
+| Location ingest          | < 200 ms p95               | 28.7 / 51.8 / 79.1 ms                              | 2 000 masters at the reporting floor (~32 rps)      | Within budget                                               |
+| Order creation           | < 300 ms p95               | 87.9 / 134.2 / 197.3 ms                            | 10 in flight (five runs)                            | Within budget                                               |
+| Standard API read        | < 200 ms p95               | 27.3 / 46.8 / 59.5 ms                              | 10 in flight, 50 000-order history                  | Within budget                                               |
+| WebSocket event delivery | < 1 s p95                  | 3.5 / 6.7 / 9.0 ms                                 | 500 clients on two instances, cross-instance        | Within budget                                               |
+| Portfolio feed read      | < 200 ms p95               | 29.4 / 36.9 / 40.7 ms                              | 60 posts × 10 photos, serial (#317)                 | Within budget                                               |
+| Photo renditions         | < 1.5 s p95                | 795.8 / 882.7 ms / —                               | One 2560 px textured JPEG at a time (#317)          | Within budget                                               |
+| App cold start           | < 3 s on mid-range Android | 856 ms median / 1 038 ms worst                     | Galaxy A36, release build, 10 runs (#293)           | Within budget                                               |
+| Screen transition        | 60 fps, no dropped frames  | 2.3–3.3 % janky frames; p95 17–19 ms, p99 21–32 ms | Galaxy A36 at 120 Hz, three transitions × 10 (#293) | Over budget (strict reading); see § Mobile on a real device |
 
 **Machine.** Intel Core i7-10870H (8 cores, 16 threads), 16 GB RAM, Windows 11
 with Docker Desktop 28.5 (WSL 2). Node 24.19, PostgreSQL 17.5 with PostGIS
@@ -387,6 +387,59 @@ The harness then runs `EXPLAIN (ANALYZE, BUFFERS)` on the first page of
   It executes in under 0.1 ms, with 5 shared buffer hits.
 - The query is written by hand, to match `listFeed` with no cursor. It is not
   captured from the endpoint.
+
+### Mobile on a real device
+
+Issue #293, measured on 4 November 2026.
+
+- **Device:** Samsung Galaxy A36 5G (SM-A366E), a 2025 mid-range A-series phone. Android 16, display at 120 Hz.
+- **Build:** a local release build of `main` at `0f6338e`, made with `expo prebuild` and `gradlew assembleRelease`. It runs Hermes bytecode with no Metro, arm64 only.
+  - It was installed as `az.tezusta.app.perf`, so the development client on the same phone was left alone.
+  - The release manifest allowed cleartext HTTP to the LAN API.
+  - The Google Maps key came from the local `.env`.
+- **API:** a local API on the same Wi-Fi network, against its own seeded database.
+
+| Measurement                             | Runs | Median | Worst    | Notes                                                                                                                 |
+| --------------------------------------- | ---- | ------ | -------- | --------------------------------------------------------------------------------------------------------------------- |
+| Cold start (`am start -W`, `TotalTime`) | 10   | 856 ms | 1 038 ms | After `force-stop`. Signed out, so the sign-in screen draws. An earlier build without the Maps key gave 857 / 892 ms. |
+
+| Transition (gfxinfo over the cycles)                             | Cycles | Frames | Janky  | p50 / p90 / p95 / p99 frame |
+| ---------------------------------------------------------------- | ------ | ------ | ------ | --------------------------- |
+| Catalogue → order creation (service list → order form, and back) | 10     | 1 152  | 2.34 % | 10 / 16 / 17 / 21 ms        |
+| Order list → order (an accepted order, and back)                 | 10     | 1 098  | 2.73 % | 10 / 16 / 18 / 22 ms        |
+| Master home → job screen (with its map, and back)                | 9      | 1 280  | 3.28 % | 9 / 15 / 19 / 32 ms         |
+
+**Notes on the transition figures:**
+
+- **"Janky"** is Android's modern count: frames that missed their deadline. The legacy count is 11–13 %, but at 120 Hz it flags any frame over 8.3 ms, so it is not used here.
+- **Each cycle includes the Back transition**, so every figure covers both directions.
+- **Master home → job screen ran 9 cycles.** The tenth was skipped because the phone's notification shade was open.
+
+**What the numbers say:**
+
+- **Cold start is comfortably inside the 3 s budget**, with room for growth.
+- **The transitions hold 60 fps, but not "no dropped frames".**
+  - The p95 frame stays under the 16.7 ms a 60 Hz frame allows.
+  - At this phone's native 120 Hz, about one frame in 30–40 misses its deadline.
+  - The job screen is the heaviest: its p99 is 32 ms and it missed 10 vsyncs, from mounting the Google map.
+  - Read strictly, the budget is not met. "No dropped frames" is likely the wrong bar for a 120 Hz device. A frame-time percentile with a janky-frame ceiling would be testable, for example p95 < 16.7 ms and < 5 % janky. Revising the budget is the owner's decision, not this measurement's.
+- **Not measured:**
+  - a phone below the A-series class;
+  - a long order list;
+  - the customer's order screen while it shows a live master position on its map. In these runs no position had been reported yet.
+
+**Procedure, so it can be repeated:**
+
+1. Build a release APK. Prebuild, then `./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a`, with `EXPO_PUBLIC_API_URL` and both `EXPO_PUBLIC_GOOGLE_MAPS_*` keys set. Install it with `adb install -r`.
+2. Cold start: run this ten times and take the median and the worst `TotalTime`:
+   ```bash
+   adb shell am force-stop <pkg> && adb shell am start -W -n <pkg>/.MainActivity
+   ```
+3. For each transition:
+   1. Run `adb shell dumpsys gfxinfo <pkg> reset`.
+   2. Do ten cycles of: tap into the screen, wait about 2.5 s, press Back, wait about 2.5 s.
+   3. Run `adb shell dumpsys gfxinfo <pkg>`, and record the total frames, the janky frames and the percentiles.
+4. Keep the phone untouched while it runs, with notifications quiet. A heads-up banner or an open shade both disturb the frame counts.
 
 ### How to re-run
 
