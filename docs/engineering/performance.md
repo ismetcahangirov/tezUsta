@@ -223,17 +223,18 @@ in-process rate-limit counters, a local queue.
 Measured on 25 September 2026 (#292). Each figure is the median of three runs
 or more, on an otherwise idle machine, one benchmark at a time.
 
-| Metric                   | Budget                     | Measured p50 / p95 / p99                           | Load                                                | Status                                                      |
-| ------------------------ | -------------------------- | -------------------------------------------------- | --------------------------------------------------- | ----------------------------------------------------------- |
-| Nearby-masters query     | < 100 ms p95               | 11.6 / 13.6 / 15.4 ms                              | 10 000 live masters, serial                         | Within budget                                               |
-| Location ingest          | < 200 ms p95               | 28.7 / 51.8 / 79.1 ms                              | 2 000 masters at the reporting floor (~32 rps)      | Within budget                                               |
-| Order creation           | < 300 ms p95               | 87.9 / 134.2 / 197.3 ms                            | 10 in flight (five runs)                            | Within budget                                               |
-| Standard API read        | < 200 ms p95               | 27.3 / 46.8 / 59.5 ms                              | 10 in flight, 50 000-order history                  | Within budget                                               |
-| WebSocket event delivery | < 1 s p95                  | 3.5 / 6.7 / 9.0 ms                                 | 500 clients on two instances, cross-instance        | Within budget                                               |
-| Portfolio feed read      | < 200 ms p95               | 29.4 / 36.9 / 40.7 ms                              | 60 posts × 10 photos, serial (#317)                 | Within budget                                               |
-| Photo renditions         | < 1.5 s p95                | 795.8 / 882.7 ms / —                               | One 2560 px textured JPEG at a time (#317)          | Within budget                                               |
-| App cold start           | < 3 s on mid-range Android | 856 ms median / 1 038 ms worst                     | Galaxy A36, release build, 10 runs (#293)           | Within budget                                               |
-| Screen transition        | 60 fps, no dropped frames  | 2.3–3.3 % janky frames; p95 17–19 ms, p99 21–32 ms | Galaxy A36 at 120 Hz, three transitions × 10 (#293) | Over budget (strict reading); see § Mobile on a real device |
+| Metric                   | Budget                         | Measured p50 / p95 / p99                           | Load                                                           | Status                                                      |
+| ------------------------ | ------------------------------ | -------------------------------------------------- | -------------------------------------------------------------- | ----------------------------------------------------------- |
+| Nearby-masters query     | < 100 ms p95                   | 11.6 / 13.6 / 15.4 ms                              | 10 000 live masters, serial                                    | Within budget                                               |
+| Location ingest          | < 200 ms p95                   | 28.7 / 51.8 / 79.1 ms                              | 2 000 masters at the reporting floor (~32 rps)                 | Within budget                                               |
+| Order creation           | < 300 ms p95                   | 87.9 / 134.2 / 197.3 ms                            | 10 in flight (five runs)                                       | Within budget                                               |
+| Standard API read        | < 200 ms p95                   | 27.3 / 46.8 / 59.5 ms                              | 10 in flight, 50 000-order history                             | Within budget                                               |
+| WebSocket event delivery | < 1 s p95                      | 3.5 / 6.7 / 9.0 ms                                 | 500 clients on two instances, cross-instance                   | Within budget                                               |
+| Portfolio feed read      | < 200 ms p95                   | 29.4 / 36.9 / 40.7 ms                              | 60 posts × 10 photos, serial (#317)                            | Within budget                                               |
+| Photo renditions         | < 1.5 s p95                    | 795.8 / 882.7 ms / —                               | One 2560 px textured JPEG at a time (#317)                     | Within budget                                               |
+| App cold start           | < 3 s on mid-range Android     | 856 ms median / 1 038 ms worst                     | Galaxy A36, release build, 10 runs (#293)                      | Within budget                                               |
+| Screen transition        | 60 fps, no dropped frames      | 2.3–3.3 % janky frames; p95 17–19 ms, p99 21–32 ms | Galaxy A36 at 120 Hz, three transitions × 10 (#293)            | Over budget (strict reading); see § Mobile on a real device |
+| Portfolio grid scroll    | Same bar as transitions (#503) | 0.31–0.47 % janky frames; p95 8 ms, p99 11 ms      | Galaxy A36 at 120 Hz, 60 tiles, three runs of 20 flings (#317) | Measured; holds 120 Hz                                      |
 
 **Machine.** Intel Core i7-10870H (8 cores, 16 threads), 16 GB RAM, Windows 11
 with Docker Desktop 28.5 (WSL 2). Node 24.19, PostgreSQL 17.5 with PostGIS
@@ -440,6 +441,39 @@ Issue #293, measured on 4 November 2026.
    2. Do ten cycles of: tap into the screen, wait about 2.5 s, press Back, wait about 2.5 s.
    3. Run `adb shell dumpsys gfxinfo <pkg>`, and record the total frames, the janky frames and the percentiles.
 4. Keep the phone untouched while it runs, with notifications quiet. A heads-up banner or an open shade both disturb the frame counts.
+
+### Portfolio grid on a real device
+
+Issue #317, measured on the night of 6–7 November 2026 on the Galaxy A36 named above, with a release build of `main` at `affe264`, arm64 only and without a Maps key. The path is the one a customer takes: an accepted order, then **Profilə bax**, then the grid.
+
+The master has 60 published posts of ten photos each, so the grid has 60 tiles, each with the mark for a multi-photo post. Tiles are 480×360 WebP at quality 75, about 27 KB each, made from the textured noise of § Portfolio and media pipeline. They are not photos.
+
+Each run is ten flings down and ten back up, driven by `adb shell input swipe` (1 200 px in 120 ms, a pause of about a second between flings). Ten flings do reach the last tile.
+
+| Run | Frames | Janky  | p50 / p90 / p95 / p99 frame | Missed vsync | Slow UI thread | Slow bitmap upload |
+| --- | ------ | ------ | --------------------------- | ------------ | -------------- | ------------------ |
+| 1   | 1 922  | 0.31 % | 6 / 7 / 8 / 11 ms           | 0            | 0              | 0                  |
+| 2   | 1 935  | 0.47 % | 6 / 7 / 8 / 11 ms           | 0            | 0              | 0                  |
+| 3   | 1 959  | 0.41 % | 6 / 7 / 8 / 11 ms           | 0            | 0              | 0                  |
+
+**What the numbers say:**
+
+- **The grid keeps up with the phone's 120 Hz display.** The p95 frame fits the 8.3 ms a 120 Hz frame allows, and about one frame in 200–300 misses its deadline. That is far lighter than the transitions above, which do not meet that 120 Hz bar (#503).
+- **No frames-per-second figure is recorded.** gfxinfo counts only frames that were drawn, and the list comes to rest between flings, so frames over elapsed time would measure the pauses. The frame times are the honest figure.
+- **Memory:** total PSS went from 276 to 282 MB over the three runs, and graphics memory stayed at 25.6 MB. That is too short a run to say whether memory levels off.
+
+**Limits of this measurement:**
+
+- **It does not cover waiting on the network.** All 60 tiles had been requested before the first fling, because the list renders ahead of the screen. They came through an adb tunnel on the same Wi-Fi, so a first load on 4G is not measured.
+- **The runs are not fully quiet.** The phone was charging, and Do Not Disturb was off. The count of posted notifications stayed at 15 throughout.
+- **Noise is not a photo.** It decodes differently from a real scene, and the tiles are smaller on disk than a real photo's thumb may be. A sample of real, consented photos would settle that, as it would the storage estimate above.
+- **Video figures are not here.** Memory after ten videos and time to first frame moved to #504 with the rest of video.
+
+**Three things that cost time, for whoever repeats this:**
+
+- On a Wi-Fi network Windows treats as Public, the firewall can refuse the phone. Use `adb reverse tcp:<port> tcp:<port>` for the API and the media server, and build with `EXPO_PUBLIC_API_URL=http://localhost:<port>`.
+- Changing an `EXPO_PUBLIC_*` value does not invalidate Gradle's bundle task. Run `./gradlew :app:createBundleReleaseJsAndAssets --rerun` first, then check the URL is in `assets/index.android.bundle`.
+- With a changed `applicationId`, the activity keeps its old name: `adb shell am start -n <pkg>/az.tezusta.app.MainActivity`.
 
 ### How to re-run
 
