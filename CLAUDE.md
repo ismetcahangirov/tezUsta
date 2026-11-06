@@ -151,8 +151,8 @@ commercial relationship.
 | Account recovery when access to the email address is lost       | Launch                                     |
 | Languages at launch                                             | Launch                                     |
 | Owner art: map style, illustration                              | Polish, not features                       |
-| Public media domain for the portfolio (ADR-0045)                | EPIC 19 — portfolio media                  |
-| Portfolio content rules and homeowner consent (ADR-0045)        | EPIC 19 — portfolio launch                 |
+| Public media domain for the portfolio (ADR-0045, #505)          | First production deploy                    |
+| Portfolio content rules and homeowner consent (ADR-0045, #506)  | Launch                                     |
 
 Sign-in is built against the `EmailSender` interface and its development stub
 (`EMAIL_PROVIDER=stub`, ADR-0072), which refuses production. What still blocks

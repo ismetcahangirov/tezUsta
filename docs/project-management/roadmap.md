@@ -113,7 +113,7 @@ order creation, matching, and lifecycle. EPIC 5 is on the path because
 | 16  | Performance & Scalability     | continuous | —                                                                                                                                                            |
 | 17  | Production Deployment         | 8          | Hosting / cloud provider                                                                                                                                     |
 | 18  | In-Order Messaging & Calls    | 8, 9       | LiveKit on Expo 57 / RN 0.86 is unproven — the Epic opens with a build spike ([ADR-0034](../decisions/ADR-0034-in-app-voice-calls.md))                       |
-| 19  | Master Profile & Portfolio    | 5, 13      | Video only: ADR-0045 § 7 ships photos at launch and defers video to a new ADR (#306, #316)                                                                   |
+| 19  | Master Profile & Portfolio    | 5, 13      | Closed. ADR-0045 § 7 ships photos at launch; whether video follows is #504                                                                                   |
 | 20  | Admin Operations              | 13         | Hosting / cloud provider, for serving the panel in production                                                                                                |
 | 21  | Live Search Radar             | 7, 9       | —                                                                                                                                                            |
 
@@ -228,7 +228,7 @@ waits on an owner decision, a real device, or a deferred feature.
 | **16** Performance & Scalability           | Continuous                | #293: cold start on a real mid-range Android                                                                                         |
 | **17** Production Deployment               | **Blocked**               | The hosting / cloud provider decision (#467)                                                                                         |
 | **18** In-Order Messaging & Calls          | **Messaging done**        | Voice calls: #183, the LiveKit spike on two real phones, gates #187–#189                                                             |
-| **19** Master Profile & Portfolio          | **Photos done**           | Video, deferred by ADR-0045 § 7 (#306, #316), and #317, measured on a real Android                                                   |
+| **19** Master Profile & Portfolio          | **Done, photos only**     | Video is the owner's decision (#504); the media domain (#505) and content rules (#506) wait for launch                               |
 | **20** Admin Operations Before Launch      | **Built**                 | Serving the panel in production, which waits for hosting                                                                             |
 | **21** Live Search Radar & Arrival Promise | **Done**                  | —                                                                                                                                    |
 
@@ -282,7 +282,9 @@ Nothing is waiting on engineering alone. In order of what it unblocks:
 5. **Device sessions.** One Android: #464 (the inspection price and hand-back
    window), #173 (battery), #293 (cold start). Two phones: #183, which unblocks
    voice calls (#187–#189). An iPhone: #319.
-6. **Video** (owner, a new ADR). Reopens #306, #316 and #317.
+6. **The portfolio's launch needs** (owner): the media domain (#505), and the
+   content rules and homeowner consent (#506).
+7. **Video** (owner, a new ADR, #504). Unblocks #306 and #316.
 
 ## Rules
 
