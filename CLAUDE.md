@@ -86,8 +86,10 @@ It added the following controls:
 - Every response carries security headers.
 - OTP challenges and admin sessions age out.
 
-The epic stays open because it is continuous. The next audit is due when a
-real billing or email provider adapter lands, or before the first deployment.
+The Epic closed on 7 November 2026. Security stays a requirement of every Epic.
+The next audit, and tuning the rate limits against real traffic, are #508: due
+when a real billing or email provider adapter lands, or before the first
+deployment.
 
 What is **not** true yet, and is easy to assume from the above: nobody can sign
 in for real, because no email provider has been chosen and only the
