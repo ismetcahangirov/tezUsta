@@ -169,6 +169,9 @@ Nothing is deployed yet (EPIC 17), so none of these was ever exposed to real use
 
 ## Still owed by EPIC 15
 
+EPIC 15 closed on 7 November 2026. These items are now tracked in #508, under
+EPIC 17.
+
 - Rate limits tuned against real traffic (EPIC 17).
 - When a real billing provider is chosen, its adapter's ADR must cover:
   - the webhook's signature scheme and replay window;

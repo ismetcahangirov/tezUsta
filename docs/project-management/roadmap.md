@@ -59,13 +59,14 @@ EPIC 21 — Live Search Radar            needs EPIC 7 and EPIC 9
    ║  EPIC 15 — Security & Abuse Prevention       ── continuous ──  ║
    ║  EPIC 16 — Performance & Scalability         ── continuous ──  ║
    ╚═══════════════════════════════════════════════════════════════╝
-      These run alongside every Epic above, from EPIC 1 onwards.
+      These ran alongside every Epic above, from EPIC 1 onwards.
 ```
 
-**EPIC 15 and 16 are continuous, not terminal.** Security and performance are
+**EPIC 15 and 16 ran continuously, and both are now closed** (#16 and #17). What
+EPIC 15 still owed is #508. Security and performance remain
 requirements of every Epic ([`../engineering/security.md`](../engineering/security.md),
 [`../engineering/performance.md`](../engineering/performance.md)). These Epics
-exist to audit and harden what was already built to standard — not to add
+existed to audit and harden what was already built to standard — not to add
 security at the end.
 
 **EPIC 15's first full audit ran on 25 September 2026**, once EPIC 8 and 13
@@ -73,8 +74,9 @@ had landed (#269–#277). It found one critical and seven lesser findings, and
 fixed each one in its own issue. The audit record lists them, the risks
 accepted with reasons, and what is still owed:
 [`../engineering/security-audit-2026-09.md`](../engineering/security-audit-2026-09.md).
-Tuning the limits against real traffic waits for EPIC 17. A second audit waits
-for subscription billing (EPIC 14), because money changes the threat model.
+Delta reviews followed in October (#391, #424) and on 4 November 2026; the last
+found nothing. Tuning the limits against real traffic and the next audit are
+#508, under EPIC 17.
 
 ## The critical path
 
@@ -224,7 +226,7 @@ waits on an owner decision, a real device, or a deferred feature.
 | **12** Payments                            | **Retired**               | ADR-0046                                                                                                                             |
 | **13** Admin Panel                         | **Done**                  | —                                                                                                                                    |
 | **14** Master Subscriptions                | **Built, not live**       | The billing provider, launch prices, trial and grace. Billing runs behind a provider port with a stub (#323)                         |
-| **15** Security & Abuse Prevention         | Continuous                | Two audits done (`security-audit-2026-09.md`, `security-audit-2026-10.md`); the next is due when a real billing provider is wired in |
+| **15** Security & Abuse Prevention         | **Done**                  | Audits recorded (`security-audit-2026-09.md`, `security-audit-2026-10.md`); the next audit and real-traffic rate limits are #508     |
 | **16** Performance & Scalability           | Continuous                | #293: cold start on a real mid-range Android                                                                                         |
 | **17** Production Deployment               | **Blocked**               | The hosting / cloud provider decision (#467)                                                                                         |
 | **18** In-Order Messaging & Calls          | **Messaging done**        | Voice calls: #183, the LiveKit spike on two real phones, gates #187–#189                                                             |
