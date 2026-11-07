@@ -5,6 +5,10 @@ import { useEffect, useState } from 'react';
 import { PermissionsAndroid, Platform, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import {
+  startCallForegroundService,
+  stopCallForegroundService,
+} from '../../modules/call-foreground-service';
 import { Button, Text } from '../../src/components';
 
 // WebRTC's globals for `livekit-client` (the SDK's README). Module scope, so
@@ -82,6 +86,10 @@ export default function LiveKitSpikeScreen(): React.JSX.Element | null {
       await next.localParticipant.setMicrophoneEnabled(true);
       const published = next.localParticipant.getTrackPublication(Track.Source.Microphone);
       log(`microphone published ${String(published !== undefined)}`);
+      // Keeps the microphone and the network once the app leaves the screen
+      // (#183: without it Android cut both ~3 s after Home).
+      startCallForegroundService('TezUsta', 'Zəng davam edir');
+      log('foreground service started');
     };
     setRoom(next);
     start().catch((error: unknown) => {
@@ -92,6 +100,7 @@ export default function LiveKitSpikeScreen(): React.JSX.Element | null {
       cancelled = true;
       void next.disconnect();
       void AudioSession.stopAudioSession();
+      stopCallForegroundService();
     };
   }, [url, token]);
 
