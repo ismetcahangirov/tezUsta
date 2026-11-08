@@ -9,6 +9,8 @@ export interface TextFieldProps extends Omit<TextInputProps, 'style' | 'classNam
   /** Shown under the field and announced as the field's error state. */
   error?: string;
   className?: string;
+  /** Reaches the input itself, so a screen can focus or blur it. */
+  ref?: React.Ref<TextInput>;
 }
 
 /**
