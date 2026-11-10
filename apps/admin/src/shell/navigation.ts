@@ -20,6 +20,12 @@ export const NAVIGATION: readonly NavigationItem[] = [
   { path: '/', label: copy.nav.dashboard, permission: 'dashboard.read', issue: 251 },
   { path: '/masters', label: copy.nav.masters, permission: 'masters.read', issue: 248 },
   { path: '/customers', label: copy.nav.customers, permission: 'customers.read', issue: 328 },
+  {
+    path: '/recoveries',
+    label: copy.nav.recoveries,
+    permission: 'accounts.recover',
+    issue: 517,
+  },
   { path: '/orders', label: copy.nav.orders, permission: 'orders.read', issue: 249 },
   { path: '/disputes', label: copy.nav.disputes, permission: 'orders.read', issue: 249 },
   { path: '/reports', label: copy.nav.reports, permission: 'reports.read', issue: 330 },

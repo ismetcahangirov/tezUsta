@@ -6,15 +6,15 @@ Scanned: apps, packages, tools
 
 ## Totals
 
-- Files: **1482**
-- Test files: **438**
+- Files: **1490**
+- Test files: **439**
 - Architecture rule violations: **0**
 
 ## Workspaces
 
 | Workspace | Files | Tests | Files with no direct test |
 | --- | ---: | ---: | ---: |
-| `apps/admin` | 131 | 25 | 91 |
+| `apps/admin` | 139 | 26 | 97 |
 | `apps/api` | 710 | 221 | 258 |
 | `apps/mobile` | 572 | 185 | 165 |
 | `apps/web` | 32 | 7 | 19 |

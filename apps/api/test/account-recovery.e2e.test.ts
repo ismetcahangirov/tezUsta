@@ -357,6 +357,13 @@ describe('a recovery from open to move (ADR-0074 § 2)', () => {
       expect(moved.status).toBe(200);
       expect((moved.body as AdminAccountRecovery).status).toBe('moved');
       expect((moved.body as AdminAccountRecovery).approvedByAdminId).toBe(approver.id);
+      // What the panel shows beside the request (#517).
+      expect(moved.body as AdminAccountRecovery).toMatchObject({
+        accountName: kind === 'master' ? 'Usta Elçin' : 'Aysel',
+        openedByName: 'Nigar',
+        approvedByName: 'Nigar',
+        cancelledByName: null,
+      });
 
       expect(await emailOf(target.userId)).toBe(newEmail);
       expect(await liveSessions(target.userId)).toBe(0);

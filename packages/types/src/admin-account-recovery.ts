@@ -49,10 +49,13 @@ export interface AdminAccountRecovery {
   readonly customerId: string | null;
   /** The account's master profile, when it has one: the evidence is matched against its documents. */
   readonly masterId: string | null;
+  /** The master's display name where there is one, else the customer's. */
+  readonly accountName: string | null;
   readonly oldEmailMasked: string;
   readonly newEmailMasked: string;
   readonly evidenceNotes: string;
   readonly openedByAdminId: string;
+  readonly openedByName: string | null;
   readonly openedAt: string;
   readonly codeExpiresAt: string;
   readonly codeVerifiedAt: string | null;
@@ -61,8 +64,10 @@ export interface AdminAccountRecovery {
   readonly cancelledAt: string | null;
   readonly cancelSource: AccountRecoveryCancelSource | null;
   readonly cancelledByAdminId: string | null;
+  readonly cancelledByName: string | null;
   readonly cancelReason: string | null;
   readonly approvedByAdminId: string | null;
+  readonly approvedByName: string | null;
   readonly movedAt: string | null;
 }
 

@@ -19,6 +19,8 @@ import { availableActions } from './actions';
 import { type MasterAction, mastersApi, useMasterDetailQuery } from './api';
 import { mastersCopy } from './copy';
 import { MasterActionDialog } from './MasterActionDialog';
+import { OpenRecoveryDialog } from '../recoveries/OpenRecoveryDialog';
+import { recoveriesCopy } from '../recoveries/copy';
 import { MasterStatusBadge } from './MasterStatusBadge';
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
@@ -75,6 +77,8 @@ function MasterFile({ master }: { master: AdminMasterDetail }) {
   const actions = availableActions(master.verificationStatus, me.permissions);
   const [pending, setPending] = useState<MasterAction | null>(null);
   const [done, setDone] = useState<MasterAction | null>(null);
+  const [recovering, setRecovering] = useState(false);
+  const canRecover = me.permissions.includes('accounts.recover') && master.suspendedAt === null;
 
   return (
     <PageFrame title={master.displayName}>
@@ -103,6 +107,16 @@ function MasterFile({ master }: { master: AdminMasterDetail }) {
               }}
             />
           ))}
+        </div>
+      )}
+
+      {canRecover && (
+        <div>
+          <Button
+            label={recoveriesCopy.open.button}
+            variant="secondary"
+            onClick={() => setRecovering(true)}
+          />
         </div>
       )}
 
@@ -192,6 +206,14 @@ function MasterFile({ master }: { master: AdminMasterDetail }) {
             setPending(null);
             setDone(action);
           }}
+        />
+      )}
+      {recovering && (
+        <OpenRecoveryDialog
+          subject={{ kind: 'master', id: master.id }}
+          title={recoveriesCopy.open.title}
+          evidence="master"
+          onClose={() => setRecovering(false)}
         />
       )}
     </PageFrame>

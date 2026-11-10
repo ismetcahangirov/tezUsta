@@ -21,6 +21,7 @@ describe('authenticated shell', () => {
       'Dashboard',
       'Masters',
       'Customers',
+      'Account recovery',
       'Orders',
       'Disputes',
       'Reports',
