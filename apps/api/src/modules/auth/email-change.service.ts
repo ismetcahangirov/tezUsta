@@ -58,6 +58,23 @@ export class EmailAddressTakenError extends AppError {
   }
 }
 
+/**
+ * Support has a recovery open on the account (#515, ADR-0074 § 2). The owner
+ * was mailed a link to cancel it; a change racing it would leave two moves
+ * pending for one account.
+ */
+export class EmailChangeRecoveryPendingError extends AppError {
+  constructor() {
+    super(
+      ERROR_CODES.EMAIL_CHANGE_RECOVERY_PENDING,
+      'An account recovery is open on this account.',
+      409,
+    );
+    this.name = 'EmailChangeRecoveryPendingError';
+    Object.setPrototypeOf(this, EmailChangeRecoveryPendingError.prototype);
+  }
+}
+
 /** Carries a refused move out of the transaction, so the completion rolls back with it. */
 class MoveRefused extends Error {
   constructor(readonly result: Exclude<AccountEmailMoveResult, 'moved'>) {
@@ -131,7 +148,7 @@ export class EmailChangeService {
     const currentCode = generateOtpCode(this.config.length);
     const newCode = generateOtpCode(this.config.length);
 
-    await this.changes.replaceLive(
+    const written = await this.changes.replaceLive(
       {
         id,
         userId,
@@ -143,6 +160,9 @@ export class EmailChangeService {
       },
       now,
     );
+    if (written === 'recovery-pending') {
+      throw new EmailChangeRecoveryPendingError();
+    }
 
     const ttlMinutes = Math.round(this.otp.codeTtlSeconds() / 60);
     await this.otp.dispatchCode(

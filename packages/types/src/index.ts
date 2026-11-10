@@ -42,6 +42,17 @@ export type {
   AdminCustomerSuspension,
 } from './admin-customer.js';
 export type {
+  AccountRecoveryCancelRequest,
+  AccountRecoveryCancelSource,
+  AccountRecoveryStatus,
+  AccountRecoverySubject,
+  AdminAccountRecovery,
+  AdminAccountRecoveryEmails,
+  AdminAccountRecoveryOpenRequest,
+  AdminAccountRecoveryReasonRequest,
+  AdminAccountRecoveryVerifyRequest,
+} from './admin-account-recovery.js';
+export type {
   AdminMasterDetail,
   AdminMasterJobRecord,
   AdminMasterService,

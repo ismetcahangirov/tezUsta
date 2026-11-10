@@ -414,6 +414,13 @@
       "when": 1794327679701,
       "tag": "0058_email_changes",
       "breakpoints": true
+    },
+    {
+      "idx": 59,
+      "version": "7",
+      "when": 1794338708518,
+      "tag": "0059_account_recovery",
+      "breakpoints": true
     }
   ]
 }

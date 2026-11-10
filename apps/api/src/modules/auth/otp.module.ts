@@ -72,7 +72,8 @@ import { OTP_CONFIG } from './otp.tokens';
   // spent and never-redeemed challenges. The statement lives here, with the
   // table's other queries, rather than in the module that schedules it.
   // `AccountEmailMover` is exported for support-mediated recovery (#515),
-  // which must move an address exactly the way the self-serve change does.
-  exports: [OtpRepository, AccountEmailMover],
+  // which must move an address exactly the way the self-serve change does,
+  // and sends its code through `OtpService` under the same budget.
+  exports: [OtpRepository, AccountEmailMover, OtpService, OTP_CONFIG],
 })
 export class OtpModule {}

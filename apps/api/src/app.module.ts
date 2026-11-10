@@ -23,6 +23,7 @@ import { BillingModule } from './modules/billing/billing.module';
 import { CallSignallingModule } from './modules/calls/call-signalling.module';
 import { AuthenticationGuard } from './modules/auth/authentication.guard';
 import { OtpModule } from './modules/auth/otp.module';
+import { AccountRecoveryModule } from './modules/account-recovery/account-recovery.module';
 import { RolesGuard } from './modules/auth/roles.guard';
 import { CustomersModule } from './modules/customers/customers.module';
 import { DevicesModule } from './modules/devices/devices.module';
@@ -110,6 +111,8 @@ import { UsersModule } from './modules/users/users.module';
     UsersModule,
     AuthModule,
     OtpModule,
+    // #515: support-mediated recovery of an account whose address is lost.
+    AccountRecoveryModule,
     ServicesModule,
     CustomersModule,
     AddressesModule,

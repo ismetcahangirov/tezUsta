@@ -30,6 +30,8 @@ export const EMAIL_CHANGE_COPY = {
     codeInvalid: 'Kodlardan biri yanlışdır və ya vaxtı keçib.',
     tooManyAttempts: 'Çox cəhd edildi. Bir az sonra yenidən yoxlayın.',
     sendCapReached: 'Kod göndərmək hazırda mümkün olmadı. Bir az sonra yenidən yoxlayın.',
+    recoveryPending:
+      'Hesabınız üçün dəstək vasitəsilə bərpa sorğusu açılıb. O bağlanana qədər ünvanı dəyişmək olmur.',
     generic: 'Alınmadı. Yenidən cəhd edin.',
   },
 } as const;

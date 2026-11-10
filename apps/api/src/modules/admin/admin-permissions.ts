@@ -30,6 +30,7 @@ export const ADMIN_PERMISSIONS = [
   'admins.manage',
   'subscriptions.read',
   'subscriptions.manage',
+  'accounts.recover',
 ] as const satisfies readonly AdminPermission[];
 
 type MissingPermission = Exclude<AdminPermission, (typeof ADMIN_PERMISSIONS)[number]>;
@@ -59,6 +60,9 @@ export const ROLE_PERMISSIONS: Readonly<Record<AdminRole, readonly AdminPermissi
     'reports.read',
     'reports.handle',
     'subscriptions.read',
+    // ADR-0074 § 3 (#515): support opens and verifies a recovery. The move
+    // itself is approved by a second admin who is a super_admin.
+    'accounts.recover',
   ],
   // `customers.suspend` (#328, ADR-0050): the same people who suspend a master.
   moderator: [

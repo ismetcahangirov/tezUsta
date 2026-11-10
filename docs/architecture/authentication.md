@@ -247,10 +247,41 @@ EMAIL_ADDRESS_TAKEN`), so the route cannot be used to enumerate addresses.
 - **Confirm is one transaction:** the `email_changes` row is completed with
   both digests in its `WHERE`, the address moves, and every session is
   revoked (`email_change`). Two confirms of one pair move the account once.
-  The move itself is `AccountEmailMover`, which support recovery (#515) is to
-  share.
+  The move itself is `AccountEmailMover`, which support recovery (#515)
+  shares.
 - After commit, the old address gets a notice with the masked new address,
   no code and no link. A failed notice is logged, not thrown.
+- **Refused while support has a recovery open** on the account
+  (`409 EMAIL_CHANGE_RECOVERY_PENDING`). Both paths lock the account's `users`
+  row before checking for the other, so they cannot both start.
+
+### Recovering an account whose address is lost (issue #515, ADR-0074 §§ 2–5)
+
+The user writes to support from the new address; support works the request
+from the admin panel under `/admin/account-recoveries`. Each step is one
+conditional `UPDATE` on `account_recovery_requests`, so racing admins leave one
+outcome, and each admin step writes its audit row in the same transaction.
+
+| Step                | Who                                       | What happens                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| ------------------- | ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `POST /`            | `accounts.recover` (support, super_admin) | The request, with the evidence notes, against a customer or master profile. A code goes to the new address. Refused when the account has an open request (`ACCOUNT_RECOVERY_ALREADY_OPEN`, also enforced by a partial unique index), a self-serve change pending (`ACCOUNT_RECOVERY_CHANGE_PENDING`), is not active (`ACCOUNT_RECOVERY_ACCOUNT_INACTIVE`), or the new address is another live account's (`EMAIL_ADDRESS_TAKEN`). |
+| `POST /:id/code`    | `accounts.recover`                        | A fresh code, while none has been entered.                                                                                                                                                                                                                                                                                                                                                                                       |
+| `POST /:id/verify`  | `accounts.recover`                        | The code the user read back. Five wrong attempts cancel the request. Right, it starts the **72-hour hold** and mails the old address the masked new address, the earliest move time and a single-use cancel link.                                                                                                                                                                                                                |
+| `POST /:id/cancel`  | `accounts.recover`                        | Cancelled with a reason. The old address is told if it was told about the hold.                                                                                                                                                                                                                                                                                                                                                  |
+| `POST /:id/approve` | `super_admin`, **never the opener**       | After the hold only (`ACCOUNT_RECOVERY_HOLD_RUNNING` before). `AccountEmailMover` moves the address and revokes every session, in the transaction that marks the request moved; both addresses are told. A move the account can no longer take cancels the request.                                                                                                                                                              |
+| `POST /:id/emails`  | `pii.read`                                | Both whole addresses, with a reason, audited. Everywhere else they are masked.                                                                                                                                                                                                                                                                                                                                                   |
+
+**The cancel link** is `<ACCOUNT_RECOVERY_LINK_BASE_URL>/account-recovery/cancel#<token>`.
+The token is 256 random bits, stored only as its SHA-256 digest, and travels in
+the fragment, so no access log holds it. `GET` serves a page that only asks,
+because mail scanners open links before people do; its button `POST`s the token
+to the same path. The `POST` answers `204` for a good, used, spent, unknown or
+malformed token alike, and is rate-limited per IP. The link works until the
+move, not only until the hold ends (ADR-0074 § 2).
+
+Nothing is frozen during the hold: sessions, orders, a job and a subscription
+carry on (ADR-0074 § 4). Reading a master's ID documents to match the evidence
+is the existing `masters.read` route, audited as it already is.
 
 Access tokens already issued remain valid until they expire — at most 15 minutes.
 Where an action must take effect immediately (an admin suspending a master mid-

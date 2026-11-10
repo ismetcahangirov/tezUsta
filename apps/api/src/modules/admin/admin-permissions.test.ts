@@ -59,6 +59,14 @@ describe('the role bundles (ADR-0043 § 1)', () => {
     expect(ROLE_PERMISSIONS.moderator).not.toContain('pii.read');
   });
 
+  it('lets only support and super_admin handle an account recovery (ADR-0074 § 3)', () => {
+    const roles = Object.keys(ROLE_PERMISSIONS) as (keyof typeof ROLE_PERMISSIONS)[];
+    const recoverers = roles.filter((role) => ROLE_PERMISSIONS[role].includes('accounts.recover'));
+    expect(recoverers.sort()).toEqual(['super_admin', 'support']);
+    // Matching a master's evidence reads the documents on file.
+    expect(ROLE_PERMISSIONS.support).toContain('masters.read');
+  });
+
   it('keeps catalogue, audit and admin management with super_admin alone', () => {
     const others = permissionsFor(['support', 'moderator', 'finance']);
     for (const permission of ['catalogue.manage', 'audit.read', 'admins.manage'] as const) {
