@@ -1,6 +1,6 @@
 # ADR-0072 — Sign-in is an email address and a one-time code; the phone number is removed
 
-- **Status:** **Accepted (email provider and account recovery pending)**
+- **Status:** **Accepted (email provider pending; account recovery settled by [ADR-0074](ADR-0074-account-recovery-and-email-change.md))**
 - **Date:** 2026-10-30
 - **Decided by:** Project owner. On 30 October 2026 the owner decided that customers and masters sign in with an email address and a one-time code sent by email, and nothing else, and that phone numbers leave the product completely: no phone sign-in, no phone number stored on the account, no SMS provider.
 - **Context:** EPIC 2 (#3), branch `feat/email-otp-sign-in`.

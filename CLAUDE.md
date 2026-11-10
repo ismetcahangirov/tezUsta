@@ -150,7 +150,6 @@ commercial relationship.
 | Subscription billing provider                                   | EPIC 14 — taking real payments             |
 | Master verification **appeal path** and re-verification cadence | Polish, not features                       |
 | Hosting / cloud provider                                        | EPIC 17                                    |
-| Account recovery when access to the email address is lost       | Launch                                     |
 | Languages at launch                                             | Launch                                     |
 | Owner art: map style, illustration                              | Polish, not features                       |
 | Public media domain for the portfolio (ADR-0045, #505)          | First production deploy                    |
