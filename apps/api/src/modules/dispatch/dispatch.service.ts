@@ -31,6 +31,7 @@ import {
   dispatchWaveCount,
   dispatchWavePlan,
   offerExpiresAt,
+  offerRenewalCutoff,
 } from './dispatch-schedule';
 
 /**
@@ -354,7 +355,13 @@ export class DispatchService implements OnModuleInit {
       searchingSince,
       round,
       radiusM,
-      expiresAt: offerExpiresAt(now, searchingSince, this.timings),
+      expiresAt: offerExpiresAt(
+        now,
+        searchingSince,
+        this.timings,
+        this.config.dispatch.offerTtlSeconds,
+      ),
+      renewBefore: offerRenewalCutoff(now, this.timings),
       candidates: candidates.map((candidate) => ({
         masterId: candidate.masterId,
         distanceM: candidate.distanceM,

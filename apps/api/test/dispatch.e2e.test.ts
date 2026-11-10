@@ -902,6 +902,7 @@ describe('the dispatch engine (issue #103)', () => {
         round: 2,
         radiusM: WAVE_RADII[1],
         expiresAt: new Date(Date.now() + 60_000),
+        renewBefore: new Date(),
         candidates: [{ masterId: latecomer, distanceM: 500 }],
       });
 
@@ -957,6 +958,7 @@ describe('the dispatch engine (issue #103)', () => {
             round: 2,
             radiusM: WAVE_RADII[1],
             expiresAt: new Date(Date.now() + 60_000),
+            renewBefore: new Date(),
             candidates: [{ masterId: latecomer, distanceM: 500 }],
           })
           .then((result) => {
@@ -1213,6 +1215,7 @@ describe('the dispatch engine (issue #103)', () => {
         round: 2,
         radiusM,
         expiresAt,
+        renewBefore: new Date(),
         candidates,
       });
       const mine = new Date(Date.now() + 60_000);

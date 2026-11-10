@@ -337,6 +337,13 @@ admin been doing".
 when nobody takes it, offers expire, and the search ends in `NO_MASTER_FOUND`
 rather than spinning forever.
 
+**An offer lives `DISPATCH_OFFER_TTL_SECONDS`, and a wave renews it only when
+it is about to run out.** A master's live offer is renewed by the first wave
+that finds it expiring within half a step, so with the shipped minute and 30 s
+step a master sees one offer count down from 60 s, and a wave tick that lands
+a moment early still renews it instead of leaving a gap until the next wave
+(#464). See `offerExpiresAt` and `offerRenewalCutoff` in `dispatch-schedule.ts`.
+
 **The whole schedule is a function of one timestamp.** When an order last
 entered `SEARCHING` is read from `order_status_history` rather than kept as a
 column — the trail already records it, once per search and including every
@@ -347,6 +354,7 @@ re-dispatch — and the wave plan is derived from it and from configuration:
 | `DISPATCH_TOTAL_TIMEOUT_SECONDS` ÷ `DISPATCH_RADIUS_STEP_SECONDS` | how many waves — 6 with the shipped values    |
 | `DISPATCH_INITIAL_RADIUS_M` → `DISPATCH_MAX_RADIUS_M`             | the radius, swept linearly across those waves |
 | `DISPATCH_MAX_MASTERS_PER_BROADCAST`                              | how many masters one wave may reach           |
+| `DISPATCH_OFFER_TTL_SECONDS`, never below the step                | how long one offer stays live — 60 s shipped  |
 
 The radius widens **by** a derived amount rather than a configured one: a fifth
 parameter could silently contradict the other four — too small and the maximum

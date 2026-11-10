@@ -178,7 +178,10 @@ Regardless of model: **exactly one master may win.** The accept operation is
 guarded so a concurrent double-accept is impossible — see
 [`../architecture/backend-architecture.md`](../architecture/backend-architecture.md).
 
-An offer that is not acted on must **expire**, not linger.
+An offer that is not acted on must **expire**, not linger. It stays on the
+master's screen for a minute (`DISPATCH_OFFER_TTL_SECONDS`), long enough to read
+the job; it used to be the 30 s radius step, which the #464 device check found
+too short.
 
 ### Accepting
 

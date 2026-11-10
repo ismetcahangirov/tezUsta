@@ -9,6 +9,7 @@ import {
   dispatchWaveCount,
   dispatchWavePlan,
   offerExpiresAt,
+  offerRenewalCutoff,
 } from './dispatch-schedule';
 
 /**
@@ -145,15 +146,32 @@ describe('the search deadline and offer expiry', () => {
     expect(dispatchDeadline(SEARCHING_SINCE, SHIPPED)).toEqual(at(180));
   });
 
-  it('keeps an offer live for one wave interval', () => {
-    expect(offerExpiresAt(at(0), SEARCHING_SINCE, SHIPPED)).toEqual(at(30));
-    expect(offerExpiresAt(at(60), SEARCHING_SINCE, SHIPPED)).toEqual(at(90));
+  it('keeps an offer live for DISPATCH_OFFER_TTL_SECONDS', () => {
+    expect(offerExpiresAt(at(0), SEARCHING_SINCE, SHIPPED, 60)).toEqual(at(60));
+    expect(offerExpiresAt(at(60), SEARCHING_SINCE, SHIPPED, 60)).toEqual(at(120));
+  });
+
+  it('never lets an offer expire before the next wave could renew it', () => {
+    // A lifetime shorter than the step would leave a master in range with
+    // nothing to accept between two waves.
+    expect(offerExpiresAt(at(0), SEARCHING_SINCE, SHIPPED, 10)).toEqual(at(30));
   });
 
   it('never lets an offer outlive the search it belongs to', () => {
-    // The final wave fires at t=150 and one interval would land exactly on the
-    // deadline; a wave that ran late must still not mint an offer past it.
-    expect(offerExpiresAt(at(150), SEARCHING_SINCE, SHIPPED)).toEqual(at(180));
-    expect(offerExpiresAt(at(175), SEARCHING_SINCE, SHIPPED)).toEqual(at(180));
+    // A minute from the t=150 wave would be t=210; the search ends at 180,
+    // and a wave that ran late must still not mint an offer past it.
+    expect(offerExpiresAt(at(120), SEARCHING_SINCE, SHIPPED, 60)).toEqual(at(180));
+    expect(offerExpiresAt(at(150), SEARCHING_SINCE, SHIPPED, 60)).toEqual(at(180));
+    expect(offerExpiresAt(at(175), SEARCHING_SINCE, SHIPPED, 30)).toEqual(at(180));
+  });
+
+  it('renews an offer that runs out within half a wave, and leaves one with longer left', () => {
+    const cutoff = offerRenewalCutoff(at(30), SHIPPED);
+    expect(cutoff).toEqual(at(45));
+    // Written at t=0 with a minute: 30 s left at the t=30 wave, so it stays.
+    expect(at(60).getTime() <= cutoff.getTime()).toBe(false);
+    // The t=60 wave ran a second early: the offer still has a second left,
+    // and is renewed anyway rather than left to lapse until t=90 (#464).
+    expect(at(60).getTime() <= offerRenewalCutoff(at(59), SHIPPED).getTime()).toBe(true);
   });
 });

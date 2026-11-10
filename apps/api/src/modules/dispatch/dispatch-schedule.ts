@@ -152,20 +152,52 @@ export function dispatchDeadline(searchingSince: Date, timings: DispatchTimings)
 /**
  * When an offer written at `now` stops being live.
  *
- * **One wave interval, and never past the search's own deadline.** An offer is
- * live for exactly as long as it takes the next wave to re-offer it, which is
- * what makes "an unactioned offer expires rather than lingering in a master's
- * list" (ADR-0009) true without a job per offer: expiry is a column the feed
- * filters on, and the next wave is what renews it for a master still in range.
+ * **`DISPATCH_OFFER_TTL_SECONDS`, never shorter than one wave interval, and
+ * never past the search's own deadline.** Expiry is a column the feed filters
+ * on, which is what makes "an unactioned offer expires rather than lingering
+ * in a master's list" (ADR-0009) true without a job per offer, and a later
+ * wave is what renews it for a master still in range (`offerRenewalCutoff`).
+ *
+ * The lifetime used to be exactly one wave interval, which gave a master 30 s
+ * to read a job. It is its own setting now (60 s, #464), and the step is its
+ * floor: an offer that ran out between two waves would leave a master in
+ * range with nothing to accept until the next one.
  *
  * The deadline cap is what stops a final-wave offer outliving the order it
  * belongs to — a master tapping accept on an offer whose order is already
  * `NO_MASTER_FOUND` is a support ticket, and the conditional guard on the
  * accept path should not be the only thing preventing it.
  */
-export function offerExpiresAt(now: Date, searchingSince: Date, timings: DispatchTimings): Date {
+export function offerExpiresAt(
+  now: Date,
+  searchingSince: Date,
+  timings: DispatchTimings,
+  offerTtlSeconds: number,
+): Date {
   const deadline = dispatchDeadline(searchingSince, timings);
-  const oneWave = new Date(now.getTime() + timings.radiusStepSeconds * 1000);
+  const lifetimeMs = Math.max(offerTtlSeconds, timings.radiusStepSeconds) * 1000;
+  const expiresAt = new Date(now.getTime() + lifetimeMs);
 
-  return oneWave.getTime() < deadline.getTime() ? oneWave : deadline;
+  return expiresAt.getTime() < deadline.getTime() ? expiresAt : deadline;
+}
+
+/**
+ * A wave written at `now` renews a master's live offer only if it would expire
+ * before this instant: half a wave interval from now.
+ *
+ * **Not `now`.** Renewing only offers already past `expires_at` assumed every
+ * tick lands at or after the instant the previous one's offer runs out. A
+ * tick that ran a moment early found the offer still live by a second,
+ * renewed nothing, and the offer then expired with no wave due for another
+ * interval: the master in range had nothing to accept for most of it (seen
+ * in the #464 device check as "offered to 0 of 1 eligible masters").
+ *
+ * Half a step absorbs that jitter and still leaves an offer alone while it
+ * has most of its life ahead: with the shipped minute and 30 s step, the wave
+ * 30 s after an offer was written leaves it (30 s left, more than 15), and
+ * the wave after renews it. A duplicate tick is still harmless, because the
+ * offer the first one wrote has a whole lifetime left.
+ */
+export function offerRenewalCutoff(now: Date, timings: DispatchTimings): Date {
+  return new Date(now.getTime() + (timings.radiusStepSeconds * 1000) / 2);
 }

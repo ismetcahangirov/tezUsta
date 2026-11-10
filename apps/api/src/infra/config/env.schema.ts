@@ -1153,6 +1153,23 @@ export const rawEnvSchema = z
     DISPATCH_TOTAL_TIMEOUT_SECONDS: positiveInt(180),
     DISPATCH_MAX_MASTERS_PER_BROADCAST: positiveInt(20),
     /**
+     * How long one offer stays on a master's screen before it expires, in
+     * seconds (ADR-0009 § Parameters).
+     *
+     * **Its own setting, no longer the radius step.** An offer used to live
+     * exactly one wave interval, so a master had 30 s to read a job, and a
+     * wave tick that ran a moment early found the previous offer still live,
+     * renewed nothing, and left the master with no offer at all until the
+     * wave after. The owner set a minute in the #464 device check: long
+     * enough to read the description and the distance.
+     *
+     * **Never shorter than the step.** `offerExpiresAt` takes the larger of
+     * the two, because an offer that expired between waves would leave a
+     * master in range with nothing to accept until the next wave renewed it.
+     * The search deadline still caps it, so no offer outlives its order.
+     */
+    DISPATCH_OFFER_TTL_SECONDS: boundedInt(60, 1, 3_600),
+    /**
      * How old a master's newest position may be before dispatch treats them as
      * **missing** rather than as "in range at their last known point"
      * ([ADR-0026](docs/decisions/ADR-0026-position-freshness-and-the-reporting-floor.md)).
@@ -2292,6 +2309,7 @@ export function toAppConfig(env: RawEnv): AppConfig {
       radiusStepSeconds: env.DISPATCH_RADIUS_STEP_SECONDS,
       totalTimeoutSeconds: env.DISPATCH_TOTAL_TIMEOUT_SECONDS,
       maxMastersPerBroadcast: env.DISPATCH_MAX_MASTERS_PER_BROADCAST,
+      offerTtlSeconds: env.DISPATCH_OFFER_TTL_SECONDS,
       maxPositionAgeSeconds: env.DISPATCH_MAX_POSITION_AGE_SECONDS,
       maxOrderRedispatches: env.MAX_ORDER_REDISPATCHES,
       reconcileIntervalSeconds: env.DISPATCH_RECONCILE_INTERVAL_SECONDS,
