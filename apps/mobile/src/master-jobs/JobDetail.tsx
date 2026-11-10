@@ -28,6 +28,7 @@ import {
 } from '../components';
 import { useConversationQuery } from '../conversation/conversation-endpoints';
 import { ConversationEntry } from '../conversation/ConversationEntry';
+import { withSupportAddress } from '../support';
 import { appLocale } from '../lib/app-locale';
 import { locationAdapter } from '../location/location-adapter';
 import type { LocationPort } from '../location/location-port';
@@ -254,7 +255,9 @@ export function JobDetail({
       <ScrollView className="flex-1">
         <View className="gap-4 pb-10">
           {failed && <Banner tone="danger" message={copy.transitionFailed} />}
-          {handBackRefused && <Banner tone="danger" message={copy.handBackWindowClosed} />}
+          {handBackRefused && (
+            <Banner tone="danger" message={withSupportAddress(copy.handBackWindowClosed)} />
+          )}
           {reporter.stale && (
             <Banner tone="danger" message={MASTER_JOBS_COPY.reporting.staleDescription} />
           )}

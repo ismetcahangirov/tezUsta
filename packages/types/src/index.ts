@@ -75,6 +75,11 @@ export type {
 export type { Customer } from './customer.js';
 export type { Device, DevicePlatform, DeviceRegistration } from './device.js';
 export type {
+  EmailChangeConfirmRequest,
+  EmailChangeStarted,
+  EmailChangeStartRequest,
+} from './email-change.js';
+export type {
   MasterDocument,
   MasterDocumentDownload,
   MasterDocumentStatus,

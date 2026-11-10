@@ -4,7 +4,7 @@ import { Provider } from 'react-redux';
 import SignInScreen from '../../app/(auth)/sign-in';
 import { createTestStore } from '../../test/support/test-store';
 import type { AppStore } from '../store';
-import { selectOtpRequestedFor } from '../store/session-slice';
+import { selectOtpRequestedFor, signedOut, signInEmailHinted } from '../store/session-slice';
 
 /**
  * Sign-in asks for an email address and nothing else (ADR-0072).
@@ -222,5 +222,24 @@ describe("offering the phone's Google accounts (#510)", () => {
     await fireEvent(screen.getByLabelText(FIELD), 'focus');
 
     expect(mockPick).not.toHaveBeenCalled();
+  });
+});
+
+describe('after the sign-in address was changed (#516)', () => {
+  it('starts with the new address in the field', async () => {
+    installTransport(200);
+    const store = createTestStore();
+    store.dispatch(signedOut());
+    store.dispatch(signInEmailHinted('aysel.new@example.az'));
+    await mount(store);
+
+    expect(screen.getByLabelText(FIELD)).toHaveProp('value', 'aysel.new@example.az');
+  });
+
+  it('starts empty otherwise', async () => {
+    installTransport(200);
+    await mount(createTestStore());
+
+    expect(screen.getByLabelText(FIELD)).toHaveProp('value', '');
   });
 });

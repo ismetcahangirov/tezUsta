@@ -248,7 +248,10 @@ describe('a signed-in user changes their address with both codes', () => {
 
     const started = await start(actor, newEmail);
     expect(started.status).toBe(200);
-    expect(started.body).toEqual({ expiresInSeconds: expect.any(Number) as number });
+    expect(started.body).toEqual({
+      expiresInSeconds: expect.any(Number) as number,
+      currentEmail: actor.email,
+    });
 
     const confirmed = await confirm(
       actor,
@@ -390,7 +393,10 @@ describe('what a start refuses, and what it does not ask', () => {
 
     const started = await start(actor, other.email);
     expect(started.status).toBe(200);
-    expect(started.body).toEqual({ expiresInSeconds: expect.any(Number) as number });
+    expect(started.body).toEqual({
+      expiresInSeconds: expect.any(Number) as number,
+      currentEmail: actor.email,
+    });
 
     const refused = await confirm(
       actor,

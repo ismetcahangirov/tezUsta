@@ -1,6 +1,7 @@
 import { createHmac } from 'node:crypto';
 
 import { Inject, Injectable, Logger } from '@nestjs/common';
+import type { EmailChangeStarted } from '@tezusta/types';
 
 import { AppError } from '../../common/errors/app-error';
 import { ERROR_CODES } from '../../common/errors/error-codes.types';
@@ -64,9 +65,7 @@ class MoveRefused extends Error {
   }
 }
 
-export interface EmailChangeStarted {
-  readonly expiresInSeconds: number;
-}
+export type { EmailChangeStarted };
 
 /**
  * A signed-in user changes the address they sign in with
@@ -162,7 +161,7 @@ export class EmailChangeService {
         `from=${maskEmail(oldEmail)} to=${maskEmail(newEmail)}`,
     );
 
-    return { expiresInSeconds: this.otp.codeTtlSeconds() };
+    return { expiresInSeconds: this.otp.codeTtlSeconds(), currentEmail: oldEmail };
   }
 
   /**
