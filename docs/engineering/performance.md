@@ -336,7 +336,8 @@ BullMQ and the in-process worker:
   for the last one.
 - This holds for photos only. Video is deferred (ADR-0045 § 7), so no transcode
   was measured. The issue names the transcode as the number that decides where
-  the worker runs, so this recommendation must be revisited with #306.
+  the worker runs, so this recommendation must be revisited if video returns
+  (#504).
 
 **The API while the worker is busy** (#387). The feed read above was
 measured during three phases: idle, and while the worker drained a burst of
@@ -492,7 +493,7 @@ Each run is ten flings down and ten back up, driven by `adb shell input swipe` (
 - **It does not cover waiting on the network.** All 60 tiles had been requested before the first fling, because the list renders ahead of the screen. They came through an adb tunnel on the same Wi-Fi, so a first load on 4G is not measured.
 - **The runs are not fully quiet.** The phone was charging, and Do Not Disturb was off. The count of posted notifications stayed at 15 throughout.
 - **Noise is not a photo.** It decodes differently from a real scene, and the tiles are smaller on disk than a real photo's thumb may be. A sample of real, consented photos would settle that, as it would the storage estimate above.
-- **Video figures are not here.** Memory after ten videos and time to first frame moved to #504 with the rest of video.
+- **Video figures are not here.** Memory after ten videos and time to first frame moved to #504 with the rest of video. Video is not planned before launch.
 
 **Three things that cost time, for whoever repeats this:**
 
