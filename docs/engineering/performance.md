@@ -223,18 +223,18 @@ in-process rate-limit counters, a local queue.
 Measured on 25 September 2026 (#292). Each figure is the median of three runs
 or more, on an otherwise idle machine, one benchmark at a time.
 
-| Metric                   | Budget                         | Measured p50 / p95 / p99                           | Load                                                           | Status                                                      |
-| ------------------------ | ------------------------------ | -------------------------------------------------- | -------------------------------------------------------------- | ----------------------------------------------------------- |
-| Nearby-masters query     | < 100 ms p95                   | 11.6 / 13.6 / 15.4 ms                              | 10 000 live masters, serial                                    | Within budget                                               |
-| Location ingest          | < 200 ms p95                   | 28.7 / 51.8 / 79.1 ms                              | 2 000 masters at the reporting floor (~32 rps)                 | Within budget                                               |
-| Order creation           | < 300 ms p95                   | 87.9 / 134.2 / 197.3 ms                            | 10 in flight (five runs)                                       | Within budget                                               |
-| Standard API read        | < 200 ms p95                   | 27.3 / 46.8 / 59.5 ms                              | 10 in flight, 50 000-order history                             | Within budget                                               |
-| WebSocket event delivery | < 1 s p95                      | 3.5 / 6.7 / 9.0 ms                                 | 500 clients on two instances, cross-instance                   | Within budget                                               |
-| Portfolio feed read      | < 200 ms p95                   | 29.4 / 36.9 / 40.7 ms                              | 60 posts × 10 photos, serial (#317)                            | Within budget                                               |
-| Photo renditions         | < 1.5 s p95                    | 795.8 / 882.7 ms / —                               | One 2560 px textured JPEG at a time (#317)                     | Within budget                                               |
-| App cold start           | < 3 s on mid-range Android     | 856 ms median / 1 038 ms worst                     | Galaxy A36, release build, 10 runs (#293)                      | Within budget                                               |
-| Screen transition        | 60 fps, no dropped frames      | 2.3–3.3 % janky frames; p95 17–19 ms, p99 21–32 ms | Galaxy A36 at 120 Hz, three transitions × 10 (#293)            | Over budget (strict reading); see § Mobile on a real device |
-| Portfolio grid scroll    | Same bar as transitions (#503) | 0.31–0.47 % janky frames; p95 8 ms, p99 11 ms      | Galaxy A36 at 120 Hz, 60 tiles, three runs of 20 flings (#317) | Measured; holds 120 Hz                                      |
+| Metric                   | Budget                          | Measured p50 / p95 / p99                           | Load                                                           | Status                                        |
+| ------------------------ | ------------------------------- | -------------------------------------------------- | -------------------------------------------------------------- | --------------------------------------------- |
+| Nearby-masters query     | < 100 ms p95                    | 11.6 / 13.6 / 15.4 ms                              | 10 000 live masters, serial                                    | Within budget                                 |
+| Location ingest          | < 200 ms p95                    | 28.7 / 51.8 / 79.1 ms                              | 2 000 masters at the reporting floor (~32 rps)                 | Within budget                                 |
+| Order creation           | < 300 ms p95                    | 87.9 / 134.2 / 197.3 ms                            | 10 in flight (five runs)                                       | Within budget                                 |
+| Standard API read        | < 200 ms p95                    | 27.3 / 46.8 / 59.5 ms                              | 10 in flight, 50 000-order history                             | Within budget                                 |
+| WebSocket event delivery | < 1 s p95                       | 3.5 / 6.7 / 9.0 ms                                 | 500 clients on two instances, cross-instance                   | Within budget                                 |
+| Portfolio feed read      | < 200 ms p95                    | 29.4 / 36.9 / 40.7 ms                              | 60 posts × 10 photos, serial (#317)                            | Within budget                                 |
+| Photo renditions         | < 1.5 s p95                     | 795.8 / 882.7 ms / —                               | One 2560 px textured JPEG at a time (#317)                     | Within budget                                 |
+| App cold start           | < 3 s on mid-range Android      | 856 ms median / 1 038 ms worst                     | Galaxy A36, release build, 10 runs (#293)                      | Within budget                                 |
+| Screen transition        | < 5 % janky, p95 ≤ 20 ms (#503) | 2.3–3.3 % janky frames; p95 17–19 ms, p99 21–32 ms | Galaxy A36 at 120 Hz, three transitions × 10 (#293)            | Within budget; see § Screen-transition budget |
+| Portfolio grid scroll    | < 5 % janky, p95 ≤ 20 ms (#503) | 0.31–0.47 % janky frames; p95 8 ms, p99 11 ms      | Galaxy A36 at 120 Hz, 60 tiles, three runs of 20 flings (#317) | Within budget; holds 120 Hz                   |
 
 **Machine.** Intel Core i7-10870H (8 cores, 16 threads), 16 GB RAM, Windows 11
 with Docker Desktop 28.5 (WSL 2). Node 24.19, PostgreSQL 17.5 with PostGIS
@@ -336,7 +336,8 @@ BullMQ and the in-process worker:
   for the last one.
 - This holds for photos only. Video is deferred (ADR-0045 § 7), so no transcode
   was measured. The issue names the transcode as the number that decides where
-  the worker runs, so this recommendation must be revisited with #306.
+  the worker runs, so this recommendation must be revisited if video returns
+  (#504).
 
 **The API while the worker is busy** (#387). The feed read above was
 measured during three phases: idle, and while the worker drained a burst of
@@ -419,11 +420,11 @@ Issue #293, measured on 4 November 2026.
 **What the numbers say:**
 
 - **Cold start is comfortably inside the 3 s budget**, with room for growth.
-- **The transitions hold 60 fps, but not "no dropped frames".**
-  - The p95 frame stays under the 16.7 ms a 60 Hz frame allows.
-  - At this phone's native 120 Hz, about one frame in 30–40 misses its deadline.
-  - The job screen is the heaviest: its p99 is 32 ms and it missed 10 vsyncs, from mounting the Google map.
-  - Read strictly, the budget is not met. "No dropped frames" is likely the wrong bar for a 120 Hz device. A frame-time percentile with a janky-frame ceiling would be testable, for example p95 < 16.7 ms and < 5 % janky. Revising the budget is the owner's decision, not this measurement's.
+- **The transitions are within the screen-transition budget** (§ Screen-transition budget, set by #503 after this measurement).
+  - About one frame in 30–40 misses its deadline at this phone's native 120 Hz: 2.3–3.3 % janky, under the 5 % ceiling.
+  - The p95 frame is 17–19 ms. That is just over the 16.7 ms a 60 Hz frame allows, and under the 20 ms ceiling.
+  - The job screen is the heaviest: its p95 is 19 ms, its p99 is 32 ms, and it missed 10 vsyncs, from mounting the Google map. It is the transition closest to the bar.
+  - The budget these figures were first measured against, "60 fps, no dropped frames", could not pass on a 120 Hz phone and was replaced (#503).
 - **Not measured:**
   - a phone below the A-series class;
   - a long order list;
@@ -441,6 +442,31 @@ Issue #293, measured on 4 November 2026.
    2. Do ten cycles of: tap into the screen, wait about 2.5 s, press Back, wait about 2.5 s.
    3. Run `adb shell dumpsys gfxinfo <pkg>`, and record the total frames, the janky frames and the percentiles.
 4. Keep the phone untouched while it runs, with notifications quiet. A heads-up banner or an open shade both disturb the frame counts.
+
+### Screen-transition budget
+
+Set by the owner on 10 November 2026 (#503). It replaces "60 fps, no dropped frames", which no React Native app on a 120 Hz phone meets, so it could neither pass nor catch a regression.
+
+**A screen transition, or a list scroll, passes when both hold:**
+
+- **fewer than 5 % janky frames**, and
+- **a p95 frame time of 20 ms or less**,
+
+on the reference mid-range Android (the Galaxy A36 above, or its successor in the same class), with a release build, measured by the procedure in § Mobile on a real device. The p99 is recorded but is not pass/fail.
+
+**Why these two figures:**
+
+- **Janky frames are the main bar.** Android counts a frame as janky when it misses its own deadline, so the count already accounts for the refresh rate. The same 5 % ceiling works at 60 Hz and at 120 Hz.
+- **The p95 catches a broad slowdown** that spreads across many frames without missing many deadlines. 20 ms is about one 60 Hz frame plus a little.
+- **The p99 is not a bar**, because a single heavy mount dominates it. On the job screen that is the Google map.
+
+**Alternatives that were set aside:**
+
+- **p95 < 16.7 ms**, which `performance.md` first suggested. It sounds like "60 fps", but all three #293 transitions miss it, by 0.3–2.3 ms, so it would fail today's app with nothing to fix it against.
+- **p95 < 8.3 ms, a 120 Hz bar.** All three transitions miss it by double. Only the portfolio grid meets it.
+- **Keeping "no dropped frames" as an aspiration.** It has no pass/fail, so it cannot catch a regression.
+
+**Trade-off:** the margin is thin. The job screen's p95 is 19 ms, 1 ms under the ceiling, so ordinary run-to-run noise could push it over. If that happens, make the map mount cheaper first, and do not raise the ceiling to fit.
 
 ### Portfolio grid on a real device
 
@@ -467,7 +493,7 @@ Each run is ten flings down and ten back up, driven by `adb shell input swipe` (
 - **It does not cover waiting on the network.** All 60 tiles had been requested before the first fling, because the list renders ahead of the screen. They came through an adb tunnel on the same Wi-Fi, so a first load on 4G is not measured.
 - **The runs are not fully quiet.** The phone was charging, and Do Not Disturb was off. The count of posted notifications stayed at 15 throughout.
 - **Noise is not a photo.** It decodes differently from a real scene, and the tiles are smaller on disk than a real photo's thumb may be. A sample of real, consented photos would settle that, as it would the storage estimate above.
-- **Video figures are not here.** Memory after ten videos and time to first frame moved to #504 with the rest of video.
+- **Video figures are not here.** Memory after ten videos and time to first frame moved to #504 with the rest of video. Video is not planned before launch.
 
 **Three things that cost time, for whoever repeats this:**
 
