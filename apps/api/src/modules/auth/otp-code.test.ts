@@ -1,6 +1,11 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { generateOtpCode, renderOtpEmail } from './otp-code';
+import {
+  generateOtpCode,
+  renderEmailChangeCodeEmail,
+  renderEmailChangedNotice,
+  renderOtpEmail,
+} from './otp-code';
 
 /**
  * A sample big enough that a generator which never emits some digit, or which
@@ -93,6 +98,39 @@ describe('renderOtpEmail', () => {
     // whoever is holding the handset, and a link is what phishing looks like.
     for (const part of [subject, text]) {
       expect(part).not.toContain('@');
+      expect(part).not.toMatch(/https?:/);
+    }
+  });
+});
+
+describe('renderEmailChangeCodeEmail', () => {
+  it('puts the code first in the subject for both addresses, with no address and no link', () => {
+    for (const target of ['current', 'new'] as const) {
+      const { subject, text } = renderEmailChangeCodeEmail('123456', 5, target);
+      expect(subject.startsWith('123456')).toBe(true);
+      expect(text).toContain('5 dəqiqə');
+      for (const part of [subject, text]) {
+        expect(part).not.toContain('@');
+        expect(part).not.toMatch(/https?:/);
+      }
+    }
+  });
+
+  it('tells the current address that this is not a sign-in code', () => {
+    // The code an attacker holding the phone would want the owner to read out.
+    const current = renderEmailChangeCodeEmail('123456', 5, 'current');
+    const fresh = renderEmailChangeCodeEmail('123456', 5, 'new');
+    expect(current.text).toContain('giriş kodu deyil');
+    expect(current.text).not.toBe(fresh.text);
+  });
+});
+
+describe('renderEmailChangedNotice', () => {
+  it('names only the masked new address, and carries no code and no link', () => {
+    const { subject, text } = renderEmailChangedNotice('n•••@example.com');
+    expect(text).toContain('n•••@example.com');
+    for (const part of [subject, text]) {
+      expect(part).not.toMatch(/\d{4,}/);
       expect(part).not.toMatch(/https?:/);
     }
   });

@@ -407,6 +407,13 @@
       "when": 1793375141888,
       "tag": "0057_email_sign_in",
       "breakpoints": true
+    },
+    {
+      "idx": 58,
+      "version": "7",
+      "when": 1794327679701,
+      "tag": "0058_email_changes",
+      "breakpoints": true
     }
   ]
 }

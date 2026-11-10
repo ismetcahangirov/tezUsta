@@ -6,7 +6,11 @@ import { DatabaseModule } from '../../infra/database/database.module';
 import { EmailModule } from '../../infra/email/email.module';
 import { RateLimitModule } from '../../infra/rate-limit/rate-limit.module';
 import { UsersModule } from '../users/users.module';
+import { AccountEmailMover } from './account-email-mover';
 import { AuthModule } from './auth.module';
+import { EmailChangeController } from './email-change.controller';
+import { EmailChangeRepository } from './email-change.repository';
+import { EmailChangeService } from './email-change.service';
 import { OtpController } from './otp.controller';
 import { WebAuthController } from './web-auth.controller';
 import { createOtpConfig } from './otp.config';
@@ -49,7 +53,9 @@ import { OTP_CONFIG } from './otp.tokens';
   imports: [AuthModule, DatabaseModule, EmailModule, RateLimitModule, UsersModule],
   // The web subscription page's sign-in (ADR-0061) is here, beside the
   // app's, because both are `OtpService`'s two front doors.
-  controllers: [OtpController, WebAuthController],
+  // The self-serve address change (#514) is here too: it issues codes
+  // through `OtpService`, under the same sending budget.
+  controllers: [OtpController, WebAuthController, EmailChangeController],
   providers: [
     {
       provide: OTP_CONFIG,
@@ -58,10 +64,15 @@ import { OTP_CONFIG } from './otp.tokens';
     },
     OtpRepository,
     OtpService,
+    AccountEmailMover,
+    EmailChangeRepository,
+    EmailChangeService,
   ],
   // `OtpRepository` is exported for `MaintenanceModule` (#276), which retires
   // spent and never-redeemed challenges. The statement lives here, with the
   // table's other queries, rather than in the module that schedules it.
-  exports: [OtpRepository],
+  // `AccountEmailMover` is exported for support-mediated recovery (#515),
+  // which must move an address exactly the way the self-serve change does.
+  exports: [OtpRepository, AccountEmailMover],
 })
 export class OtpModule {}

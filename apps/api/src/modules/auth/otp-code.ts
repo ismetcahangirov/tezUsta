@@ -70,3 +70,57 @@ export function renderOtpEmail(
       'Onu heç kimə deməyin. Kodu siz istəməmisinizsə, bu məktuba məhəl qoymayın.',
   };
 }
+
+/** Which of the two addresses an email-change code is going to (ADR-0074 § 1). */
+export type EmailChangeCodeTarget = 'current' | 'new';
+
+/**
+ * The two code emails of a self-serve address change (ADR-0074 § 1, #514).
+ *
+ * Placeholder wording, like {@link renderOtpEmail}, and for the same reason:
+ * the copy is the owner's (CLAUDE.md §17). Each says plainly that it is
+ * **not** a sign-in code and what entering it will do, because a code that
+ * moves an account somewhere else must not read like the everyday one. The
+ * mail to the current address says so twice, since that is the one an
+ * attacker holding the phone would want the owner to enter without reading.
+ */
+export function renderEmailChangeCodeEmail(
+  code: string,
+  ttlMinutes: number,
+  target: EmailChangeCodeTarget,
+): { readonly subject: string; readonly text: string } {
+  const validity = `Kod ${String(ttlMinutes)} dəqiqə ərzində etibarlıdır. Onu heç kimə deməyin.`;
+  if (target === 'current') {
+    return {
+      subject: `${code} — TezUsta e-poçt ünvanının dəyişdirilməsi`,
+      text:
+        `${code} — hesabınızın e-poçt ünvanını dəyişmək üçün kod. Bu, giriş kodu deyil: ` +
+        `onu daxil etsəniz, hesabınız başqa ünvana keçəcək. ${validity} ` +
+        'Ünvanı siz dəyişmirsinizsə, bu kodu heç yerə daxil etməyin və dəstəklə əlaqə saxlayın.',
+    };
+  }
+  return {
+    subject: `${code} — TezUsta yeni e-poçt ünvanının təsdiqi`,
+    text:
+      `${code} — bu ünvanı TezUsta hesabınızın yeni ünvanı kimi təsdiqləmək üçün kod. ` +
+      `${validity} Bunu siz istəməmisinizsə, bu məktuba məhəl qoymayın.`,
+  };
+}
+
+/**
+ * The notice the **old** address receives once a change has completed
+ * (ADR-0074 § 5). It carries no code and no link, and only the masked new
+ * address: an inbox is not a place to put the full address of whoever took
+ * the account, if that is what happened.
+ */
+export function renderEmailChangedNotice(maskedNewEmail: string): {
+  readonly subject: string;
+  readonly text: string;
+} {
+  return {
+    subject: 'TezUsta hesabınızın e-poçt ünvanı dəyişdirildi',
+    text:
+      `TezUsta hesabınızın e-poçt ünvanı ${maskedNewEmail} olaraq dəyişdirildi və ` +
+      'bütün cihazlarda hesabdan çıxış edildi. Bunu siz etməmisinizsə, dərhal dəstəklə əlaqə saxlayın.',
+  };
+}

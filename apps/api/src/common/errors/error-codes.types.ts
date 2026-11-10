@@ -391,6 +391,24 @@ export const ERROR_CODES = {
   PORTFOLIO_POST_ALREADY_REMOVED: 'PORTFOLIO_POST_ALREADY_REMOVED',
   PORTFOLIO_POST_NOT_REMOVABLE: 'PORTFOLIO_POST_NOT_REMOVABLE',
   MASTER_AVATAR_NOT_SET: 'MASTER_AVATAR_NOT_SET',
+
+  /**
+   * #514 (ADR-0074 § 1). A signed-in user's change of sign-in address:
+   *
+   * - `EMAIL_CHANGE_SAME_ADDRESS` — the new address is the one the account
+   *   already has.
+   * - `EMAIL_CHANGE_CODE_INVALID` — one answer for a wrong, expired or spent
+   *   code, for either address, or no change pending at all, as sign-in gives
+   *   one answer for all of those. A 422 and not a 401, because the session is
+   *   fine and a client reading 401 would sign the user out.
+   * - `EMAIL_ADDRESS_TAKEN` — another account holds the new address. Only
+   *   ever answered after both codes were right, so only to somebody who has
+   *   proven they read that inbox: it tells them nothing they could not learn
+   *   by signing in there.
+   */
+  EMAIL_CHANGE_SAME_ADDRESS: 'EMAIL_CHANGE_SAME_ADDRESS',
+  EMAIL_CHANGE_CODE_INVALID: 'EMAIL_CHANGE_CODE_INVALID',
+  EMAIL_ADDRESS_TAKEN: 'EMAIL_ADDRESS_TAKEN',
 } as const;
 
 export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES];

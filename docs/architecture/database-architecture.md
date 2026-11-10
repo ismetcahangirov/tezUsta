@@ -381,6 +381,15 @@ folding (ADR-0072 § 3). Accounts that existed before ADR-0072 were backfilled
 with `<user id>@legacy.invalid`, which can never receive mail, so their foreign
 keys survive and they can no longer be signed into.
 
+Issue #514 added `email_changes`: a signed-in user's change of sign-in address
+(ADR-0074 § 1). One row per attempt, with **keyed digests** of the two codes
+(the current address's and the new one's), at most one live row per user by a
+partial unique index, and the completing `UPDATE` checking both digests in its
+`WHERE`. It is its own table rather than more `otp_challenges` rows, so a
+change code can never be used to sign in and a sign-in request can never
+supersede a change. A completed row is the record of the change: which
+account, from which address, to which, and when.
+
 ### Decisions already settled
 
 **`users` is separate from `customers` / `masters`.** One person may be both

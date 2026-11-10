@@ -184,10 +184,11 @@ export class OtpService {
     // already written; a refusal here leaves it exactly as a `deliver()`
     // failure would — live, unsent, and superseded by whatever request
     // eventually gets through, per this method's own doc comment.
-    await this.enforceGlobalDailyCap();
-    await this.enforceFraudControls(now);
-
-    await this.deliver(input.email, code);
+    await this.dispatchCode(
+      input.email,
+      renderOtpEmail(code, Math.round(this.ttlSeconds() / 60)),
+      now,
+    );
 
     // The audit line for "a code was sent". Masked address and challenge id
     // only: `docs/engineering/security.md` forbids a full address in a log,
@@ -295,6 +296,45 @@ export class OtpService {
     );
   }
 
+  /**
+   * Sends one message that carries a code, behind every platform-wide control
+   * sign-in codes are behind: the daily cap, the hourly ceiling and the
+   * circuit breaker (#272, #390). The self-serve address change (#514) sends
+   * its two codes through here, so changing an address can never become a way
+   * around the sending budget.
+   *
+   * Refuses with the same generic 503 sign-in uses, whichever control said no.
+   */
+  async dispatchCode(
+    email: string,
+    message: { readonly subject: string; readonly text: string },
+    now: Date = new Date(),
+  ): Promise<void> {
+    await this.enforceGlobalDailyCap();
+    await this.enforceFraudControls(now);
+    await this.deliver(email, message);
+  }
+
+  /**
+   * Counts one code that reached a person who entered it, for the circuit
+   * breaker's numerator (#390). Sign-in counts its own in `consumeCode`; the
+   * address change calls this once per code it accepts, so its sends do not
+   * drag the breaker's success share down.
+   */
+  async recordCodeEntered(now: Date = new Date()): Promise<void> {
+    await this.limiter.consumeAttempt({
+      scope: BREAKER_VERIFIED_SCOPE,
+      subject: hourBucket(now),
+      maxAttempts: Number.MAX_SAFE_INTEGER,
+      ttlMs: 2 * HOUR_MS,
+    });
+  }
+
+  /** The configured code lifetime, in seconds: what both code flows answer with. */
+  codeTtlSeconds(): number {
+    return this.ttlSeconds();
+  }
+
   /** The account behind the address, when it is active and holds the master role. */
   private async activeMasterUserId(email: string): Promise<string | undefined> {
     const account = await this.users.findByEmail(email);
@@ -367,12 +407,7 @@ export class OtpService {
     await this.limiter.clearAttempts(ATTEMPT_SCOPE, challenge.id);
     // The circuit breaker's numerator: a code that reached a person who
     // entered it (#390). Codes mailed to addresses nobody reads never get here.
-    await this.limiter.consumeAttempt({
-      scope: BREAKER_VERIFIED_SCOPE,
-      subject: hourBucket(now),
-      maxAttempts: Number.MAX_SAFE_INTEGER,
-      ttlMs: 2 * HOUR_MS,
-    });
+    await this.recordCodeEntered(now);
 
     return challenge.id;
   }
@@ -538,12 +573,12 @@ export class OtpService {
    * forbids it in words; this catch is what makes the guarantee not depend on
    * a future vendor adapter honouring the comment.
    */
-  private async deliver(email: string, code: string): Promise<void> {
+  private async deliver(
+    email: string,
+    message: { readonly subject: string; readonly text: string },
+  ): Promise<void> {
     try {
-      await this.mail.send({
-        to: email,
-        ...renderOtpEmail(code, Math.round(this.ttlSeconds() / 60)),
-      });
+      await this.mail.send({ to: email, ...message });
     } catch (error: unknown) {
       this.logger.error(
         `email delivery failed: email=${maskEmail(email)} ` +
