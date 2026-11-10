@@ -223,6 +223,32 @@ are never supplied by whatever proved the credential. Passing them in would make
 "mint a master token for a user holding no master grant" a one-argument mistake,
 in the one place where a mistake is a privilege escalation.
 
+### Changing the sign-in address (issue #514, ADR-0074 § 1)
+
+`POST /me/email-change` with `{ newEmail }`, then
+`POST /me/email-change/confirm` with `{ currentCode, newCode }`. Both need a
+session; neither needs a role.
+
+- **Two codes, entered together:** one to the address the account has now, one
+  to the new address. A stolen, unlocked phone with a live session is not
+  enough to move the account; a user who no longer reads the current address
+  recovers through support (ADR-0074 § 2).
+- **Start does not look the new address up.** Whether another account holds it
+  is answered only at confirm, after both codes were right (`409
+EMAIL_ADDRESS_TAKEN`), so the route cannot be used to enumerate addresses.
+- A new start **replaces** the pending pair, so a mistyped address can be
+  corrected at once. Both codes go through `OtpService.dispatchCode`, behind
+  the same daily cap, hourly ceiling and circuit breaker as sign-in codes.
+- Every refusal of the codes is one answer, `422 EMAIL_CHANGE_CODE_INVALID`.
+  Not a 401: the session is fine, and a client reading 401 would sign out.
+- **Confirm is one transaction:** the `email_changes` row is completed with
+  both digests in its `WHERE`, the address moves, and every session is
+  revoked (`email_change`). Two confirms of one pair move the account once.
+  The move itself is `AccountEmailMover`, which support recovery (#515) is to
+  share.
+- After commit, the old address gets a notice with the masked new address,
+  no code and no link. A failed notice is logged, not thrown.
+
 Access tokens already issued remain valid until they expire — at most 15 minutes.
 Where an action must take effect immediately (an admin suspending a master mid-
 order), the **authorization check re-reads current status from the database**, so
@@ -367,12 +393,13 @@ makes the platform mail any address it is given, and mail to addresses nobody
 asked to be mailed at puts the sending domain into spam folders, after which no
 real user can sign in.
 
-| Endpoint      | Limit                                               |
-| ------------- | --------------------------------------------------- |
-| OTP request   | Per email address **and** per IP, with backoff      |
-| OTP verify    | 5 attempts per code, then invalidate                |
-| Refresh       | Per session                                         |
-| Admin sign-in | Per identifier **and** per IP, with account lockout |
+| Endpoint      | Limit                                                                        |
+| ------------- | ---------------------------------------------------------------------------- |
+| OTP request   | Per email address **and** per IP, with backoff                               |
+| OTP verify    | 5 attempts per code, then invalidate                                         |
+| Refresh       | Per session                                                                  |
+| Admin sign-in | Per identifier **and** per IP, with account lockout                          |
+| Email change  | Per user: start spends `otp-request`, confirm `sign-in`; 5 attempts per pair |
 
 **OTP request and OTP verify _are_ sign-in on the consumer path** — there is no
 third endpoint to throttle, and listing one invites somebody to build it. The

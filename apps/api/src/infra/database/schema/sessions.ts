@@ -19,6 +19,8 @@ export const sessionRevokedReason = pgEnum('session_revoked_reason', [
   'reuse_detected',
   'suspension',
   'phone_change',
+  // A change of sign-in address (ADR-0074): the address is the credential.
+  'email_change',
 ]);
 
 /**

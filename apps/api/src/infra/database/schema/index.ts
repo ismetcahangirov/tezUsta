@@ -80,3 +80,4 @@ export * from './subscriptions';
 export * from './subscription-billing';
 export * from './reports';
 export * from './portfolio';
+export * from './email-changes';
