@@ -167,8 +167,8 @@ export interface DispatchOfferMetrics {
    * and counting them would read as indifference. `null` when nothing in the
    * window reached one of the three states.
    *
-   * **Evidence for `DISPATCH_RADIUS_STEP_SECONDS`**, which is also how long an
-   * offer lives (`offerExpiresAt` in `dispatch-schedule.ts`): a high expiry
+   * **Evidence for `DISPATCH_OFFER_TTL_SECONDS`**, how long an offer lives
+   * (`offerExpiresAt` in `dispatch-schedule.ts`): a high expiry
    * rate alongside a slow `timeToRespondSeconds` means offers are being
    * withdrawn from masters who were still reading them.
    */

@@ -162,7 +162,9 @@ export function formatDispatchMetrics(
   );
   out.push(`  expiry rate: ${percent(offers.expiryRate)}`);
   out.push('  Q: is an offer being withdrawn from masters who were still deciding?');
-  out.push('     (the step is also the offer lifetime — see offerExpiresAt)');
+  out.push(
+    '     (an offer lives DISPATCH_OFFER_TTL_SECONDS, never less than the step — see offerExpiresAt)',
+  );
   out.push('');
 
   out.push(`DISPATCH_TOTAL_TIMEOUT_SECONDS = ${String(parameters.totalTimeoutSeconds)}`);

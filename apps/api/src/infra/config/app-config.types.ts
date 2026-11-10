@@ -369,6 +369,8 @@ export interface AppConfig {
     readonly radiusStepSeconds: number;
     readonly totalTimeoutSeconds: number;
     readonly maxMastersPerBroadcast: number;
+    /** How long one offer lives; see `DISPATCH_OFFER_TTL_SECONDS`. Never shorter than the step. */
+    readonly offerTtlSeconds: number;
     /**
      * How old a master's newest position may be before dispatch treats them as
      * missing rather than as "in range at their last known point"

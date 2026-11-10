@@ -26,6 +26,11 @@ export interface BroadcastCommand {
   readonly round: number;
   readonly radiusM: number;
   readonly expiresAt: Date;
+  /**
+   * A live offer that would expire before this instant is renewed by this
+   * round; one with longer left is left alone. See `offerRenewalCutoff`.
+   */
+  readonly renewBefore: Date;
   readonly candidates: readonly OfferCandidate[];
 }
 
@@ -86,7 +91,9 @@ export class OrderOffersRepository {
    * 3. **`declined` is forever. Losing a race is not.** The `WHERE` on the
    *    conflict branch is ADR-0009's rule and the whole of it: a row is
    *    re-offered when it is `expired`, when it is `offered` with its window
-   *    already run out, or when it is `lost`.
+   *    running out before `renewBefore` (half a wave from now, so a tick that
+   *    ran a moment early still renews it; see `offerRenewalCutoff`), or when
+   *    it is `lost`.
    *
    *    **`lost` belongs on that list, and leaving it off was a permanent
    *    exclusion nobody decided.** A `lost` row is a master who tapped accept
@@ -107,14 +114,15 @@ export class OrderOffersRepository {
    *    broadcast — their row is what keeps them out of it.
    *
    *    That same predicate is what makes a duplicate tick harmless: the offers
-   *    it would write are still live, so it updates nothing and reports nobody.
+   *    it would write still have their whole lifetime ahead of `renewBefore`,
+   *    so it updates nothing and reports nobody.
    *
    * `returning master_id` therefore reports **who was really offered this
    * round**, not who the round wanted to reach — which is what the caller
    * logs, and what a test asserts against.
    */
   async broadcast(command: BroadcastCommand): Promise<string[]> {
-    const { orderId, searchingSince, round, radiusM, expiresAt, candidates } = command;
+    const { orderId, searchingSince, round, radiusM, expiresAt, renewBefore, candidates } = command;
 
     if (candidates.length === 0) {
       return [];
@@ -162,7 +170,8 @@ export class OrderOffersRepository {
              -- counts from (#397). The insert branch takes the column default.
              offered_at = now()
        where order_offers.status in ('expired', 'lost')
-          or (order_offers.status = 'offered' and order_offers.expires_at <= now())
+          or (order_offers.status = 'offered'
+              and order_offers.expires_at <= ${renewBefore}::timestamptz)
        returning master_id
     `);
 
