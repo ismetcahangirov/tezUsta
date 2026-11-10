@@ -111,6 +111,7 @@ export const copy = {
     portfolio: 'Portfolio',
     audit: 'Audit log',
     admins: 'Admins',
+    recoveries: 'Account recovery',
   },
 
   roles: {

@@ -5,14 +5,14 @@
     "tools"
   ],
   "totals": {
-    "files": 1482,
-    "tests": 438,
+    "files": 1490,
+    "tests": 439,
     "violations": 0
   },
   "byWorkspace": {
     "apps/admin": {
-      "files": 131,
-      "tests": 25,
+      "files": 139,
+      "tests": 26,
       "untested": [
         "apps/admin/eslint.config.mjs",
         "apps/admin/smoke/vitest.config.ts",
@@ -75,6 +75,12 @@
         "apps/admin/src/features/portfolio/RemovePostDialog.tsx",
         "apps/admin/src/features/portfolio/api.ts",
         "apps/admin/src/features/portfolio/copy.ts",
+        "apps/admin/src/features/recoveries/OpenRecoveryDialog.tsx",
+        "apps/admin/src/features/recoveries/RecoveriesPage.tsx",
+        "apps/admin/src/features/recoveries/RecoveryDetailPage.tsx",
+        "apps/admin/src/features/recoveries/RecoveryDialogs.tsx",
+        "apps/admin/src/features/recoveries/api.ts",
+        "apps/admin/src/features/recoveries/rules.ts",
         "apps/admin/src/features/reports/CloseReportDialog.tsx",
         "apps/admin/src/features/reports/ReportDetailPage.tsx",
         "apps/admin/src/features/reports/ReportsPage.tsx",
@@ -698,6 +704,7 @@
         "apps/admin/src/features/masters/api.ts",
         "apps/admin/src/features/orders/api.ts",
         "apps/admin/src/features/portfolio/api.ts",
+        "apps/admin/src/features/recoveries/api.ts",
         "apps/admin/src/features/reports/api.ts",
         "apps/admin/src/features/reviews/api.ts",
         "apps/admin/src/features/subscription/api.ts",
@@ -731,6 +738,10 @@
         "apps/admin/src/features/orders/RevealEmailDialog.tsx",
         "apps/admin/src/features/portfolio/PortfolioPostPage.tsx",
         "apps/admin/src/features/portfolio/RemovePostDialog.tsx",
+        "apps/admin/src/features/recoveries/OpenRecoveryDialog.tsx",
+        "apps/admin/src/features/recoveries/RecoveryDetailPage.tsx",
+        "apps/admin/src/features/recoveries/RecoveryDialogs.tsx",
+        "apps/admin/src/features/recoveries/copy.ts",
         "apps/admin/src/features/reports/CloseReportDialog.tsx",
         "apps/admin/src/features/reports/ReportDetailPage.tsx",
         "apps/admin/src/features/subscription/SubscriptionDialogs.tsx",
@@ -892,6 +903,10 @@
         "apps/admin/src/features/portfolio/PortfolioPage.tsx",
         "apps/admin/src/features/portfolio/PortfolioPostPage.tsx",
         "apps/admin/src/features/portfolio/RemovalDialog.tsx",
+        "apps/admin/src/features/recoveries/OpenRecoveryDialog.tsx",
+        "apps/admin/src/features/recoveries/RecoveriesPage.tsx",
+        "apps/admin/src/features/recoveries/RecoveryDetailPage.tsx",
+        "apps/admin/src/features/recoveries/RecoveryDialogs.tsx",
         "apps/admin/src/features/reports/CloseReportDialog.tsx",
         "apps/admin/src/features/reports/ReportDetailPage.tsx",
         "apps/admin/src/features/reports/ReportsPage.tsx",
@@ -942,6 +957,10 @@
         "apps/admin/src/features/portfolio/PortfolioPage.tsx",
         "apps/admin/src/features/portfolio/PortfolioPostPage.tsx",
         "apps/admin/src/features/portfolio/RemovalDialog.tsx",
+        "apps/admin/src/features/recoveries/OpenRecoveryDialog.tsx",
+        "apps/admin/src/features/recoveries/RecoveriesPage.tsx",
+        "apps/admin/src/features/recoveries/RecoveryDetailPage.tsx",
+        "apps/admin/src/features/recoveries/RecoveryDialogs.tsx",
         "apps/admin/src/features/reports/CloseReportDialog.tsx",
         "apps/admin/src/features/reports/ReportDetailPage.tsx",
         "apps/admin/src/features/reports/ReportsPage.tsx",
@@ -968,6 +987,7 @@
         "apps/admin/src/components/form-controls.test.tsx",
         "apps/admin/src/features/admins/form-support.tsx",
         "apps/admin/src/features/catalogue/CommonFieldsEditor.tsx",
+        "apps/admin/src/features/recoveries/OpenRecoveryDialog.tsx",
         "apps/admin/src/features/subscription/SubscriptionDialogs.tsx"
       ],
       "coveredByTests": [
@@ -1007,6 +1027,8 @@
         "apps/admin/src/features/masters/MasterActionDialog.tsx",
         "apps/admin/src/features/orders/OverrideDialog.tsx",
         "apps/admin/src/features/orders/RevealEmailDialog.tsx",
+        "apps/admin/src/features/recoveries/OpenRecoveryDialog.tsx",
+        "apps/admin/src/features/recoveries/RecoveryDialogs.tsx",
         "apps/admin/src/features/reports/CloseReportDialog.tsx",
         "apps/admin/src/features/subscription/SubscriptionDialogs.tsx"
       ],
@@ -1040,6 +1062,7 @@
         "apps/admin/src/features/orders/OverrideDialog.tsx",
         "apps/admin/src/features/orders/RevealEmailDialog.tsx",
         "apps/admin/src/features/portfolio/RemovalDialog.tsx",
+        "apps/admin/src/features/recoveries/RecoveryDialogs.tsx",
         "apps/admin/src/features/reports/CloseReportDialog.tsx",
         "apps/admin/src/features/reviews/RemoveReviewDialog.tsx",
         "apps/admin/src/features/subscription/SubscriptionDialogs.tsx"
@@ -1081,6 +1104,7 @@
         "apps/admin/src/features/masters/MastersPage.tsx",
         "apps/admin/src/features/orders/OrdersTable.tsx",
         "apps/admin/src/features/portfolio/PortfolioPage.tsx",
+        "apps/admin/src/features/recoveries/RecoveriesPage.tsx",
         "apps/admin/src/features/reports/ReportsPage.tsx",
         "apps/admin/src/features/reviews/ReviewsPage.tsx",
         "apps/admin/src/features/subscription/SubscriptionPage.tsx"
@@ -1103,6 +1127,8 @@
         "apps/admin/src/features/catalogue/ServiceForm.tsx",
         "apps/admin/src/features/customers/CustomersPage.tsx",
         "apps/admin/src/features/portfolio/PortfolioPage.tsx",
+        "apps/admin/src/features/recoveries/OpenRecoveryDialog.tsx",
+        "apps/admin/src/features/recoveries/RecoveryDetailPage.tsx",
         "apps/admin/src/features/reviews/RecalculateDialog.tsx",
         "apps/admin/src/features/reviews/ReviewsPage.tsx",
         "apps/admin/src/features/subscription/SubscriptionDialogs.tsx",
@@ -1585,6 +1611,8 @@
         "apps/admin/src/features/customers/copy.ts",
         "apps/admin/src/features/orders/OrdersTable.tsx",
         "apps/admin/src/features/orders/rules.ts",
+        "apps/admin/src/features/recoveries/OpenRecoveryDialog.tsx",
+        "apps/admin/src/features/recoveries/copy.ts",
         "apps/admin/src/format.ts",
         "apps/admin/src/shell/PageFrame.tsx",
         "apps/admin/src/shell/Shell.tsx",
@@ -1821,6 +1849,8 @@
         "apps/admin/src/features/masters/copy.ts",
         "apps/admin/src/features/portfolio/RemovePostDialog.tsx",
         "apps/admin/src/features/portfolio/copy.ts",
+        "apps/admin/src/features/recoveries/OpenRecoveryDialog.tsx",
+        "apps/admin/src/features/recoveries/copy.ts",
         "apps/admin/src/features/subscription/MasterSubscriptionPanel.tsx",
         "apps/admin/src/features/subscription/copy.ts",
         "apps/admin/src/format.ts",
@@ -2287,6 +2317,165 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/admin/src/features/recoveries/OpenRecoveryDialog.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/api/api-error.ts",
+        "apps/admin/src/components/Banner.tsx",
+        "apps/admin/src/components/Button.tsx",
+        "apps/admin/src/components/Checkbox.tsx",
+        "apps/admin/src/components/Modal.tsx",
+        "apps/admin/src/components/TextField.tsx",
+        "apps/admin/src/features/recoveries/api.ts",
+        "apps/admin/src/features/recoveries/copy.ts",
+        "apps/admin/src/format.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/features/customers/CustomerDetailPage.tsx",
+        "apps/admin/src/features/masters/MasterDetailPage.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/recoveries/RecoveriesPage.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/components/Banner.tsx",
+        "apps/admin/src/components/Button.tsx",
+        "apps/admin/src/components/Table.tsx",
+        "apps/admin/src/features/recoveries/api.ts",
+        "apps/admin/src/features/recoveries/copy.ts",
+        "apps/admin/src/features/recoveries/rules.ts",
+        "apps/admin/src/format.ts",
+        "apps/admin/src/shell/PageFrame.tsx",
+        "apps/admin/src/shell/Shell.tsx"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/shell/pages.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/recoveries/RecoveryDetailPage.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/api/api-error.ts",
+        "apps/admin/src/components/Banner.tsx",
+        "apps/admin/src/components/Button.tsx",
+        "apps/admin/src/components/TextField.tsx",
+        "apps/admin/src/features/recoveries/RecoveryDialogs.tsx",
+        "apps/admin/src/features/recoveries/api.ts",
+        "apps/admin/src/features/recoveries/copy.ts",
+        "apps/admin/src/features/recoveries/rules.ts",
+        "apps/admin/src/format.ts",
+        "apps/admin/src/shell/PageFrame.tsx",
+        "apps/admin/src/shell/Shell.tsx",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/shell/pages.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/recoveries/RecoveryDialogs.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/api/api-error.ts",
+        "apps/admin/src/components/Banner.tsx",
+        "apps/admin/src/components/Button.tsx",
+        "apps/admin/src/components/Modal.tsx",
+        "apps/admin/src/components/ReasonField.tsx",
+        "apps/admin/src/features/recoveries/api.ts",
+        "apps/admin/src/features/recoveries/copy.ts",
+        "apps/admin/src/hooks.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/features/recoveries/RecoveryDetailPage.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/recoveries/api.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/api/admin-api.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/features/recoveries/OpenRecoveryDialog.tsx",
+        "apps/admin/src/features/recoveries/RecoveriesPage.tsx",
+        "apps/admin/src/features/recoveries/RecoveryDetailPage.tsx",
+        "apps/admin/src/features/recoveries/RecoveryDialogs.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/recoveries/copy.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/api/api-error.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/features/customers/CustomerDetailPage.tsx",
+        "apps/admin/src/features/masters/MasterDetailPage.tsx",
+        "apps/admin/src/features/recoveries/OpenRecoveryDialog.tsx",
+        "apps/admin/src/features/recoveries/RecoveriesPage.tsx",
+        "apps/admin/src/features/recoveries/RecoveryDetailPage.tsx",
+        "apps/admin/src/features/recoveries/RecoveryDialogs.tsx",
+        "apps/admin/src/features/recoveries/recoveries.test.tsx",
+        "apps/admin/src/features/recoveries/rules.ts"
+      ],
+      "coveredByTests": [
+        "apps/admin/src/features/recoveries/recoveries.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/admin/src/features/recoveries/recoveries.test.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": true,
+      "dependsOn": [
+        "apps/admin/src/features/recoveries/copy.ts",
+        "apps/admin/test/fake-server.ts",
+        "apps/admin/test/render-app.tsx",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/recoveries/rules.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/features/recoveries/copy.ts",
+        "apps/admin/src/format.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/features/recoveries/RecoveriesPage.tsx",
+        "apps/admin/src/features/recoveries/RecoveryDetailPage.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/admin/src/features/reports/CloseReportDialog.tsx": {
       "workspace": "apps/admin",
       "module": "apps/admin",
@@ -2641,6 +2830,10 @@
         "apps/admin/src/features/orders/orders.test.tsx",
         "apps/admin/src/features/portfolio/PortfolioPage.tsx",
         "apps/admin/src/features/portfolio/PortfolioPostPage.tsx",
+        "apps/admin/src/features/recoveries/OpenRecoveryDialog.tsx",
+        "apps/admin/src/features/recoveries/RecoveriesPage.tsx",
+        "apps/admin/src/features/recoveries/RecoveryDetailPage.tsx",
+        "apps/admin/src/features/recoveries/rules.ts",
         "apps/admin/src/features/reports/ReportDetailPage.tsx",
         "apps/admin/src/features/reports/ReportsPage.tsx",
         "apps/admin/src/features/reviews/ReviewsPage.tsx",
@@ -2668,6 +2861,7 @@
         "apps/admin/src/features/orders/OrderDetailPage.tsx",
         "apps/admin/src/features/orders/RevealEmailDialog.tsx",
         "apps/admin/src/features/portfolio/PortfolioPostPage.tsx",
+        "apps/admin/src/features/recoveries/RecoveryDialogs.tsx",
         "apps/admin/src/shell/Shell.tsx"
       ],
       "coveredByTests": [],
@@ -2782,6 +2976,8 @@
         "apps/admin/src/features/orders/OrdersPage.tsx",
         "apps/admin/src/features/portfolio/PortfolioPage.tsx",
         "apps/admin/src/features/portfolio/PortfolioPostPage.tsx",
+        "apps/admin/src/features/recoveries/RecoveriesPage.tsx",
+        "apps/admin/src/features/recoveries/RecoveryDetailPage.tsx",
         "apps/admin/src/features/reports/ReportDetailPage.tsx",
         "apps/admin/src/features/reports/ReportsPage.tsx",
         "apps/admin/src/features/reviews/ReviewsPage.tsx",
@@ -2854,6 +3050,8 @@
         "apps/admin/src/features/customers/CustomerDetailPage.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/orders/OrderDetailPage.tsx",
+        "apps/admin/src/features/recoveries/RecoveriesPage.tsx",
+        "apps/admin/src/features/recoveries/RecoveryDetailPage.tsx",
         "apps/admin/src/features/reports/ReportDetailPage.tsx",
         "apps/admin/src/features/subscription/MasterSubscriptionPanel.tsx",
         "apps/admin/src/features/subscription/SubscriptionPage.tsx"
@@ -2894,6 +3092,8 @@
         "apps/admin/src/features/orders/OrdersPage.tsx",
         "apps/admin/src/features/portfolio/PortfolioPage.tsx",
         "apps/admin/src/features/portfolio/PortfolioPostPage.tsx",
+        "apps/admin/src/features/recoveries/RecoveriesPage.tsx",
+        "apps/admin/src/features/recoveries/RecoveryDetailPage.tsx",
         "apps/admin/src/features/reports/ReportDetailPage.tsx",
         "apps/admin/src/features/reports/ReportsPage.tsx",
         "apps/admin/src/features/reviews/ReviewsPage.tsx",
@@ -2990,6 +3190,7 @@
         "apps/admin/src/features/masters/masters.test.tsx",
         "apps/admin/src/features/orders/orders.test.tsx",
         "apps/admin/src/features/portfolio/portfolio.test.tsx",
+        "apps/admin/src/features/recoveries/recoveries.test.tsx",
         "apps/admin/src/features/reports/reports.test.tsx",
         "apps/admin/src/features/reviews/ReviewsPage.test.tsx",
         "apps/admin/src/features/subscription/SubscriptionPage.test.tsx",
@@ -3008,6 +3209,7 @@
         "apps/admin/src/features/masters/masters.test.tsx",
         "apps/admin/src/features/orders/orders.test.tsx",
         "apps/admin/src/features/portfolio/portfolio.test.tsx",
+        "apps/admin/src/features/recoveries/recoveries.test.tsx",
         "apps/admin/src/features/reports/reports.test.tsx",
         "apps/admin/src/features/reviews/ReviewsPage.test.tsx",
         "apps/admin/src/features/subscription/SubscriptionPage.test.tsx",
@@ -3034,6 +3236,7 @@
         "apps/admin/src/features/masters/masters.test.tsx",
         "apps/admin/src/features/orders/orders.test.tsx",
         "apps/admin/src/features/portfolio/portfolio.test.tsx",
+        "apps/admin/src/features/recoveries/recoveries.test.tsx",
         "apps/admin/src/features/reports/reports.test.tsx",
         "apps/admin/src/features/reviews/ReviewsPage.test.tsx",
         "apps/admin/src/features/subscription/SubscriptionPage.test.tsx",
@@ -3051,6 +3254,7 @@
         "apps/admin/src/features/masters/masters.test.tsx",
         "apps/admin/src/features/orders/orders.test.tsx",
         "apps/admin/src/features/portfolio/portfolio.test.tsx",
+        "apps/admin/src/features/recoveries/recoveries.test.tsx",
         "apps/admin/src/features/reports/reports.test.tsx",
         "apps/admin/src/features/reviews/ReviewsPage.test.tsx",
         "apps/admin/src/features/subscription/SubscriptionPage.test.tsx",
@@ -5910,6 +6114,7 @@
         "apps/api/src/infra/database/schema/reports.ts",
         "apps/api/src/infra/database/schema/reviews.ts",
         "apps/api/src/infra/database/schema/subscriptions.ts",
+        "apps/api/src/modules/account-recovery/account-recovery.repository.ts",
         "apps/api/src/modules/admin/admin-accounts.service.ts",
         "apps/api/src/modules/admin/admin-customers.repository.ts",
         "apps/api/src/modules/admin/admin-setup.service.ts",
@@ -8981,6 +9186,7 @@
         "apps/api/src/infra/database/database.types.ts",
         "apps/api/src/infra/database/schema/account-recovery.ts",
         "apps/api/src/infra/database/schema/account-recovery.ts",
+        "apps/api/src/infra/database/schema/admin.ts",
         "apps/api/src/infra/database/schema/customers.ts",
         "apps/api/src/infra/database/schema/email-changes.ts",
         "apps/api/src/infra/database/schema/masters.ts",
@@ -32540,6 +32746,13 @@
         "apps/admin/src/features/portfolio/api.ts",
         "apps/admin/src/features/portfolio/copy.ts",
         "apps/admin/src/features/portfolio/portfolio.test.tsx",
+        "apps/admin/src/features/recoveries/OpenRecoveryDialog.tsx",
+        "apps/admin/src/features/recoveries/RecoveryDetailPage.tsx",
+        "apps/admin/src/features/recoveries/RecoveryDialogs.tsx",
+        "apps/admin/src/features/recoveries/api.ts",
+        "apps/admin/src/features/recoveries/copy.ts",
+        "apps/admin/src/features/recoveries/recoveries.test.tsx",
+        "apps/admin/src/features/recoveries/rules.ts",
         "apps/admin/src/features/reports/CloseReportDialog.tsx",
         "apps/admin/src/features/reports/ReportDetailPage.tsx",
         "apps/admin/src/features/reports/ReportsPage.tsx",
@@ -32974,6 +33187,7 @@
         "apps/admin/src/features/masters/masters.test.tsx",
         "apps/admin/src/features/orders/orders.test.tsx",
         "apps/admin/src/features/portfolio/portfolio.test.tsx",
+        "apps/admin/src/features/recoveries/recoveries.test.tsx",
         "apps/admin/src/features/reports/reports.test.tsx",
         "apps/admin/src/features/reviews/ReviewsPage.test.tsx",
         "apps/admin/src/features/subscription/SubscriptionPage.test.tsx",

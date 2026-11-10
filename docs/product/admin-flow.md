@@ -215,7 +215,17 @@ request; approving the move takes a `super_admin` who did not open it.
 - Both addresses are masked; revealing them needs `pii.read` and a reason.
   Every step is audited with the admin and the reason.
 
-The panel's view of this (#517) is not built yet; the API is.
+In the panel (#517), **Account recovery** lists the open requests with the
+time left in each hold; the panel does not refresh it on a timer. A request is
+opened from the customer's or the master's file. A customer who also holds a
+master profile is recovered from the master file, where the identity evidence
+applies. The evidence step cannot be skipped: a master's request needs the
+document match ticked; a customer's needs at least three facts ticked as
+matching, and the account's own answers appear only after the admin has
+written down what the user said. Approve stays disabled, with the reason
+shown, for the admin who opened the request and until the code is confirmed
+and the hold has run; support sees that only a super admin approves. Until
+#524, the new photos stay in the support mailbox and only the notes are kept.
 
 ### 9. Portfolio moderation
 

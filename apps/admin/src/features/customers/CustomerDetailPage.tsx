@@ -15,6 +15,8 @@ import { customersCopy } from './copy';
 import { type CustomerStatusAction, CustomerStatusDialog } from './CustomerStatusDialog';
 import { CustomerStatusBadge } from './CustomerStatusBadge';
 import { RevealCustomerEmailDialog } from './RevealCustomerEmailDialog';
+import { accountAnswers, OpenRecoveryDialog } from '../recoveries/OpenRecoveryDialog';
+import { recoveriesCopy } from '../recoveries/copy';
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -87,6 +89,10 @@ function CustomerFile({ customer }: { customer: AdminCustomerDetail }) {
   const canOpenMaster = me.permissions.includes('masters.read');
   const [pending, setPending] = useState<CustomerStatusAction | null>(null);
   const [revealing, setRevealing] = useState(false);
+  const [recovering, setRecovering] = useState(false);
+  const canRecover = me.permissions.includes('accounts.recover') && customer.status === 'active';
+  // The orders already loaded for the history below, for the evidence check.
+  const { data: orderPages } = useCustomerOrdersInfiniteQuery(customer.id);
   const [outcome, setOutcome] = useState<Outcome | null>(null);
 
   const action: CustomerStatusAction | null =
@@ -133,6 +139,20 @@ function CustomerFile({ customer }: { customer: AdminCustomerDetail }) {
           )}
         </div>
       ) : null}
+
+      {canRecover && (
+        <div className="flex flex-col items-start gap-2">
+          {customer.masterProfile === null ? (
+            <Button
+              label={recoveriesCopy.open.button}
+              variant="secondary"
+              onClick={() => setRecovering(true)}
+            />
+          ) : (
+            <p className="text-caption text-text-muted">{recoveriesCopy.open.useMasterFile}</p>
+          )}
+        </div>
+      )}
 
       <Section title={customersCopy.profile}>
         <dl className="grid grid-cols-2 gap-x-8 gap-y-3 rounded-md border-hairline border-border bg-surface p-4 lg:grid-cols-4">
@@ -205,6 +225,19 @@ function CustomerFile({ customer }: { customer: AdminCustomerDetail }) {
             setPending(null);
             setOutcome(result);
           }}
+        />
+      )}
+      {recovering && (
+        <OpenRecoveryDialog
+          subject={{ kind: 'customer', id: customer.id }}
+          title={recoveriesCopy.open.title}
+          evidence="customer"
+          answers={accountAnswers(
+            customer.displayName,
+            customer.addresses.map((address) => address.label),
+            orderPages?.pages.flatMap((page) => page.items) ?? [],
+          )}
+          onClose={() => setRecovering(false)}
         />
       )}
       {revealing && (

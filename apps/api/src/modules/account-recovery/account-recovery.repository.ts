@@ -1,19 +1,28 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, eq, gt, isNotNull, isNull, lte, ne, sql } from 'drizzle-orm';
+import { and, eq, gt, isNotNull, isNull, lte, ne, type SQL, sql } from 'drizzle-orm';
+import { alias } from 'drizzle-orm/pg-core';
 
 import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
 import type { Database, DatabaseExecutor } from '../../infra/database/database.types';
 import type { AccountRecoveryRow } from '../../infra/database/schema/account-recovery';
 import { accountRecoveryRequests } from '../../infra/database/schema/account-recovery';
+import { adminUsers } from '../../infra/database/schema/admin';
 import { customers } from '../../infra/database/schema/customers';
 import { emailChanges } from '../../infra/database/schema/email-changes';
 import { masters } from '../../infra/database/schema/masters';
 import { users } from '../../infra/database/schema/users';
 
-/** A request with the profiles of the account it is about, for the panel. */
+/**
+ * A request with what the panel shows beside it: the account's profiles and
+ * name, and the names of the admins who acted on it (#517).
+ */
 export interface AccountRecoveryView extends AccountRecoveryRow {
   readonly customerId: string | null;
   readonly masterId: string | null;
+  readonly accountName: string | null;
+  readonly openedByName: string | null;
+  readonly cancelledByName: string | null;
+  readonly approvedByName: string | null;
 }
 
 export interface RecoveryAccount {
@@ -40,11 +49,34 @@ const isOpen = and(
   isNull(accountRecoveryRequests.movedAt),
 );
 
+const opener = alias(adminUsers, 'opener');
+const canceller = alias(adminUsers, 'canceller');
+const approver = alias(adminUsers, 'approver');
+
 const viewColumns = {
   request: accountRecoveryRequests,
   customerId: customers.id,
   masterId: masters.id,
+  // A master's own name where there is one: that is who support is talking to.
+  accountName: sql<string | null>`coalesce(${masters.displayName}, ${customers.displayName})`,
+  openedByName: opener.displayName,
+  cancelledByName: canceller.displayName,
+  approvedByName: approver.displayName,
 };
+
+type ViewRow = {
+  readonly request: AccountRecoveryRow;
+  readonly customerId: string | null;
+  readonly masterId: string | null;
+  readonly accountName: string | null;
+  readonly openedByName: string | null;
+  readonly cancelledByName: string | null;
+  readonly approvedByName: string | null;
+};
+
+function toView({ request, ...rest }: ViewRow): AccountRecoveryView {
+  return { ...request, ...rest };
+}
 
 /**
  * Drizzle queries over `account_recovery_requests` (#515), and no policy.
@@ -139,33 +171,26 @@ export class AccountRecoveryRepository {
   }
 
   async find(id: string): Promise<AccountRecoveryView | undefined> {
-    const [row] = await this.db
-      .select(viewColumns)
-      .from(accountRecoveryRequests)
-      .leftJoin(customers, eq(customers.userId, accountRecoveryRequests.userId))
-      .leftJoin(masters, eq(masters.userId, accountRecoveryRequests.userId))
-      .where(eq(accountRecoveryRequests.id, id))
-      .limit(1);
-    return row === undefined
-      ? undefined
-      : { ...row.request, customerId: row.customerId, masterId: row.masterId };
+    const [row] = await this.views(eq(accountRecoveryRequests.id, id)).limit(1);
+    return row === undefined ? undefined : toView(row);
   }
 
   /** Every open request, oldest first: the order support works them in. */
   async listOpen(limit: number): Promise<AccountRecoveryView[]> {
-    const rows = await this.db
+    const rows = await this.views(isOpen).orderBy(accountRecoveryRequests.createdAt).limit(limit);
+    return rows.map(toView);
+  }
+
+  private views(where: SQL | undefined) {
+    return this.db
       .select(viewColumns)
       .from(accountRecoveryRequests)
       .leftJoin(customers, eq(customers.userId, accountRecoveryRequests.userId))
       .leftJoin(masters, eq(masters.userId, accountRecoveryRequests.userId))
-      .where(isOpen)
-      .orderBy(accountRecoveryRequests.createdAt)
-      .limit(limit);
-    return rows.map((row) => ({
-      ...row.request,
-      customerId: row.customerId,
-      masterId: row.masterId,
-    }));
+      .leftJoin(opener, eq(opener.id, accountRecoveryRequests.openedByAdminId))
+      .leftJoin(canceller, eq(canceller.id, accountRecoveryRequests.cancelledByAdminId))
+      .leftJoin(approver, eq(approver.id, accountRecoveryRequests.approvedByAdminId))
+      .where(where);
   }
 
   /** A fresh code for a request still waiting for one. */
