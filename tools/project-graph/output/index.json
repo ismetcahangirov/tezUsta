@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1458,
-    "tests": 434,
+    "files": 1470,
+    "tests": 436,
     "violations": 0
   },
   "byWorkspace": {
@@ -365,8 +365,8 @@
       ]
     },
     "apps/mobile": {
-      "files": 561,
-      "tests": 183,
+      "files": 572,
+      "tests": 185,
       "untested": [
         "apps/mobile/.storybook/main.ts",
         "apps/mobile/.storybook/preview.tsx",
@@ -392,6 +392,7 @@
         "apps/mobile/app/(master)/subscription.tsx",
         "apps/mobile/app/(shared)/_layout.tsx",
         "apps/mobile/app/(shared)/become-master.tsx",
+        "apps/mobile/app/(shared)/email-change.tsx",
         "apps/mobile/app/(shared)/reviews.tsx",
         "apps/mobile/app/(shared)/settings.tsx",
         "apps/mobile/app/_layout.tsx",
@@ -519,7 +520,9 @@
         "apps/mobile/src/service-catalogue/CategoryList.stories.tsx",
         "apps/mobile/src/service-catalogue/ServiceList.stories.tsx",
         "apps/mobile/src/service-catalogue/index.ts",
+        "apps/mobile/src/settings/email-change-endpoints.ts",
         "apps/mobile/src/store/hooks.ts",
+        "apps/mobile/src/support/index.ts",
         "apps/mobile/src/theme/design-tokens.json",
         "apps/mobile/src/theme/tokens.stories.tsx",
         "apps/mobile/src/theme/typography.stories.tsx",
@@ -566,7 +569,7 @@
       ]
     },
     "packages/types": {
-      "files": 30,
+      "files": 31,
       "tests": 0,
       "untested": [
         "packages/types/eslint.config.mjs",
@@ -580,6 +583,7 @@
         "packages/types/src/conversation.ts",
         "packages/types/src/customer.ts",
         "packages/types/src/device.ts",
+        "packages/types/src/email-change.ts",
         "packages/types/src/geocoding.ts",
         "packages/types/src/master-document.ts",
         "packages/types/src/master-job.ts",
@@ -10964,7 +10968,8 @@
         "apps/api/src/modules/auth/otp.config.ts",
         "apps/api/src/modules/auth/otp.service.ts",
         "apps/api/src/modules/auth/otp.tokens.ts",
-        "apps/api/src/modules/users/users.repository.ts"
+        "apps/api/src/modules/users/users.repository.ts",
+        "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
         "apps/api/src/modules/auth/email-change.controller.ts",
@@ -20799,7 +20804,10 @@
       "dependsOn": [
         "apps/mobile/modules/google-account-picker/index.ts",
         "apps/mobile/src/auth/index.ts",
-        "apps/mobile/src/components/index.ts"
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/store/hooks.ts",
+        "apps/mobile/src/store/session-slice.ts",
+        "apps/mobile/src/support/index.ts"
       ],
       "dependedOnBy": [
         "apps/mobile/src/auth/SignInScreen.test.tsx"
@@ -21113,6 +21121,17 @@
       "isTest": false,
       "dependsOn": [
         "apps/mobile/src/master-onboarding/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/app/(shared)/email-change.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile/app/(shared)",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/settings/index.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -21751,6 +21770,7 @@
         "apps/mobile/src/reports/report-endpoints.ts",
         "apps/mobile/src/reviews/reviews-endpoints.ts",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.ts",
+        "apps/mobile/src/settings/email-change-endpoints.ts",
         "apps/mobile/src/store/index.ts",
         "apps/mobile/test/support/test-store.test.ts",
         "apps/mobile/test/support/test-store.ts"
@@ -22118,7 +22138,9 @@
       "dependsOn": [],
       "dependedOnBy": [
         "apps/mobile/src/auth/email-address.test.ts",
-        "apps/mobile/src/auth/index.ts"
+        "apps/mobile/src/auth/index.ts",
+        "apps/mobile/src/settings/EmailChange.tsx",
+        "apps/mobile/src/support/support-contact.ts"
       ],
       "coveredByTests": [
         "apps/mobile/src/auth/email-address.test.ts"
@@ -22272,7 +22294,8 @@
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.tsx",
-        "apps/mobile/src/realtime/session-recovery.ts"
+        "apps/mobile/src/realtime/session-recovery.ts",
+        "apps/mobile/src/settings/email-change-endpoints.ts"
       ],
       "coveredByTests": [
         "apps/mobile/src/auth/VerifyScreen.test.tsx",
@@ -24243,7 +24266,9 @@
         "apps/mobile/src/service-catalogue/CategoryList.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.tsx",
         "apps/mobile/src/service-catalogue/ServiceList.tsx",
+        "apps/mobile/src/settings/EmailChange.tsx",
         "apps/mobile/src/settings/Settings.tsx",
+        "apps/mobile/src/support/SupportLine.tsx",
         "apps/mobile/src/tracking/MasterTrackingCard.stories.tsx",
         "apps/mobile/src/tracking/MasterTrackingCard.tsx",
         "apps/mobile/src/tracking/map-surface-placeholder.tsx"
@@ -25695,6 +25720,7 @@
         "apps/mobile/src/reviews/index.ts",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.ts",
         "apps/mobile/src/store/hooks.ts",
+        "apps/mobile/src/support/index.ts",
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
@@ -25839,7 +25865,8 @@
         "apps/mobile/src/orders/CreateOrder.tsx",
         "apps/mobile/src/orders/PriceApproval.tsx",
         "apps/mobile/src/portfolio/PostEditor.tsx",
-        "apps/mobile/src/reviews/review-errors.ts"
+        "apps/mobile/src/reviews/review-errors.ts",
+        "apps/mobile/src/settings/email-change-errors.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -26119,6 +26146,7 @@
         "apps/mobile/src/master-onboarding/onboarding-state.ts",
         "apps/mobile/src/master-onboarding/useBecomeMaster.ts",
         "apps/mobile/src/master-onboarding/useDocumentUpload.ts",
+        "apps/mobile/src/support/index.ts",
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
@@ -29970,6 +29998,27 @@
       ],
       "orphan": false
     },
+    "apps/mobile/src/settings/EmailChange.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/auth/email-address.ts",
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/settings/email-change-copy.ts",
+        "apps/mobile/src/settings/email-change-endpoints.ts",
+        "apps/mobile/src/settings/email-change-errors.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/settings/email-change.test.tsx",
+        "apps/mobile/src/settings/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/settings/email-change.test.tsx"
+      ],
+      "orphan": false
+    },
     "apps/mobile/src/settings/Settings.tsx": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
@@ -29980,6 +30029,7 @@
         "apps/mobile/src/master-onboarding/index.ts",
         "apps/mobile/src/notifications/index.ts",
         "apps/mobile/src/reviews/reviews-copy.ts",
+        "apps/mobile/src/settings/email-change-copy.ts",
         "apps/mobile/src/settings/settings-copy.ts",
         "apps/mobile/src/store/hooks.ts",
         "apps/mobile/src/store/session-slice.ts",
@@ -29994,18 +30044,87 @@
       ],
       "orphan": false
     },
+    "apps/mobile/src/settings/email-change-copy.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/src/settings/EmailChange.tsx",
+        "apps/mobile/src/settings/Settings.tsx",
+        "apps/mobile/src/settings/email-change-errors.ts",
+        "apps/mobile/src/settings/email-change.test.tsx",
+        "apps/mobile/src/settings/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/settings/email-change.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/settings/email-change-endpoints.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/api/api-slice.ts",
+        "apps/mobile/src/auth/token-store.ts",
+        "apps/mobile/src/store/session-slice.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/settings/EmailChange.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/settings/email-change-errors.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/master-jobs/error-code.ts",
+        "apps/mobile/src/settings/email-change-copy.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/settings/EmailChange.tsx",
+        "apps/mobile/src/settings/email-change.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/settings/email-change.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/settings/email-change.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/settings/EmailChange.tsx",
+        "apps/mobile/src/settings/email-change-copy.ts",
+        "apps/mobile/src/settings/email-change-errors.ts",
+        "apps/mobile/src/store/index.ts",
+        "apps/mobile/src/store/session-slice.ts",
+        "apps/mobile/test/support/test-store.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/mobile/src/settings/index.ts": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
       "isTest": false,
       "dependsOn": [
+        "apps/mobile/src/settings/EmailChange.tsx",
         "apps/mobile/src/settings/Settings.tsx",
+        "apps/mobile/src/settings/email-change-copy.ts",
         "apps/mobile/src/settings/settings-copy.ts"
       ],
       "dependedOnBy": [
         "apps/mobile/app/(customer)/(tabs)/_layout.tsx",
         "apps/mobile/app/(customer)/(tabs)/settings.tsx",
         "apps/mobile/app/(master)/index.tsx",
+        "apps/mobile/app/(shared)/email-change.tsx",
         "apps/mobile/app/(shared)/settings.tsx",
         "apps/mobile/src/addresses/addresses-settings-entry.test.tsx",
         "apps/mobile/src/reviews/ReceivedReviews.test.tsx"
@@ -30057,6 +30176,7 @@
         "apps/mobile/src/store/index.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/app/(auth)/sign-in.tsx",
         "apps/mobile/app/(auth)/verify.tsx",
         "apps/mobile/app/(master)/index.tsx",
         "apps/mobile/app/(master)/subscription.tsx",
@@ -30135,6 +30255,7 @@
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
+        "apps/mobile/src/settings/email-change.test.tsx",
         "apps/mobile/src/store/hooks.ts",
         "apps/mobile/src/tracking/order-tracking.test.tsx",
         "apps/mobile/test/support/test-store.ts"
@@ -30163,6 +30284,7 @@
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
+        "apps/mobile/src/settings/email-change.test.tsx",
         "apps/mobile/src/tracking/order-tracking.test.tsx",
         "apps/mobile/test/support/test-store.ts"
       ],
@@ -30218,6 +30340,7 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/mobile/app/(auth)/sign-in.tsx",
         "apps/mobile/app/(auth)/verify.tsx",
         "apps/mobile/app/(shared)/reviews.tsx",
         "apps/mobile/app/index.tsx",
@@ -30267,6 +30390,8 @@
         "apps/mobile/src/realtime/session-recovery.ts",
         "apps/mobile/src/reviews/ReceivedReviews.test.tsx",
         "apps/mobile/src/settings/Settings.tsx",
+        "apps/mobile/src/settings/email-change-endpoints.ts",
+        "apps/mobile/src/settings/email-change.test.tsx",
         "apps/mobile/src/settings/settings-entry.test.tsx",
         "apps/mobile/src/store/index.ts",
         "apps/mobile/src/store/remembered-role.test.ts",
@@ -30303,11 +30428,94 @@
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/realtime/session-recovery.test.ts",
         "apps/mobile/src/reviews/ReceivedReviews.test.tsx",
+        "apps/mobile/src/settings/email-change.test.tsx",
         "apps/mobile/src/settings/settings-entry.test.tsx",
         "apps/mobile/src/store/remembered-role.test.ts",
         "apps/mobile/src/store/session-slice.test.ts",
         "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
+      "orphan": false
+    },
+    "apps/mobile/src/support/SupportLine.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/support/support-contact.ts",
+        "apps/mobile/src/support/support-copy.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/support/index.ts",
+        "apps/mobile/src/support/support.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/support/support.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/support/index.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/support/SupportLine.tsx",
+        "apps/mobile/src/support/support-contact.ts",
+        "apps/mobile/src/support/support-copy.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/app/(auth)/sign-in.tsx",
+        "apps/mobile/src/master-jobs/JobDetail.tsx",
+        "apps/mobile/src/master-onboarding/MasterOnboarding.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/support/support-contact.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/auth/email-address.ts",
+        "apps/mobile/src/support/support-copy.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/support/SupportLine.tsx",
+        "apps/mobile/src/support/index.ts",
+        "apps/mobile/src/support/support.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/support/support.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/support/support-copy.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/src/support/SupportLine.tsx",
+        "apps/mobile/src/support/index.ts",
+        "apps/mobile/src/support/support-contact.ts",
+        "apps/mobile/src/support/support.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/support/support.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/support/support.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/support/SupportLine.tsx",
+        "apps/mobile/src/support/support-contact.ts",
+        "apps/mobile/src/support/support-copy.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
       "orphan": false
     },
     "apps/mobile/src/theme/FixedScheme.test.tsx": {
@@ -31197,6 +31405,7 @@
         "apps/mobile/src/reviews/ReviewPrompt.test.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
+        "apps/mobile/src/settings/email-change.test.tsx",
         "apps/mobile/src/settings/settings-entry.test.tsx",
         "apps/mobile/src/store/remembered-role.test.ts",
         "apps/mobile/src/store/session-slice.test.ts",
@@ -31261,6 +31470,7 @@
         "apps/mobile/src/reviews/ReviewPrompt.test.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
+        "apps/mobile/src/settings/email-change.test.tsx",
         "apps/mobile/src/settings/settings-entry.test.tsx",
         "apps/mobile/src/store/remembered-role.test.ts",
         "apps/mobile/src/store/session-slice.test.ts",
@@ -31897,6 +32107,17 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "packages/types/src/email-change.ts": {
+      "workspace": "packages/types",
+      "module": "packages/types",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "packages/types/src/index.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "packages/types/src/geocoding.ts": {
       "workspace": "packages/types",
       "module": "packages/types",
@@ -31923,6 +32144,7 @@
         "packages/types/src/conversation.ts",
         "packages/types/src/customer.ts",
         "packages/types/src/device.ts",
+        "packages/types/src/email-change.ts",
         "packages/types/src/geocoding.ts",
         "packages/types/src/master-document.ts",
         "packages/types/src/master-job.ts",
@@ -32066,6 +32288,7 @@
         "apps/api/src/modules/admin/admin.repository.ts",
         "apps/api/src/modules/admin/admin.types.ts",
         "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
+        "apps/api/src/modules/auth/email-change.service.ts",
         "apps/api/src/modules/auth/web-auth.controller.ts",
         "apps/api/src/modules/billing/billing.repository.ts",
         "apps/api/src/modules/billing/subscription-auto-renewal.controller.ts",
@@ -32401,6 +32624,8 @@
         "apps/mobile/src/service-catalogue/format-service-price.ts",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.ts",
+        "apps/mobile/src/settings/EmailChange.tsx",
+        "apps/mobile/src/settings/email-change-endpoints.ts",
         "apps/mobile/src/tracking/MasterTracking.tsx",
         "apps/mobile/src/tracking/MasterTrackingCard.tsx",
         "apps/mobile/src/tracking/order-tracking.test.tsx",

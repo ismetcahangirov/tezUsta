@@ -17,6 +17,7 @@ import {
 import type { StatusTone } from '../components/StatusPill';
 import { useOwnMasterQuery } from '../master-jobs/master-jobs-endpoints';
 
+import { withSupportAddress } from '../support';
 import { MASTER_ONBOARDING_COPY as copy } from './master-onboarding-copy';
 import { useOwnDocumentsQuery, useSubmitVerificationMutation } from './master-onboarding-endpoints';
 import {
@@ -138,7 +139,10 @@ export function MasterOnboarding({
           />
         )}
         {step === 'closed' && (
-          <Outcome title={copy.closedTitle} description={copy.closedDescription} />
+          <Outcome
+            title={copy.closedTitle}
+            description={withSupportAddress(copy.closedDescription)}
+          />
         )}
         {(step === 'documents' || step === 'in_review') && (
           <DocumentsStep

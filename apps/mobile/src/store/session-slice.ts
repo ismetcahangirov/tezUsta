@@ -54,6 +54,14 @@ export interface SessionState {
    * (CLAUDE.md §11).
    */
   otpRequestedFor: string | null;
+  /**
+   * The address to prefill on the sign-in screen, set only when the session
+   * ended because the user changed their address (#516): every session is
+   * revoked, and the next thing they do is sign in with the new one. Held
+   * here for `otpRequestedFor`'s reason, and dropped once a code is requested
+   * or a session starts.
+   */
+  signInEmailHint: string | null;
 }
 
 const initialState: SessionState = {
@@ -62,7 +70,17 @@ const initialState: SessionState = {
   grantedRoles: [],
   role: 'customer',
   otpRequestedFor: null,
+  signInEmailHint: null,
 };
+
+/** What every way of ending a session drops. */
+function clearSession(state: SessionState): void {
+  state.status = 'signed-out';
+  state.userId = null;
+  state.grantedRoles = [];
+  state.role = initialState.role;
+  state.otpRequestedFor = null;
+}
 
 const sessionSlice = createSlice({
   name: 'session',
@@ -74,6 +92,7 @@ const sessionSlice = createSlice({
 
     otpRequested(state, action: PayloadAction<string>) {
       state.otpRequestedFor = action.payload;
+      state.signInEmailHint = null;
     },
 
     /**
@@ -91,6 +110,7 @@ const sessionSlice = createSlice({
       state.userId = userId;
       state.grantedRoles = [...roles];
       state.otpRequestedFor = null;
+      state.signInEmailHint = null;
 
       const preferredIsGranted = roles.length === 0 || roles.includes(state.role);
       if (!preferredIsGranted) {
@@ -107,11 +127,21 @@ const sessionSlice = createSlice({
      * showing them to the next person who signs in on the same device.
      */
     signedOut(state) {
-      state.status = 'signed-out';
-      state.userId = null;
-      state.grantedRoles = [];
-      state.role = initialState.role;
-      state.otpRequestedFor = null;
+      clearSession(state);
+      // `signInEmailHint` survives on purpose. After an address change the
+      // requests still in flight come back 401, fail to refresh and sign out
+      // again; clearing it here would lose the address the user is about to
+      // sign in with. Requesting a code or signing in is what drops it.
+    },
+
+    /**
+     * The account's address moved and the server revoked every session
+     * (#514). Dispatched right after `signedOut`, which every other slice
+     * already listens to, so the new address is kept for the sign-in screen
+     * to start from without a second kind of sign-out to keep in step.
+     */
+    signInEmailHinted(state, action: PayloadAction<string>) {
+      state.signInEmailHint = action.payload;
     },
   },
   selectors: {
@@ -120,19 +150,22 @@ const sessionSlice = createSlice({
     selectUserId: (state) => state.userId,
     selectGrantedRoles: (state): readonly AppRole[] => state.grantedRoles,
     selectOtpRequestedFor: (state) => state.otpRequestedFor,
+    selectSignInEmailHint: (state) => state.signInEmailHint,
     /** True only for a user the token says holds both roles. */
     selectCanSwitchRole: (state) =>
       state.grantedRoles.includes('customer') && state.grantedRoles.includes('master'),
   },
 });
 
-export const { roleSelected, otpRequested, signedIn, signedOut } = sessionSlice.actions;
+export const { roleSelected, otpRequested, signedIn, signedOut, signInEmailHinted } =
+  sessionSlice.actions;
 export const {
   selectRole,
   selectAuthStatus,
   selectUserId,
   selectGrantedRoles,
   selectOtpRequestedFor,
+  selectSignInEmailHint,
   selectCanSwitchRole,
 } = sessionSlice.getSelectors((root: { session: SessionState }) => root.session);
 

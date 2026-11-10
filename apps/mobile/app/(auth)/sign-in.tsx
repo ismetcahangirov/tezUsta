@@ -7,6 +7,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { canPickGoogleAccount, pickGoogleAccount } from '../../modules/google-account-picker';
 import { isPlausibleEmail, normaliseEmail, useRequestOtpMutation } from '../../src/auth';
 import { Button, Text, TextField, Wordmark } from '../../src/components';
+import { useAppSelector } from '../../src/store/hooks';
+import { selectSignInEmailHint } from '../../src/store/session-slice';
+import { SupportLine } from '../../src/support';
 
 /**
  * Sign-in is one of the design system's inverse surfaces — the reference does
@@ -28,7 +31,9 @@ import { Button, Text, TextField, Wordmark } from '../../src/components';
  * to the address by email, and nothing signs in with Google (ADR-0072).
  */
 export default function SignInScreen(): React.JSX.Element {
-  const [email, setEmail] = useState('');
+  // Prefilled only after an address change signed this device out (#516).
+  const hint = useAppSelector(selectSignInEmailHint);
+  const [email, setEmail] = useState(hint ?? '');
   // Set by a submit the shape check refused, and cleared by the next edit — an
   // error that stays up while the user is fixing the address reads as though
   // the fix did not take.
@@ -117,17 +122,22 @@ export default function SignInScreen(): React.JSX.Element {
           />
         </View>
 
-        <Button
-          label="Kod göndər"
-          variant="accent"
-          size="lg"
-          fullWidth
-          loading={isLoading}
-          disabled={email.trim() === ''}
-          onPress={() => {
-            void submit();
-          }}
-        />
+        <View className="gap-4">
+          <Button
+            label="Kod göndər"
+            variant="accent"
+            size="lg"
+            fullWidth
+            loading={isLoading}
+            disabled={email.trim() === ''}
+            onPress={() => {
+              void submit();
+            }}
+          />
+          {/* For a user who can no longer read their address (ADR-0074 § 6).
+              Hidden until the support address is configured. */}
+          <SupportLine tone="on-inverse" />
+        </View>
       </View>
     </SafeAreaView>
   );

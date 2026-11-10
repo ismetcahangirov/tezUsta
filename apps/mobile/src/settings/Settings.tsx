@@ -19,6 +19,7 @@ import {
   useSchemePreference,
   type SchemePreference,
 } from '../theme/scheme-preference';
+import { EMAIL_CHANGE_COPY } from './email-change-copy';
 import { SETTINGS_COPY as copy } from './settings-copy';
 
 const SCHEMES = [
@@ -135,6 +136,17 @@ export function Settings(): React.JSX.Element {
             both roles — the same "this is the screen both can reach" reason
             as everything else in this section.
           */}
+          {/*
+            The sign-in address, for both roles (#516, ADR-0074 § 1).
+          */}
+          <Button
+            label={EMAIL_CHANGE_COPY.entry}
+            variant="secondary"
+            fullWidth
+            onPress={() => {
+              router.push('/(shared)/email-change');
+            }}
+          />
           <Button
             label={REVIEWS_COPY.received.entry}
             variant="secondary"

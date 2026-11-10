@@ -225,9 +225,12 @@ in the one place where a mistake is a privilege escalation.
 
 ### Changing the sign-in address (issue #514, ADR-0074 § 1)
 
-`POST /me/email-change` with `{ newEmail }`, then
-`POST /me/email-change/confirm` with `{ currentCode, newCode }`. Both need a
-session; neither needs a role.
+`POST /me/email-change` with `{ newEmail }`, answered with
+`{ expiresInSeconds, currentEmail }`, then `POST /me/email-change/confirm` with
+`{ currentCode, newCode }`. Both need a session; neither needs a role.
+`currentEmail` is the account's own address, returned to its own session so the
+app can label each code field by the inbox it went to (#516); it says nothing
+about the new address.
 
 - **Two codes, entered together:** one to the address the account has now, one
   to the new address. A stolen, unlocked phone with a live session is not
