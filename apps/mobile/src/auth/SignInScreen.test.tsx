@@ -29,6 +29,16 @@ jest.mock('expo-router', () => ({
   },
 }));
 
+// The Android account chooser (#510). Unavailable by default, as it is on
+// iOS, web and Expo Go; the tests for it turn it on.
+const mockCanPick = jest.fn(() => false);
+const mockPick = jest.fn<Promise<string | null>, []>(() => Promise.resolve(null));
+
+jest.mock('../../modules/google-account-picker', () => ({
+  canPickGoogleAccount: () => mockCanPick(),
+  pickGoogleAccount: () => mockPick(),
+}));
+
 /** See `VerifyScreen.test.tsx`: the budget is the machine's, not the app's. */
 const SETTLED = { timeout: 10_000 };
 
@@ -132,5 +142,85 @@ describe('signing in with an email address', () => {
     }, SETTLED);
     expect(mockPush).not.toHaveBeenCalled();
     expect(selectOtpRequestedFor(store.getState())).toBeNull();
+  });
+});
+
+describe("offering the phone's Google accounts (#510)", () => {
+  beforeEach(() => {
+    mockPush.mockClear();
+    mockPick.mockReset();
+    mockCanPick.mockReturnValue(true);
+  });
+
+  afterEach(() => {
+    mockCanPick.mockReturnValue(false);
+  });
+
+  it('fills the field with the account picked on the first tap', async () => {
+    mockPick.mockResolvedValue('aysel@gmail.com');
+    installTransport(200);
+    await mount(createTestStore());
+
+    await fireEvent(screen.getByLabelText(FIELD), 'focus');
+
+    await waitFor(() => {
+      expect(screen.getByLabelText(FIELD)).toHaveProp('value', 'aysel@gmail.com');
+    });
+    expect(mockPick).toHaveBeenCalledTimes(1);
+  });
+
+  it('sends the picked address like a typed one', async () => {
+    mockPick.mockResolvedValue('Aysel@Gmail.com');
+    installTransport(200);
+    await mount(createTestStore());
+
+    await fireEvent(screen.getByLabelText(FIELD), 'focus');
+    await waitFor(() => {
+      expect(screen.getByLabelText(FIELD)).toHaveProp('value', 'Aysel@Gmail.com');
+    });
+    await fireEvent.press(screen.getByRole('button', { name: SUBMIT }));
+
+    await waitFor(() => {
+      expect(mockPush).toHaveBeenCalledWith('/(auth)/verify');
+    }, SETTLED);
+    expect(requestBodies).toEqual([{ email: 'aysel@gmail.com' }]);
+  });
+
+  it('leaves the field empty when the chooser is dismissed, and does not reopen it', async () => {
+    mockPick.mockResolvedValue(null);
+    installTransport(200);
+    await mount(createTestStore());
+    const field = screen.getByLabelText(FIELD);
+
+    await fireEvent(field, 'focus');
+    await waitFor(() => {
+      expect(mockPick).toHaveBeenCalledTimes(1);
+    });
+    await fireEvent(field, 'blur');
+    await fireEvent(field, 'focus');
+
+    expect(mockPick).toHaveBeenCalledTimes(1);
+    expect(screen.getByLabelText(FIELD)).toHaveProp('value', '');
+  });
+
+  it('does not interrupt a field that already has an address in it', async () => {
+    installTransport(200);
+    await mount(createTestStore());
+    const field = screen.getByLabelText(FIELD);
+
+    await fireEvent.changeText(field, 'aysel@example.az');
+    await fireEvent(field, 'focus');
+
+    expect(mockPick).not.toHaveBeenCalled();
+  });
+
+  it('goes straight to the keyboard where the chooser does not exist', async () => {
+    mockCanPick.mockReturnValue(false);
+    installTransport(200);
+    await mount(createTestStore());
+
+    await fireEvent(screen.getByLabelText(FIELD), 'focus');
+
+    expect(mockPick).not.toHaveBeenCalled();
   });
 });

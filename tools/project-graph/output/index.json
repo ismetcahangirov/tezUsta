@@ -5,7 +5,7 @@
     "tools"
   ],
   "totals": {
-    "files": 1450,
+    "files": 1451,
     "tests": 433,
     "violations": 0
   },
@@ -360,7 +360,7 @@
       ]
     },
     "apps/mobile": {
-      "files": 560,
+      "files": 561,
       "tests": 183,
       "untested": [
         "apps/mobile/.storybook/main.ts",
@@ -408,6 +408,7 @@
         "apps/mobile/jest.config.js",
         "apps/mobile/jest.setup.js",
         "apps/mobile/metro.config.js",
+        "apps/mobile/modules/google-account-picker/index.ts",
         "apps/mobile/nativewind-env.d.ts",
         "apps/mobile/src/addresses/AddressForm.stories.tsx",
         "apps/mobile/src/addresses/AddressList.stories.tsx",
@@ -20570,6 +20571,7 @@
       "module": "apps/mobile/app/(auth)",
       "isTest": false,
       "dependsOn": [
+        "apps/mobile/modules/google-account-picker/index.ts",
         "apps/mobile/src/auth/index.ts",
         "apps/mobile/src/components/index.ts"
       ],
@@ -21143,6 +21145,17 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/modules/google-account-picker/index.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/app/(auth)/sign-in.tsx"
+      ],
       "coveredByTests": [],
       "orphan": false
     },

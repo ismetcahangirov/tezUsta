@@ -93715,6 +93715,23 @@
       "dependencies": [
         {
           "dynamic": false,
+          "module": "../../modules/google-account-picker",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/modules/google-account-picker/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../../src/auth",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -95438,6 +95455,15 @@
       "source": "apps/mobile/metro.config.js",
       "dependencies": [],
       "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/modules/google-account-picker/index.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/app/(auth)/sign-in.tsx"
+      ],
       "orphan": false,
       "valid": true
     },
@@ -137912,8 +137938,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 1450,
-    "totalDependenciesCruised": 6904,
+    "totalCruised": 1451,
+    "totalDependenciesCruised": 6905,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

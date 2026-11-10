@@ -26,6 +26,9 @@ build/
 *.orig.*
 ios/
 android/
+# A local Expo module's native code is source, not generated output (#510).
+!apps/mobile/modules/*/android/
+apps/mobile/modules/*/android/build/
 
 # Native credentials
 google-services.json
