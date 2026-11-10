@@ -39,7 +39,13 @@ export type AdminPermission =
   | 'audit.read'
   | 'admins.manage'
   | 'subscriptions.read'
-  | 'subscriptions.manage';
+  | 'subscriptions.manage'
+  /**
+   * ADR-0074 § 3 (#515): open, verify and cancel a support-mediated account
+   * recovery. Approving the move additionally needs the `super_admin` role
+   * and a different admin from the one who opened it.
+   */
+  | 'accounts.recover';
 
 /** `GET /admin/me` — the signed-in admin, read from the database on this request. */
 export interface AdminMe {

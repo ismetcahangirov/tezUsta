@@ -409,6 +409,38 @@ export const ERROR_CODES = {
   EMAIL_CHANGE_SAME_ADDRESS: 'EMAIL_CHANGE_SAME_ADDRESS',
   EMAIL_CHANGE_CODE_INVALID: 'EMAIL_CHANGE_CODE_INVALID',
   EMAIL_ADDRESS_TAKEN: 'EMAIL_ADDRESS_TAKEN',
+  /**
+   * #515 (ADR-0074 § 2): a support-mediated recovery is open on the account,
+   * so a self-serve change cannot start. The owner was mailed a cancel link
+   * when it opened; a change racing it would leave two moves for one account.
+   */
+  EMAIL_CHANGE_RECOVERY_PENDING: 'EMAIL_CHANGE_RECOVERY_PENDING',
+
+  /**
+   * #515 (ADR-0074 §§ 2–3). Support-mediated recovery, each a different
+   * sentence in the panel:
+   *
+   * - `ACCOUNT_RECOVERY_ALREADY_OPEN` — the account has an open request.
+   * - `ACCOUNT_RECOVERY_CHANGE_PENDING` — the user has a self-serve change
+   *   pending; it must finish or expire first.
+   * - `ACCOUNT_RECOVERY_ACCOUNT_INACTIVE` — the account is suspended or deleted.
+   * - `ACCOUNT_RECOVERY_CODE_INVALID` — the code from the new address is
+   *   wrong or has expired.
+   * - `ACCOUNT_RECOVERY_NOT_ALLOWED_NOW` — the request is not where the action
+   *   starts from (already verified, cancelled, moved); `details.status` says
+   *   where it is.
+   * - `ACCOUNT_RECOVERY_HOLD_RUNNING` — approved before the 72-hour hold
+   *   ended; `details.holdUntil` says when it does.
+   * - `ACCOUNT_RECOVERY_SAME_ADMIN` — the approver opened the request. No
+   *   single admin both accepts the evidence and moves the account.
+   */
+  ACCOUNT_RECOVERY_ALREADY_OPEN: 'ACCOUNT_RECOVERY_ALREADY_OPEN',
+  ACCOUNT_RECOVERY_CHANGE_PENDING: 'ACCOUNT_RECOVERY_CHANGE_PENDING',
+  ACCOUNT_RECOVERY_ACCOUNT_INACTIVE: 'ACCOUNT_RECOVERY_ACCOUNT_INACTIVE',
+  ACCOUNT_RECOVERY_CODE_INVALID: 'ACCOUNT_RECOVERY_CODE_INVALID',
+  ACCOUNT_RECOVERY_NOT_ALLOWED_NOW: 'ACCOUNT_RECOVERY_NOT_ALLOWED_NOW',
+  ACCOUNT_RECOVERY_HOLD_RUNNING: 'ACCOUNT_RECOVERY_HOLD_RUNNING',
+  ACCOUNT_RECOVERY_SAME_ADMIN: 'ACCOUNT_RECOVERY_SAME_ADMIN',
 } as const;
 
 export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES];

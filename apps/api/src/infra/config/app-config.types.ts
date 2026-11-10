@@ -245,6 +245,11 @@ export interface AppConfig {
       /** Below this share of codes entered correctly, sending stops. 0 is off. */
       readonly breakerMinSuccessPercent: number;
     };
+    /**
+     * Where this API is reached from a browser; the cancel link in an
+     * account-recovery notice is built on it (ADR-0074 § 2, #515).
+     */
+    readonly recoveryLinkBaseUrl: string;
   };
 
   /** Subscription billing (issue #323, ADR-0057). */

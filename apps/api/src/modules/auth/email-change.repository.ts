@@ -1,14 +1,16 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, eq, gt, isNull } from 'drizzle-orm';
+import { and, eq, gt, isNull, sql } from 'drizzle-orm';
 
 import { isUniqueViolation } from '../../infra/database/database-error';
 import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
 import type { Database, DatabaseExecutor } from '../../infra/database/database.types';
+import { accountRecoveryRequests } from '../../infra/database/schema/account-recovery';
 import type {
   EmailChangeInvalidationReasonName,
   EmailChangeRow,
 } from '../../infra/database/schema/email-changes';
 import { emailChanges } from '../../infra/database/schema/email-changes';
+import { users } from '../../infra/database/schema/users';
 
 export interface NewEmailChangeInput {
   readonly id: string;
@@ -36,8 +38,15 @@ export class EmailChangeRepository {
    * transaction. Retried once on a unique violation, exactly as
    * `OtpRepository.replaceLiveChallenge` is and for the same proven reason: the
    * retry runs after the winner committed, so its supersede finds that row.
+   *
+   * Answers `recovery-pending`, writing nothing, while support has a recovery
+   * open on the account (#515). The account's `users` row is locked first, as
+   * opening a recovery locks it, so the two cannot both pass their checks.
    */
-  async replaceLive(input: NewEmailChangeInput, now: Date): Promise<EmailChangeRow> {
+  async replaceLive(
+    input: NewEmailChangeInput,
+    now: Date,
+  ): Promise<EmailChangeRow | 'recovery-pending'> {
     try {
       return await this.write(input, now);
     } catch (error: unknown) {
@@ -48,8 +57,27 @@ export class EmailChangeRepository {
     }
   }
 
-  private async write(input: NewEmailChangeInput, now: Date): Promise<EmailChangeRow> {
+  private async write(
+    input: NewEmailChangeInput,
+    now: Date,
+  ): Promise<EmailChangeRow | 'recovery-pending'> {
     return this.db.transaction(async (tx) => {
+      await tx.execute(sql`select 1 from ${users} where ${users.id} = ${input.userId} for update`);
+      const [recovery] = await tx
+        .select({ id: accountRecoveryRequests.id })
+        .from(accountRecoveryRequests)
+        .where(
+          and(
+            eq(accountRecoveryRequests.userId, input.userId),
+            isNull(accountRecoveryRequests.cancelledAt),
+            isNull(accountRecoveryRequests.movedAt),
+          ),
+        )
+        .limit(1);
+      if (recovery !== undefined) {
+        return 'recovery-pending';
+      }
+
       await tx
         .update(emailChanges)
         .set({ invalidatedAt: now, invalidatedReason: 'superseded' })

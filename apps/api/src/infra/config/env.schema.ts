@@ -802,6 +802,16 @@ export const rawEnvSchema = z
     // for development and tests, and it refuses production. A real provider
     // is one adapter in `infra/email/` and one enum member here.
     EMAIL_PROVIDER: z.preprocess(emptyToUndefined, z.enum(['stub']).default('stub')),
+    // Where this API is reached from a browser, for the cancel link in an
+    // account-recovery notice (ADR-0074 § 2, #515). The link opens a page this
+    // API serves, and the token travels in the fragment, which a browser
+    // never sends, so it stays out of access logs, as the admin setup link's
+    // does. https in production, enforced by the module that builds the link
+    // (`account-recovery.service.ts`), as `ADMIN_SETUP_LINK_BASE_URL` is.
+    ACCOUNT_RECOVERY_LINK_BASE_URL: z.preprocess(
+      emptyToUndefined,
+      z.url({ protocol: /^https?$/ }).default('http://localhost:3000'),
+    ),
     // The pepper every OTP code is HMAC'd under before it reaches a database
     // row. Optional here and required by the module that needs it (`OtpModule`
     // — see `otp.config.ts`), exactly like the JWT secrets and the rate-limit
@@ -2266,6 +2276,7 @@ export function toAppConfig(env: RawEnv): AppConfig {
         breakerMinSends: env.OTP_BREAKER_MIN_SENDS,
         breakerMinSuccessPercent: env.OTP_BREAKER_MIN_SUCCESS_PERCENT,
       }),
+      recoveryLinkBaseUrl: env.ACCOUNT_RECOVERY_LINK_BASE_URL,
     }),
     billing: Object.freeze({
       provider: env.BILLING_PROVIDER,

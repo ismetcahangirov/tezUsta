@@ -102,6 +102,7 @@ export const ALL_PERMISSIONS: readonly AdminPermission[] = [
   'admins.manage',
   'subscriptions.read',
   'subscriptions.manage',
+  'accounts.recover',
 ];
 
 export function adminMe(overrides: Partial<AdminMe> = {}): AdminMe {

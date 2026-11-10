@@ -141,6 +141,11 @@ describe('changing the sign-in address', () => {
     ['the same address', refusal(422, 'EMAIL_CHANGE_SAME_ADDRESS'), copy.errors.sameAddress],
     ['an address the server refuses', refusal(422, 'VALIDATION_FAILED'), copy.errors.malformed],
     ['too many starts', refusal(429, 'RATE_LIMITED'), copy.errors.tooManyAttempts],
+    [
+      'a recovery support has open',
+      refusal(409, 'EMAIL_CHANGE_RECOVERY_PENDING'),
+      copy.errors.recoveryPending,
+    ],
   ])(
     'says so when the start is refused for %s, and lets the user try again',
     async (_, reply, message) => {

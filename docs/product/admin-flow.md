@@ -195,6 +195,28 @@ super_admin) can suspend and reinstate.
   cancelled. Both actions take a reason and are audited in the same
   transaction as the change.
 
+### 8a. Account recovery
+
+When a user has lost the mailbox they sign in with, support recovers the
+account (#515,
+[ADR-0074](../decisions/ADR-0074-account-recovery-and-email-change.md) §§ 2–5).
+`accounts.recover` (support and super_admin) opens, verifies and cancels a
+request; approving the move takes a `super_admin` who did not open it.
+
+- **Open** a request against the customer or master, with the evidence in your
+  own words: for a master, a fresh selfie with the same ID card and the card's
+  front, matched against the documents on file; for a customer, at least three
+  facts about the account, asked without prompting. A code goes to the new
+  address.
+- **Verify** the code the user reads back. The 72-hour hold starts and the old
+  address is mailed a link that cancels.
+- **Approve** after the hold. The address moves and every session ends; the
+  user signs in with the new address and finds everything where it was.
+- Both addresses are masked; revealing them needs `pii.read` and a reason.
+  Every step is audited with the admin and the reason.
+
+The panel's view of this (#517) is not built yet; the API is.
+
 ### 9. Portfolio moderation
 
 The **Portfolio** page (#312,

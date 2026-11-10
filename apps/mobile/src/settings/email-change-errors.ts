@@ -25,8 +25,9 @@ function httpStatusOf(error: unknown): number | undefined {
  * - `422 VALIDATION_FAILED` on a start: the server did not accept the
  *   address. On a confirm it can only be a code that is not digits.
  *
- * "A change already pending" is not a refusal: a new start replaces it. A
- * recovery in progress (#515) has no code yet and falls to the generic line.
+ * "A change already pending" is not a refusal: a new start replaces it.
+ * `409 EMAIL_CHANGE_RECOVERY_PENDING`: support has a recovery open on the
+ * account (#515); the owner was mailed a link to cancel it.
  */
 export function emailChangeErrorMessage(stage: EmailChangeStage, error: unknown): string {
   switch (errorCodeOf(error)) {
@@ -36,6 +37,8 @@ export function emailChangeErrorMessage(stage: EmailChangeStage, error: unknown)
       return copy.taken;
     case 'EMAIL_CHANGE_CODE_INVALID':
       return copy.codeInvalid;
+    case 'EMAIL_CHANGE_RECOVERY_PENDING':
+      return copy.recoveryPending;
     case 'RATE_LIMITED':
       return copy.tooManyAttempts;
     case 'VALIDATION_FAILED':
