@@ -1,4 +1,8 @@
-import type { AccountRecoveryCancelSource, AccountRecoveryStatus } from '@tezusta/types';
+import type {
+  AccountRecoveryCancelSource,
+  AccountRecoveryPhotoKind,
+  AccountRecoveryStatus,
+} from '@tezusta/types';
 
 import type { ApiFailure } from '../../api/api-error';
 
@@ -128,7 +132,7 @@ export const recoveriesCopy = {
     masterEvidenceBody:
       'Ask for a fresh selfie holding the same ID card, and a photo of the card’s front. Compare both with the documents on file in this master’s Documents section: the same card number and the same face.',
     masterPhotosNote:
-      'Until the panel can store them (#524), the new photos stay in the support mailbox.',
+      'Once the request is open, add both photos on its page, where they are shown beside the documents on file.',
     masterMatch: 'Same card, same face: the new photos match the documents on file.',
     masterMatchRequired: 'Confirm the match before opening the request.',
 
@@ -151,7 +155,40 @@ export const recoveriesCopy = {
     summary: (facts: readonly string[]) => `Matched facts: ${facts.join('; ')}.`,
   },
 
+  photos: {
+    title: 'Evidence photos',
+    intro:
+      'The new photos the user sent, beside the documents on file. Each photo opened is recorded in the audit log.',
+    caption: 'Evidence photos and documents on file',
+    columns: { kind: 'Photo', added: 'New photo', onFile: 'On file' },
+    kind: {
+      selfie_with_id: 'Selfie with the ID card',
+      id_card_front: 'ID card, front',
+    } satisfies Record<AccountRecoveryPhotoKind, string>,
+    open: 'Open',
+    opening: 'Opening…',
+    openLabel: (what: string) => `Open ${what}`,
+    openFileLabel: (what: string) => `Open ${what} on file`,
+    openFailed: 'The photo could not be opened. Try again.',
+    added: (name: string, at: string) => `Added by ${name}, ${at}`,
+    uploadLabel: (what: string) => `Add: ${what}`,
+    uploading: 'Uploading…',
+    notAdded: 'Not added',
+    noneOnFile: 'Nothing on file',
+    loadFailed: 'The photos could not be loaded.',
+    filesUnavailable: 'The documents on file could not be loaded.',
+    notImage: 'Choose a JPEG, PNG or WebP photo.',
+    tooLarge: (limit: string) => `The photo is larger than ${limit}. Send a smaller one.`,
+    storageUnreachable:
+      'The photo could not reach storage. Nothing was saved. If this keeps happening, the storage setup for the panel needs checking (ADR-0075).',
+    refused: 'The file is not a JPEG, PNG or WebP photo, or is over the size limit. Nothing was saved.',
+    notArrived: 'The upload did not finish. Try again.',
+  },
+
   errors: {
+    ACCOUNT_RECOVERY_PHOTOS_MASTER_ONLY: 'Photos are evidence for a master’s account only.',
+    ACCOUNT_RECOVERY_PHOTO_EXISTS:
+      'This photo is already on the request. To use a different one, cancel the request and open a new one.',
     ACCOUNT_RECOVERY_ALREADY_OPEN: 'This account already has an open recovery.',
     ACCOUNT_RECOVERY_CHANGE_PENDING:
       'The user has an address change of their own pending. It must finish or expire first.',

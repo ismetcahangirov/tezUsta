@@ -5,14 +5,25 @@
 # other path is the panel: a file if one exists, `index.html` if not, so a
 # deep link reloads.
 #
-# Rendered at start by the image's entrypoint: `${API_UPSTREAM}` is the one
-# variable substituted (`envsubst` only touches variables that are set), and
-# nginx's own `$uri`, `$host` and friends are left alone.
+# Rendered at start by the image's entrypoint: `${API_UPSTREAM}` and
+# `${PANEL_STORAGE_UPLOAD_ORIGIN}` are the variables substituted (`envsubst`
+# only touches variables that are set; the Dockerfile sets the second to empty),
+# and nginx's own `$uri`, `$host` and friends are left alone.
 
 # A WebSocket upgrade passes through; a plain request keeps the connection.
 map $http_upgrade $connection_upgrade {
   default upgrade;
   '' close;
+}
+
+# The CSP's `connect-src` (ADR-0075, #524): this origin, plus the private
+# bucket's upload origin when one is configured, so the browser can PUT a
+# recovery evidence photo to its presigned URL. Unset, the policy is exactly
+# ADR-0052's. The value is checked at start by `15-panel-storage-origin.sh`,
+# so it can only ever be one https origin, never another directive.
+map "${PANEL_STORAGE_UPLOAD_ORIGIN}" $panel_connect_src {
+  ""      "'self'";
+  default "'self' ${PANEL_STORAGE_UPLOAD_ORIGIN}";
 }
 
 server {

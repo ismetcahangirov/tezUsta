@@ -1,12 +1,21 @@
 import { Body, Controller, Get, HttpCode, Param, Post } from '@nestjs/common';
-import type { AdminAccountRecovery, AdminAccountRecoveryEmails } from '@tezusta/types';
+import type {
+  AdminAccountRecovery,
+  AdminAccountRecoveryEmails,
+  AdminAccountRecoveryPhoto,
+  AdminAccountRecoveryPhotoDownload,
+  AdminAccountRecoveryPhotoUpload,
+} from '@tezusta/types';
 
 import { RequireAdminPermission } from '../admin/admin-permission.decorator';
 import type { AdminActor } from '../admin/admin.types';
 import { CurrentAdmin } from '../admin/current-admin.decorator';
+import { AccountRecoveryPhotosService } from './account-recovery-photos.service';
 import {
   OpenRecoveryDto,
+  PresignRecoveryPhotoDto,
   RecoveryIdParamsDto,
+  RecoveryPhotoParamsDto,
   RecoveryReasonDto,
   VerifyRecoveryDto,
 } from './account-recovery.schema';
@@ -24,7 +33,10 @@ import { AccountRecoveryService } from './account-recovery.service';
  */
 @Controller('admin/account-recoveries')
 export class AdminAccountRecoveryController {
-  constructor(private readonly recoveries: AccountRecoveryService) {}
+  constructor(
+    private readonly recoveries: AccountRecoveryService,
+    private readonly photos: AccountRecoveryPhotosService,
+  ) {}
 
   /** Every open request, oldest first. */
   @RequireAdminPermission('accounts.recover')
@@ -105,5 +117,44 @@ export class AdminAccountRecoveryController {
     @Body() body: RecoveryReasonDto,
   ): Promise<AdminAccountRecoveryEmails> {
     return this.recoveries.revealEmails(admin, params.id, body.reason);
+  }
+
+  /** The stored evidence photos of a master's request (#524), without links. */
+  @RequireAdminPermission('accounts.recover')
+  @Get(':id/photos')
+  listPhotos(@Param() params: RecoveryIdParamsDto): Promise<AdminAccountRecoveryPhoto[]> {
+    return this.photos.list(params.id);
+  }
+
+  /** A presigned PUT for one photo, while the request is open. */
+  @RequireAdminPermission('accounts.recover')
+  @Post(':id/photos')
+  presignPhoto(
+    @CurrentAdmin() admin: AdminActor,
+    @Param() params: RecoveryIdParamsDto,
+    @Body() body: PresignRecoveryPhotoDto,
+  ): Promise<AdminAccountRecoveryPhotoUpload> {
+    return this.photos.presign(admin, params.id, body);
+  }
+
+  /** Checks the uploaded bytes and stores the photo, audited. */
+  @RequireAdminPermission('accounts.recover')
+  @HttpCode(200)
+  @Post(':id/photos/:photoId/confirm')
+  confirmPhoto(
+    @CurrentAdmin() admin: AdminActor,
+    @Param() params: RecoveryPhotoParamsDto,
+  ): Promise<AdminAccountRecoveryPhoto> {
+    return this.photos.confirm(admin, params.id, params.photoId);
+  }
+
+  /** A short-lived read link; each one issued is audited against the photo. */
+  @RequireAdminPermission('accounts.recover')
+  @Get(':id/photos/:photoId/download')
+  downloadPhoto(
+    @CurrentAdmin() admin: AdminActor,
+    @Param() params: RecoveryPhotoParamsDto,
+  ): Promise<AdminAccountRecoveryPhotoDownload> {
+    return this.photos.presignDownload(admin, params.id, params.photoId);
   }
 }

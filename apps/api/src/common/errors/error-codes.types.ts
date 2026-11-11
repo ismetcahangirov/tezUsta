@@ -441,6 +441,18 @@ export const ERROR_CODES = {
   ACCOUNT_RECOVERY_NOT_ALLOWED_NOW: 'ACCOUNT_RECOVERY_NOT_ALLOWED_NOW',
   ACCOUNT_RECOVERY_HOLD_RUNNING: 'ACCOUNT_RECOVERY_HOLD_RUNNING',
   ACCOUNT_RECOVERY_SAME_ADMIN: 'ACCOUNT_RECOVERY_SAME_ADMIN',
+
+  /**
+   * #524 (ADR-0074 § 2). The evidence photos of a recovery request:
+   *
+   * - `ACCOUNT_RECOVERY_PHOTOS_MASTER_ONLY` — the account has no master
+   *   profile; a customer's evidence is the facts in the notes.
+   * - `ACCOUNT_RECOVERY_PHOTO_EXISTS` — a photo of this kind is already
+   *   stored. It is the record of what the request was opened on and is not
+   *   replaced; a wrong one means cancelling and opening again.
+   */
+  ACCOUNT_RECOVERY_PHOTOS_MASTER_ONLY: 'ACCOUNT_RECOVERY_PHOTOS_MASTER_ONLY',
+  ACCOUNT_RECOVERY_PHOTO_EXISTS: 'ACCOUNT_RECOVERY_PHOTO_EXISTS',
 } as const;
 
 export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES];

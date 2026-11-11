@@ -18,6 +18,7 @@ import {
 } from './api';
 import { recoveriesCopy, recoveryErrorMessage } from './copy';
 import { ReasonDialog, RevealEmailsDialog } from './RecoveryDialogs';
+import { RecoveryPhotos } from './RecoveryPhotos';
 import { adminName, approveBlocker, canApprove, holdLeft, isOpen } from './rules';
 
 const LINK_CLASS =
@@ -207,6 +208,8 @@ function Recovery({ recovery }: { recovery: AdminAccountRecovery }) {
           )}
         </dl>
       </section>
+
+      {recovery.masterId !== null && <RecoveryPhotos recovery={recovery} />}
 
       <section className="flex flex-col gap-3">
         <h2 className="text-h2 text-text">{recoveriesCopy.evidence}</h2>

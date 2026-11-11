@@ -167,6 +167,9 @@ services:
       dockerfile: apps/admin/Dockerfile
     environment:
       API_UPSTREAM: ${API_UPSTREAM:-http://api:3000}
+      # The private bucket's upload origin for the panel's CSP (ADR-0075).
+      # Empty locally: the stub storage hands out no real upload URL.
+      PANEL_STORAGE_UPLOAD_ORIGIN: ${PANEL_STORAGE_UPLOAD_ORIGIN:-}
     depends_on:
       api:
         condition: service_healthy

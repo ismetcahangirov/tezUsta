@@ -44,11 +44,16 @@ export type {
 export type {
   AccountRecoveryCancelRequest,
   AccountRecoveryCancelSource,
+  AccountRecoveryPhotoKind,
   AccountRecoveryStatus,
   AccountRecoverySubject,
   AdminAccountRecovery,
   AdminAccountRecoveryEmails,
   AdminAccountRecoveryOpenRequest,
+  AdminAccountRecoveryPhoto,
+  AdminAccountRecoveryPhotoDownload,
+  AdminAccountRecoveryPhotoPresignRequest,
+  AdminAccountRecoveryPhotoUpload,
   AdminAccountRecoveryReasonRequest,
   AdminAccountRecoveryVerifyRequest,
 } from './admin-account-recovery.js';

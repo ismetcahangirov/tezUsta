@@ -3,7 +3,14 @@ import { randomUUID } from 'node:crypto';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { FastifyAdapter } from '@nestjs/platform-fastify';
 import { Test } from '@nestjs/testing';
-import type { AdminAccountRecovery, AdminAccountRecoveryEmails, AdminRole } from '@tezusta/types';
+import type {
+  AdminAccountRecovery,
+  AdminAccountRecoveryEmails,
+  AdminAccountRecoveryPhoto,
+  AdminAccountRecoveryPhotoDownload,
+  AdminAccountRecoveryPhotoUpload,
+  AdminRole,
+} from '@tezusta/types';
 import { Pool } from 'pg';
 import request from 'supertest';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -22,6 +29,9 @@ import type {
 } from '../src/infra/rate-limit/rate-limit.config';
 import { RATE_LIMIT_CONFIG } from '../src/infra/rate-limit/rate-limit.tokens';
 import { RateLimiterService } from '../src/infra/rate-limit/rate-limiter.service';
+import type { StubStorageProvider } from '../src/infra/storage/stub-storage.provider';
+import { STORAGE_PROVIDER } from '../src/infra/storage/storage.types';
+import { AccountRecoveryPhotosRepository } from '../src/modules/account-recovery/account-recovery-photos.repository';
 import { AdminRepository } from '../src/modules/admin/admin.repository';
 import { AdminSessionService } from '../src/modules/admin/admin-session.service';
 import { SessionsService } from '../src/modules/auth/sessions.service';
@@ -771,5 +781,237 @@ describe('what stays out of the audit log', () => {
     for (const { row } of rows) {
       expect(row).not.toContain('12345678');
     }
+  });
+});
+
+describe('the evidence photos (#524, ADR-0074 § 2)', () => {
+  type Kind = 'selfie_with_id' | 'id_card_front';
+
+  function jpeg(size = 64): Uint8Array {
+    const bytes = new Uint8Array(size);
+    bytes.set([0xff, 0xd8, 0xff, 0xe0]);
+    return bytes;
+  }
+
+  function storage(): StubStorageProvider {
+    return app.get<StubStorageProvider>(STORAGE_PROVIDER);
+  }
+
+  async function keyOf(photoId: string): Promise<string> {
+    return (
+      await one<{ storage_key: string }>(
+        `select storage_key from account_recovery_photos where id = $1`,
+        [photoId],
+      )
+    ).storage_key;
+  }
+
+  function presign(admin: Admin, id: string, kind: Kind) {
+    return as(admin, 'post', `/admin/account-recoveries/${id}/photos`).send({
+      kind,
+      contentType: 'image/jpeg',
+    });
+  }
+
+  function confirm(admin: Admin, id: string, photoId: string) {
+    return as(admin, 'post', `/admin/account-recoveries/${id}/photos/${photoId}/confirm`);
+  }
+
+  function download(admin: Admin, id: string, photoId: string) {
+    return as(admin, 'get', `/admin/account-recoveries/${id}/photos/${photoId}/download`);
+  }
+
+  /** Presigns, puts the bytes as the browser would, and confirms. */
+  async function upload(admin: Admin, id: string, kind: Kind, bytes: Uint8Array = jpeg()) {
+    const presigned = await presign(admin, id, kind);
+    expect(presigned.status).toBe(201);
+    const body = presigned.body as AdminAccountRecoveryPhotoUpload;
+    const key = await keyOf(body.photoId);
+    storage().putObject(key, bytes);
+    return {
+      photoId: body.photoId,
+      key,
+      upload: body,
+      confirmed: await confirm(admin, id, body.photoId),
+    };
+  }
+
+  async function photoAudit(photoId: string): Promise<{ action: string; admin_user_id: string }[]> {
+    const { rows } = await pool.query<{ action: string; admin_user_id: string }>(
+      `select action, admin_user_id from admin_audit_log
+        where target_type = 'account_recovery_photo' and target_id = $1 order by created_at, id`,
+      [photoId],
+    );
+    return rows;
+  }
+
+  async function openFor(kind: 'customer' | 'master', opener: Admin): Promise<string> {
+    const opened = await open(opener, await account(kind), nextEmail('photos'));
+    expect(opened.status).toBe(201);
+    return (opened.body as AdminAccountRecovery).id;
+  }
+
+  it('stores both photos, and a second admin reads them through audited links', async () => {
+    const support = await adminWith(['support']);
+    const reviewer = await adminWith(['super_admin']);
+    const id = await openFor('master', support);
+
+    const selfie = await upload(support, id, 'selfie_with_id');
+    expect(selfie.confirmed.status).toBe(200);
+    const front = await upload(support, id, 'id_card_front');
+    expect(front.confirmed.status).toBe(200);
+    // The key is the server's: never in a response.
+    expect(JSON.stringify(selfie.upload)).not.toContain(selfie.key);
+    expect(JSON.stringify(selfie.confirmed.body)).not.toContain(selfie.key);
+
+    const listed = await as(reviewer, 'get', `/admin/account-recoveries/${id}/photos`);
+    expect(listed.status).toBe(200);
+    const photos = listed.body as AdminAccountRecoveryPhoto[];
+    expect(photos.map((photo) => photo.kind).sort()).toEqual(['id_card_front', 'selfie_with_id']);
+    expect(photos[0]?.uploadedByName).toBe('Nigar');
+    expect(photos[0]?.uploadedByAdminId).toBe(support.id);
+
+    const read = await download(reviewer, id, selfie.photoId);
+    expect(read.status).toBe(200);
+    expect((read.body as AdminAccountRecoveryPhotoDownload).url).toEqual(expect.any(String));
+
+    expect(await photoAudit(selfie.photoId)).toEqual([
+      { action: 'account.recovery.photo.add', admin_user_id: support.id },
+      { action: 'account.recovery.photo.read', admin_user_id: reviewer.id },
+    ]);
+  });
+
+  it('keeps one photo of each kind and does not replace it', async () => {
+    const support = await adminWith(['support']);
+    const id = await openFor('master', support);
+    expect((await upload(support, id, 'selfie_with_id')).confirmed.status).toBe(200);
+
+    const again = await presign(support, id, 'selfie_with_id');
+    expect(again.status).toBe(409);
+    expect((again.body as ErrorEnvelope).error.code).toBe('ACCOUNT_RECOVERY_PHOTO_EXISTS');
+  });
+
+  it('replaces a presign nobody confirmed, and deletes what was behind it', async () => {
+    const support = await adminWith(['support']);
+    const id = await openFor('master', support);
+    const first = (await presign(support, id, 'id_card_front'))
+      .body as AdminAccountRecoveryPhotoUpload;
+    const firstKey = await keyOf(first.photoId);
+    storage().putObject(firstKey, jpeg());
+
+    const second = await presign(support, id, 'id_card_front');
+    expect(second.status).toBe(201);
+    expect(storage().hasObject(firstKey)).toBe(false);
+    expect((await confirm(support, id, first.photoId)).status).toBe(404);
+  });
+
+  it('refuses at confirm a file that is not an image, or is over the cap, and deletes it', async () => {
+    const support = await adminWith(['support']);
+    const id = await openFor('master', support);
+
+    const html = await upload(
+      support,
+      id,
+      'selfie_with_id',
+      new TextEncoder().encode('<html><body>not a photo</body></html>'),
+    );
+    expect(html.confirmed.status).toBe(422);
+    expect(storage().hasObject(html.key)).toBe(false);
+
+    const presigned = (await presign(support, id, 'id_card_front'))
+      .body as AdminAccountRecoveryPhotoUpload;
+    const key = await keyOf(presigned.photoId);
+    storage().putObject(key, jpeg(presigned.maxBytes + 1));
+    const big = await confirm(support, id, presigned.photoId);
+    expect(big.status).toBe(422);
+    expect((big.body as ErrorEnvelope).error.details).toMatchObject({
+      maxBytes: presigned.maxBytes,
+    });
+    expect(storage().hasObject(key)).toBe(false);
+
+    // Nothing was stored, and nothing was audited as added.
+    const listed = await as(support, 'get', `/admin/account-recoveries/${id}/photos`);
+    expect(listed.body).toEqual([]);
+    expect(await photoAudit(presigned.photoId)).toEqual([]);
+  });
+
+  it('says the file has not arrived when confirm comes before the upload', async () => {
+    const support = await adminWith(['support']);
+    const id = await openFor('master', support);
+    const presigned = (await presign(support, id, 'selfie_with_id'))
+      .body as AdminAccountRecoveryPhotoUpload;
+    expect((await confirm(support, id, presigned.photoId)).status).toBe(409);
+  });
+
+  it('takes no photos on a customer request', async () => {
+    const support = await adminWith(['support']);
+    const id = await openFor('customer', support);
+    const refused = await presign(support, id, 'selfie_with_id');
+    expect(refused.status).toBe(409);
+    expect((refused.body as ErrorEnvelope).error.code).toBe('ACCOUNT_RECOVERY_PHOTOS_MASTER_ONLY');
+  });
+
+  it('takes no photos once the request is closed, and still shows the stored ones', async () => {
+    const support = await adminWith(['support']);
+    const id = await openFor('master', support);
+    const selfie = await upload(support, id, 'selfie_with_id');
+    const cancelled = await as(support, 'post', `/admin/account-recoveries/${id}/cancel`).send({
+      reason: 'The user called; they found the old mailbox.',
+    });
+    expect(cancelled.status).toBe(200);
+
+    const refused = await presign(support, id, 'id_card_front');
+    expect(refused.status).toBe(409);
+    expect((refused.body as ErrorEnvelope).error.code).toBe('ACCOUNT_RECOVERY_NOT_ALLOWED_NOW');
+    expect((await download(support, id, selfie.photoId)).status).toBe(200);
+  });
+
+  it.each([['moderator'], ['finance']] as const)(
+    'refuses %s on every photo route',
+    async (role) => {
+      const support = await adminWith(['support']);
+      const other = await adminWith([role]);
+      const id = await openFor('master', support);
+      const selfie = await upload(support, id, 'selfie_with_id');
+
+      expect((await presign(other, id, 'id_card_front')).status).toBe(403);
+      expect((await as(other, 'get', `/admin/account-recoveries/${id}/photos`)).status).toBe(403);
+      expect((await download(other, id, selfie.photoId)).status).toBe(403);
+      expect((await confirm(other, id, selfie.photoId)).status).toBe(403);
+    },
+  );
+
+  it('answers 404 for a photo id of another request', async () => {
+    const support = await adminWith(['support']);
+    const first = await openFor('master', support);
+    const second = await openFor('master', support);
+    const selfie = await upload(support, first, 'selfie_with_id');
+    expect((await download(support, second, selfie.photoId)).status).toBe(404);
+  });
+
+  it('lets the sweep clear a presign nobody confirmed, and never a stored photo', async () => {
+    const support = await adminWith(['support']);
+    const id = await openFor('master', support);
+    const stored = await upload(support, id, 'selfie_with_id');
+    const pending = (await presign(support, id, 'id_card_front'))
+      .body as AdminAccountRecoveryPhotoUpload;
+    const pendingKey = await keyOf(pending.photoId);
+    storage().putObject(pendingKey, jpeg());
+    await pool.query(
+      `update account_recovery_photos set presign_expires_at = now() - interval '2 hours'
+        where recovery_id = $1`,
+      [id],
+    );
+
+    const photos = app.get(AccountRecoveryPhotosRepository);
+    const candidates = await photos.listAbandoned(new Date(Date.now() - HOUR_MS), 100);
+    const ids = candidates.map((candidate) => candidate.id);
+    expect(ids).toContain(pending.photoId);
+    expect(ids).not.toContain(stored.photoId);
+    expect(await photos.deleteAbandoned(pending.photoId, (key) => storage().delete(key))).toBe(
+      true,
+    );
+    expect(storage().hasObject(pendingKey)).toBe(false);
+    expect(storage().hasObject(stored.key)).toBe(true);
   });
 });

@@ -8,6 +8,7 @@ import { DeferredJobHandlerRegistry } from '../../infra/queue/deferred-job-handl
 import { RecurringWorkService } from '../../infra/queue/recurring-work.service';
 import type { StorageProvider } from '../../infra/storage/storage.types';
 import { STORAGE_PROVIDER } from '../../infra/storage/storage.types';
+import { AccountRecoveryPhotosRepository } from '../account-recovery/account-recovery-photos.repository';
 import { AdminRepository } from '../admin/admin.repository';
 import { OtpRepository } from '../auth/otp.repository';
 import { SessionsRepository } from '../auth/sessions.repository';
@@ -35,6 +36,9 @@ import {
  * A job takes seconds, and its retries minutes; an hour is a lost job.
  */
 const ORDER_PHOTO_SANITIZE_STUCK_AFTER_MS = 60 * 60_000;
+
+/** How long after its URL expired an unconfirmed recovery photo is cleared (#524). */
+const RECOVERY_PHOTO_ABANDONED_AFTER_MS = 60 * 60_000;
 
 /**
  * The retention sweeps: expired refresh tokens and dead sessions, consumer and
@@ -83,6 +87,7 @@ export class MaintenanceService implements OnModuleInit, OnApplicationBootstrap 
     private readonly photos: OrderPhotosRepository,
     private readonly messagePhotos: MessageAttachmentsRepository,
     private readonly documents: MasterVerificationRepository,
+    private readonly recoveryPhotos: AccountRecoveryPhotosRepository,
     private readonly locations: MasterLocationRepository,
     private readonly subscriptions: SubscriptionsService,
     private readonly portfolio: PortfolioCleanupService,
@@ -101,7 +106,10 @@ export class MaintenanceService implements OnModuleInit, OnApplicationBootstrap 
     this.handlers.register(OTP_CHALLENGE_SWEEP_JOB, () => this.sweepOtpChallenges());
     this.handlers.register(GEOCODE_CACHE_SWEEP_JOB, () => this.sweepGeocodeCache());
     this.handlers.register(ORDER_PHOTO_SWEEP_JOB, () => this.sweepAbandonedPhotos());
-    this.handlers.register(MASTER_DOCUMENT_SWEEP_JOB, () => this.sweepAbandonedDocuments());
+    this.handlers.register(MASTER_DOCUMENT_SWEEP_JOB, async () => {
+      await this.sweepAbandonedDocuments();
+      await this.sweepAbandonedRecoveryPhotos();
+    });
     this.handlers.register(MASTER_LOCATION_SWEEP_JOB, () => this.sweepExpiredLocationTrails());
     this.handlers.register(SUBSCRIPTION_SWEEP_JOB, () => this.sweepSubscriptions());
     // The portfolio's own sweep (#311), on the retention schedule; its steps
@@ -451,6 +459,49 @@ export class MaintenanceService implements OnModuleInit, OnApplicationBootstrap 
       // a file more people read than expect to.
       this.logger.log(
         `Master documents: swept ${String(swept)} abandoned uploads (${String(raced)} were confirmed in the meantime)`,
+      );
+    }
+  }
+
+  /**
+   * A recovery evidence photo (#524) presigned and never confirmed: the admin
+   * closed the tab, or the request closed first. It is an identity document
+   * like the master documents above, so it runs on their job.
+   *
+   * Only `awaiting_upload`, and only an hour after its URL stopped working, so
+   * an upload still in flight is never pulled from under a confirm. A stored
+   * photo is the record of the request and is never swept.
+   */
+  private async sweepAbandonedRecoveryPhotos(): Promise<void> {
+    const { batchSize } = this.config.maintenance;
+    const cutoff = new Date(Date.now() - RECOVERY_PHOTO_ABANDONED_AFTER_MS);
+
+    let swept = 0;
+    let raced = 0;
+    for (let batch = 0; batch < MAX_BATCHES_PER_RUN; batch += 1) {
+      const candidates = await this.recoveryPhotos.listAbandoned(cutoff, batchSize);
+      if (candidates.length === 0) {
+        break;
+      }
+      for (const candidate of candidates) {
+        const deleted = await this.recoveryPhotos.deleteAbandoned(candidate.id, (key) =>
+          this.storage.delete(key),
+        );
+        if (deleted) {
+          swept += 1;
+        } else {
+          raced += 1;
+        }
+      }
+      if (candidates.length < batchSize) {
+        break;
+      }
+    }
+
+    if (swept > 0 || raced > 0) {
+      // Counts only, as for master documents.
+      this.logger.log(
+        `Recovery photos: swept ${String(swept)} abandoned uploads (${String(raced)} were confirmed in the meantime)`,
       );
     }
   }
