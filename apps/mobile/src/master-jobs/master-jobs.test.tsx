@@ -6,8 +6,8 @@ import type {
   MasterOffer,
   OrderReviews,
 } from '@tezusta/types';
-import { fireEvent, render, screen, waitFor, within } from '@testing-library/react-native';
-import { Linking } from 'react-native';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react-native';
+import { DeviceEventEmitter, Linking, Platform } from 'react-native';
 import { Provider } from 'react-redux';
 
 import { pointText, valueOf } from '../../test/support/fake-map-surface';
@@ -707,6 +707,36 @@ describe('JobDetail', () => {
     expect(screen.queryByLabelText(copy.job.handBackReason)).not.toBeOnTheScreen();
     expect(screen.getByText(copy.job.handBack)).toBeOnTheScreen();
     expect(posts('/orders/order-1/transitions')).toHaveLength(0);
+  });
+
+  it('keeps the hand-back sheet above the keyboard and the navigation bar on Android (#528)', async () => {
+    jest.replaceProperty(Platform, 'OS', 'android');
+    replies['GET /masters/me/jobs/current'] = current(job());
+    await mount();
+
+    await fireEvent.press(await screen.findByText(copy.job.handBack));
+    const avoider = screen.getByTestId('hand-back-keyboard');
+    await fireEvent(avoider, 'layout', {
+      nativeEvent: { layout: { x: 0, y: 0, width: 400, height: 800 } },
+      persist: () => undefined,
+    });
+
+    // Under edge-to-edge Android no longer resizes the window for the
+    // keyboard, so the sheet has to rise by itself: by the keyboard's height.
+    await act(() => {
+      DeviceEventEmitter.emit('keyboardDidShow', {
+        endCoordinates: { screenX: 0, screenY: 500, width: 400, height: 300 },
+      });
+    });
+    await waitFor(() => {
+      expect(avoider).toHaveStyle({ paddingBottom: 300 });
+    });
+
+    // The modal draws under the navigation bar: the sheet's foot pads for it.
+    const body = screen.getByTestId('hand-back-sheet-body');
+    expect(body.props.edges).toMatchObject({ bottom: 'additive', top: 'off' });
+    expect(within(body).getByLabelText(copy.job.handBackReason)).toBeOnTheScreen();
+    expect(within(body).getByText(copy.job.handBackConfirm)).toBeOnTheScreen();
   });
 
   it('offers no hand-back once the first minute after accept has passed (ADR-0068 § 4)', async () => {
