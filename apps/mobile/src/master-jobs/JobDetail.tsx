@@ -1,15 +1,8 @@
 import { skipToken } from '@reduxjs/toolkit/query';
 import type { MasterJob } from '@tezusta/types';
 import { useMemo, useState } from 'react';
-import {
-  KeyboardAvoidingView,
-  Linking,
-  Modal,
-  Platform,
-  Pressable,
-  ScrollView,
-  View,
-} from 'react-native';
+import { KeyboardAvoidingView, Linking, Modal, Pressable, ScrollView, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { formatAddressDetail } from '../addresses/format-address-detail';
 import { ArrivalCountdownRow } from '../arrival/ArrivalCountdownRow';
@@ -349,8 +342,15 @@ export function JobDetail({
         animationType="none"
         onRequestClose={closeHandBack}
       >
+        {/*
+          "padding" on Android too (#528). Left to the window, Android was to
+          resize it for the keyboard (`adjustResize`), which it no longer does
+          under edge-to-edge: the keyboard covered the reason field and
+          "Geri qaytar" for the whole minute.
+        */}
         <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          testID="hand-back-keyboard"
+          behavior="padding"
           className="flex-1 justify-end"
         >
           <Pressable
@@ -361,30 +361,34 @@ export function JobDetail({
             className={`absolute inset-0 ${SCRIM_CLASS}`}
           />
           {handingBack && (
-            <HandBackSheet
-              busy={transitionResult.isLoading}
-              onCancel={closeHandBack}
-              onConfirm={(reason) => {
-                setFailed(false);
-                setHandBackRefused(false);
-                void transition({ orderId: current.orderId, to: 'SEARCHING', reason })
-                  .unwrap()
-                  .then(() => {
-                    setHandingBack(false);
-                  })
-                  .catch((error: unknown) => {
-                    setHandingBack(false);
-                    // The minute ran out — a rule, not a fault, so it is
-                    // explained rather than offered again. The mutation's
-                    // invalidation re-reads the job either way.
-                    if (errorCodeOf(error) === HANDBACK_WINDOW_CLOSED) {
-                      setHandBackRefused(true);
-                      return;
-                    }
-                    setFailed(true);
-                  });
-              }}
-            />
+            // The modal draws under the navigation bar (edge-to-edge), so the
+            // sheet's foot pads for it, in the sheet's own colour (#528).
+            <SafeAreaView testID="hand-back-sheet-body" edges={['bottom']} className="bg-bg">
+              <HandBackSheet
+                busy={transitionResult.isLoading}
+                onCancel={closeHandBack}
+                onConfirm={(reason) => {
+                  setFailed(false);
+                  setHandBackRefused(false);
+                  void transition({ orderId: current.orderId, to: 'SEARCHING', reason })
+                    .unwrap()
+                    .then(() => {
+                      setHandingBack(false);
+                    })
+                    .catch((error: unknown) => {
+                      setHandingBack(false);
+                      // The minute ran out — a rule, not a fault, so it is
+                      // explained rather than offered again. The mutation's
+                      // invalidation re-reads the job either way.
+                      if (errorCodeOf(error) === HANDBACK_WINDOW_CLOSED) {
+                        setHandBackRefused(true);
+                        return;
+                      }
+                      setFailed(true);
+                    });
+                }}
+              />
+            </SafeAreaView>
           )}
         </KeyboardAvoidingView>
       </Modal>
