@@ -181,7 +181,8 @@ export const recoveriesCopy = {
     tooLarge: (limit: string) => `The photo is larger than ${limit}. Send a smaller one.`,
     storageUnreachable:
       'The photo could not reach storage. Nothing was saved. If this keeps happening, the storage setup for the panel needs checking (ADR-0075).',
-    refused: 'The file is not a JPEG, PNG or WebP photo, or is over the size limit. Nothing was saved.',
+    refused:
+      'The file is not a JPEG, PNG or WebP photo, or is over the size limit. Nothing was saved.',
     notArrived: 'The upload did not finish. Try again.',
   },
 

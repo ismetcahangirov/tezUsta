@@ -5,13 +5,13 @@
     "tools"
   ],
   "totals": {
-    "files": 1490,
+    "files": 1493,
     "tests": 439,
     "violations": 0
   },
   "byWorkspace": {
     "apps/admin": {
-      "files": 139,
+      "files": 140,
       "tests": 26,
       "untested": [
         "apps/admin/eslint.config.mjs",
@@ -79,6 +79,7 @@
         "apps/admin/src/features/recoveries/RecoveriesPage.tsx",
         "apps/admin/src/features/recoveries/RecoveryDetailPage.tsx",
         "apps/admin/src/features/recoveries/RecoveryDialogs.tsx",
+        "apps/admin/src/features/recoveries/RecoveryPhotos.tsx",
         "apps/admin/src/features/recoveries/api.ts",
         "apps/admin/src/features/recoveries/rules.ts",
         "apps/admin/src/features/reports/CloseReportDialog.tsx",
@@ -114,7 +115,7 @@
       ]
     },
     "apps/api": {
-      "files": 710,
+      "files": 712,
       "tests": 221,
       "untested": [
         "apps/api/drizzle.config.ts",
@@ -166,6 +167,7 @@
         "apps/api/src/main.ts",
         "apps/api/src/modules/account-recovery/account-recovery-cancel-page.ts",
         "apps/api/src/modules/account-recovery/account-recovery-cancel.controller.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.service.ts",
         "apps/api/src/modules/account-recovery/account-recovery.module.ts",
         "apps/api/src/modules/account-recovery/account-recovery.repository.ts",
         "apps/api/src/modules/account-recovery/account-recovery.schema.ts",
@@ -741,6 +743,7 @@
         "apps/admin/src/features/recoveries/OpenRecoveryDialog.tsx",
         "apps/admin/src/features/recoveries/RecoveryDetailPage.tsx",
         "apps/admin/src/features/recoveries/RecoveryDialogs.tsx",
+        "apps/admin/src/features/recoveries/RecoveryPhotos.tsx",
         "apps/admin/src/features/recoveries/copy.ts",
         "apps/admin/src/features/reports/CloseReportDialog.tsx",
         "apps/admin/src/features/reports/ReportDetailPage.tsx",
@@ -907,6 +910,7 @@
         "apps/admin/src/features/recoveries/RecoveriesPage.tsx",
         "apps/admin/src/features/recoveries/RecoveryDetailPage.tsx",
         "apps/admin/src/features/recoveries/RecoveryDialogs.tsx",
+        "apps/admin/src/features/recoveries/RecoveryPhotos.tsx",
         "apps/admin/src/features/reports/CloseReportDialog.tsx",
         "apps/admin/src/features/reports/ReportDetailPage.tsx",
         "apps/admin/src/features/reports/ReportsPage.tsx",
@@ -961,6 +965,7 @@
         "apps/admin/src/features/recoveries/RecoveriesPage.tsx",
         "apps/admin/src/features/recoveries/RecoveryDetailPage.tsx",
         "apps/admin/src/features/recoveries/RecoveryDialogs.tsx",
+        "apps/admin/src/features/recoveries/RecoveryPhotos.tsx",
         "apps/admin/src/features/reports/CloseReportDialog.tsx",
         "apps/admin/src/features/reports/ReportDetailPage.tsx",
         "apps/admin/src/features/reports/ReportsPage.tsx",
@@ -1105,6 +1110,7 @@
         "apps/admin/src/features/orders/OrdersTable.tsx",
         "apps/admin/src/features/portfolio/PortfolioPage.tsx",
         "apps/admin/src/features/recoveries/RecoveriesPage.tsx",
+        "apps/admin/src/features/recoveries/RecoveryPhotos.tsx",
         "apps/admin/src/features/reports/ReportsPage.tsx",
         "apps/admin/src/features/reviews/ReviewsPage.tsx",
         "apps/admin/src/features/subscription/SubscriptionPage.tsx"
@@ -1932,7 +1938,8 @@
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/masters/MastersPage.tsx",
         "apps/admin/src/features/masters/actions.ts",
-        "apps/admin/src/features/masters/copy.ts"
+        "apps/admin/src/features/masters/copy.ts",
+        "apps/admin/src/features/recoveries/RecoveryPhotos.tsx"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -2371,6 +2378,7 @@
         "apps/admin/src/components/Button.tsx",
         "apps/admin/src/components/TextField.tsx",
         "apps/admin/src/features/recoveries/RecoveryDialogs.tsx",
+        "apps/admin/src/features/recoveries/RecoveryPhotos.tsx",
         "apps/admin/src/features/recoveries/api.ts",
         "apps/admin/src/features/recoveries/copy.ts",
         "apps/admin/src/features/recoveries/rules.ts",
@@ -2406,6 +2414,31 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/admin/src/features/recoveries/RecoveryPhotos.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/api/api-error.ts",
+        "apps/admin/src/components/Banner.tsx",
+        "apps/admin/src/components/Button.tsx",
+        "apps/admin/src/components/Table.tsx",
+        "apps/admin/src/features/masters/api.ts",
+        "apps/admin/src/features/recoveries/api.ts",
+        "apps/admin/src/features/recoveries/copy.ts",
+        "apps/admin/src/features/recoveries/rules.ts",
+        "apps/admin/src/format.ts",
+        "apps/admin/src/hooks.ts",
+        "apps/admin/src/open-in-new-tab.ts",
+        "apps/admin/src/shell/Shell.tsx",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/features/recoveries/RecoveryDetailPage.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/admin/src/features/recoveries/api.ts": {
       "workspace": "apps/admin",
       "module": "apps/admin",
@@ -2418,7 +2451,8 @@
         "apps/admin/src/features/recoveries/OpenRecoveryDialog.tsx",
         "apps/admin/src/features/recoveries/RecoveriesPage.tsx",
         "apps/admin/src/features/recoveries/RecoveryDetailPage.tsx",
-        "apps/admin/src/features/recoveries/RecoveryDialogs.tsx"
+        "apps/admin/src/features/recoveries/RecoveryDialogs.tsx",
+        "apps/admin/src/features/recoveries/RecoveryPhotos.tsx"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -2438,6 +2472,7 @@
         "apps/admin/src/features/recoveries/RecoveriesPage.tsx",
         "apps/admin/src/features/recoveries/RecoveryDetailPage.tsx",
         "apps/admin/src/features/recoveries/RecoveryDialogs.tsx",
+        "apps/admin/src/features/recoveries/RecoveryPhotos.tsx",
         "apps/admin/src/features/recoveries/recoveries.test.tsx",
         "apps/admin/src/features/recoveries/rules.ts"
       ],
@@ -2471,7 +2506,8 @@
       ],
       "dependedOnBy": [
         "apps/admin/src/features/recoveries/RecoveriesPage.tsx",
-        "apps/admin/src/features/recoveries/RecoveryDetailPage.tsx"
+        "apps/admin/src/features/recoveries/RecoveryDetailPage.tsx",
+        "apps/admin/src/features/recoveries/RecoveryPhotos.tsx"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -2833,6 +2869,7 @@
         "apps/admin/src/features/recoveries/OpenRecoveryDialog.tsx",
         "apps/admin/src/features/recoveries/RecoveriesPage.tsx",
         "apps/admin/src/features/recoveries/RecoveryDetailPage.tsx",
+        "apps/admin/src/features/recoveries/RecoveryPhotos.tsx",
         "apps/admin/src/features/recoveries/rules.ts",
         "apps/admin/src/features/reports/ReportDetailPage.tsx",
         "apps/admin/src/features/reports/ReportsPage.tsx",
@@ -2862,6 +2899,7 @@
         "apps/admin/src/features/orders/RevealEmailDialog.tsx",
         "apps/admin/src/features/portfolio/PortfolioPostPage.tsx",
         "apps/admin/src/features/recoveries/RecoveryDialogs.tsx",
+        "apps/admin/src/features/recoveries/RecoveryPhotos.tsx",
         "apps/admin/src/shell/Shell.tsx"
       ],
       "coveredByTests": [],
@@ -2907,7 +2945,8 @@
       "dependedOnBy": [
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/orders/OrderDetailPage.tsx",
-        "apps/admin/src/features/portfolio/PortfolioPostPage.tsx"
+        "apps/admin/src/features/portfolio/PortfolioPostPage.tsx",
+        "apps/admin/src/features/recoveries/RecoveryPhotos.tsx"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -3052,6 +3091,7 @@
         "apps/admin/src/features/orders/OrderDetailPage.tsx",
         "apps/admin/src/features/recoveries/RecoveriesPage.tsx",
         "apps/admin/src/features/recoveries/RecoveryDetailPage.tsx",
+        "apps/admin/src/features/recoveries/RecoveryPhotos.tsx",
         "apps/admin/src/features/reports/ReportDetailPage.tsx",
         "apps/admin/src/features/subscription/MasterSubscriptionPanel.tsx",
         "apps/admin/src/features/subscription/SubscriptionPage.tsx"
@@ -3701,6 +3741,7 @@
         "apps/api/src/common/filters/all-exceptions.filter.ts",
         "apps/api/src/common/pipes/zod-validation.pipe.test.ts",
         "apps/api/src/common/pipes/zod-validation.pipe.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.service.ts",
         "apps/api/src/modules/account-recovery/account-recovery.service.ts",
         "apps/api/src/modules/addresses/addresses.service.ts",
         "apps/api/src/modules/admin/admin-accounts.service.ts",
@@ -3773,6 +3814,7 @@
         "apps/api/src/common/filters/all-exceptions.filter.ts",
         "apps/api/src/common/filters/all-exceptions.filter.ts",
         "apps/api/src/common/pipes/zod-validation.pipe.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.service.ts",
         "apps/api/src/modules/account-recovery/account-recovery.service.ts",
         "apps/api/src/modules/addresses/addresses.service.ts",
         "apps/api/src/modules/admin/admin-accounts.service.ts",
@@ -3960,6 +4002,7 @@
       "dependedOnBy": [
         "apps/api/src/common/authorization/resource-visibility.test.ts",
         "apps/api/src/common/authorization/resource-visibility.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.service.ts",
         "apps/api/src/modules/account-recovery/account-recovery.service.ts",
         "apps/api/src/modules/addresses/addresses.service.ts",
         "apps/api/src/modules/admin/admin-accounts.service.ts",
@@ -4196,6 +4239,8 @@
       "dependedOnBy": [
         "apps/api/src/common/ids/uuid-v7.test.ts",
         "apps/api/src/infra/database/seed/seed-service-catalogue.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.repository.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.service.ts",
         "apps/api/src/modules/account-recovery/account-recovery.service.ts",
         "apps/api/src/modules/addresses/addresses.repository.ts",
         "apps/api/src/modules/admin/admin-calls.service.ts",
@@ -4972,6 +5017,7 @@
         "apps/api/src/infra/storage/storage.module.ts",
         "apps/api/src/main.ts",
         "apps/api/src/modules/account-recovery/account-recovery-emails.test.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.service.ts",
         "apps/api/src/modules/account-recovery/account-recovery.service.ts",
         "apps/api/src/modules/admin/admin-dashboard.service.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
@@ -5124,6 +5170,7 @@
         "apps/api/src/infra/storage/storage.module.test.ts",
         "apps/api/src/infra/storage/storage.module.ts",
         "apps/api/src/main.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.service.ts",
         "apps/api/src/modules/account-recovery/account-recovery.service.ts",
         "apps/api/src/modules/admin/admin-dashboard.service.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
@@ -5657,6 +5704,7 @@
       "dependedOnBy": [
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/infra/geo/geocode-cache.repository.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.repository.ts",
         "apps/api/src/modules/account-recovery/account-recovery.repository.ts",
         "apps/api/src/modules/account-recovery/account-recovery.service.ts",
         "apps/api/src/modules/addresses/addresses.repository.ts",
@@ -5733,6 +5781,7 @@
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/infra/database/seed/seed-service-catalogue.ts",
         "apps/api/src/infra/geo/geocode-cache.repository.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.repository.ts",
         "apps/api/src/modules/account-recovery/account-recovery.repository.ts",
         "apps/api/src/modules/account-recovery/account-recovery.service.ts",
         "apps/api/src/modules/addresses/addresses.repository.ts",
@@ -6073,6 +6122,9 @@
       ],
       "dependedOnBy": [
         "apps/api/src/infra/database/schema/index.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.repository.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.repository.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.service.ts",
         "apps/api/src/modules/account-recovery/account-recovery.repository.ts",
         "apps/api/src/modules/account-recovery/account-recovery.repository.ts",
         "apps/api/src/modules/account-recovery/account-recovery.service.ts",
@@ -6114,6 +6166,7 @@
         "apps/api/src/infra/database/schema/reports.ts",
         "apps/api/src/infra/database/schema/reviews.ts",
         "apps/api/src/infra/database/schema/subscriptions.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.repository.ts",
         "apps/api/src/modules/account-recovery/account-recovery.repository.ts",
         "apps/api/src/modules/admin/admin-accounts.service.ts",
         "apps/api/src/modules/admin/admin-customers.repository.ts",
@@ -8801,6 +8854,8 @@
       "dependedOnBy": [
         "apps/api/src/infra/media/image-renditions.ts",
         "apps/api/src/infra/storage/image-content-type.test.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.service.ts",
+        "apps/api/src/modules/account-recovery/account-recovery.schema.ts",
         "apps/api/src/modules/masters/master-avatar.schema.ts",
         "apps/api/src/modules/masters/master-verification.schema.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
@@ -8935,6 +8990,7 @@
       "dependedOnBy": [
         "apps/api/src/infra/media/media.module.ts",
         "apps/api/src/infra/storage/storage.module.test.ts",
+        "apps/api/src/modules/account-recovery/account-recovery.module.ts",
         "apps/api/src/modules/admin/admin.module.ts",
         "apps/api/src/modules/maintenance/maintenance.module.ts",
         "apps/api/src/modules/masters/masters.module.ts",
@@ -8964,6 +9020,8 @@
         "apps/api/src/infra/storage/stub-storage.provider.test.ts",
         "apps/api/src/infra/storage/stub-storage.provider.ts",
         "apps/api/src/infra/storage/stub-storage.provider.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.service.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.service.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/admin/admin-order-photos.service.ts",
@@ -8991,6 +9049,7 @@
         "apps/api/src/modules/portfolio/portfolio.service.ts",
         "apps/api/src/modules/portfolio/public-profile.service.ts",
         "apps/api/src/modules/portfolio/public-profile.service.ts",
+        "apps/api/test/account-recovery.e2e.test.ts",
         "apps/api/test/admin-portfolio.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
@@ -9009,6 +9068,7 @@
         "apps/api/src/infra/storage/storage.module.test.ts",
         "apps/api/src/infra/storage/storage.module.test.ts",
         "apps/api/src/infra/storage/stub-storage.provider.test.ts",
+        "apps/api/test/account-recovery.e2e.test.ts",
         "apps/api/test/admin-portfolio.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
@@ -9051,6 +9111,7 @@
         "apps/api/src/infra/storage/storage.module.test.ts",
         "apps/api/src/infra/storage/storage.module.ts",
         "apps/api/src/infra/storage/stub-storage.provider.test.ts",
+        "apps/api/test/account-recovery.e2e.test.ts",
         "apps/api/test/admin-portfolio.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
@@ -9068,6 +9129,7 @@
         "apps/api/src/infra/media/media-pipeline.service.test.ts",
         "apps/api/src/infra/storage/storage.module.test.ts",
         "apps/api/src/infra/storage/stub-storage.provider.test.ts",
+        "apps/api/test/account-recovery.e2e.test.ts",
         "apps/api/test/admin-portfolio.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
@@ -9156,6 +9218,63 @@
       ],
       "orphan": false
     },
+    "apps/api/src/modules/account-recovery/account-recovery-photos.repository.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/account-recovery",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/ids/uuid-v7.ts",
+        "apps/api/src/infra/database/database.tokens.ts",
+        "apps/api/src/infra/database/database.types.ts",
+        "apps/api/src/infra/database/schema/account-recovery.ts",
+        "apps/api/src/infra/database/schema/account-recovery.ts",
+        "apps/api/src/infra/database/schema/admin.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/account-recovery/account-recovery-photos.service.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.service.ts",
+        "apps/api/src/modules/account-recovery/account-recovery.module.ts",
+        "apps/api/src/modules/maintenance/maintenance.service.ts",
+        "apps/api/test/account-recovery.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/account-recovery.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/modules/account-recovery/account-recovery-photos.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/account-recovery",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/errors/app-error.ts",
+        "apps/api/src/common/errors/error-codes.types.ts",
+        "apps/api/src/common/errors/not-found.error.ts",
+        "apps/api/src/common/ids/uuid-v7.ts",
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/database/schema/account-recovery.ts",
+        "apps/api/src/infra/storage/image-content-type.ts",
+        "apps/api/src/infra/storage/storage.types.ts",
+        "apps/api/src/infra/storage/storage.types.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.repository.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.repository.ts",
+        "apps/api/src/modules/account-recovery/account-recovery.repository.ts",
+        "apps/api/src/modules/account-recovery/account-recovery.repository.ts",
+        "apps/api/src/modules/account-recovery/account-recovery.schema.ts",
+        "apps/api/src/modules/account-recovery/account-recovery.service.ts",
+        "apps/api/src/modules/admin/admin.repository.ts",
+        "apps/api/src/modules/admin/admin.types.ts",
+        "apps/api/src/modules/masters/master-verification.service.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/account-recovery/account-recovery.module.ts",
+        "apps/api/src/modules/account-recovery/admin-account-recovery.controller.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/modules/account-recovery/account-recovery.module.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/account-recovery",
@@ -9164,7 +9283,10 @@
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/infra/email/email.module.ts",
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
+        "apps/api/src/infra/storage/storage.module.ts",
         "apps/api/src/modules/account-recovery/account-recovery-cancel.controller.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.repository.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.service.ts",
         "apps/api/src/modules/account-recovery/account-recovery.repository.ts",
         "apps/api/src/modules/account-recovery/account-recovery.service.ts",
         "apps/api/src/modules/account-recovery/admin-account-recovery.controller.ts",
@@ -9172,7 +9294,8 @@
         "apps/api/src/modules/auth/otp.module.ts"
       ],
       "dependedOnBy": [
-        "apps/api/src/app.module.ts"
+        "apps/api/src/app.module.ts",
+        "apps/api/src/modules/maintenance/maintenance.module.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -9193,6 +9316,8 @@
         "apps/api/src/infra/database/schema/users.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/account-recovery/account-recovery-photos.service.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.service.ts",
         "apps/api/src/modules/account-recovery/account-recovery.module.ts",
         "apps/api/src/modules/account-recovery/account-recovery.service.ts",
         "apps/api/src/modules/account-recovery/account-recovery.service.ts"
@@ -9206,10 +9331,12 @@
       "isTest": false,
       "dependsOn": [
         "apps/api/src/common/pipes/zod-validation.pipe.ts",
-        "apps/api/src/infra/email/email-address.ts"
+        "apps/api/src/infra/email/email-address.ts",
+        "apps/api/src/infra/storage/image-content-type.ts"
       ],
       "dependedOnBy": [
         "apps/api/src/modules/account-recovery/account-recovery-cancel.controller.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.service.ts",
         "apps/api/src/modules/account-recovery/admin-account-recovery.controller.ts"
       ],
       "coveredByTests": [],
@@ -9252,6 +9379,7 @@
       "dependedOnBy": [
         "apps/api/src/modules/account-recovery/account-recovery-cancel.controller.ts",
         "apps/api/src/modules/account-recovery/account-recovery-emails.test.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.service.ts",
         "apps/api/src/modules/account-recovery/account-recovery.module.ts",
         "apps/api/src/modules/account-recovery/admin-account-recovery.controller.ts"
       ],
@@ -9265,6 +9393,7 @@
       "module": "apps/api/src/modules/account-recovery",
       "isTest": false,
       "dependsOn": [
+        "apps/api/src/modules/account-recovery/account-recovery-photos.service.ts",
         "apps/api/src/modules/account-recovery/account-recovery.schema.ts",
         "apps/api/src/modules/account-recovery/account-recovery.service.ts",
         "apps/api/src/modules/admin/admin-permission.decorator.ts",
@@ -10668,6 +10797,7 @@
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/account-recovery/account-recovery-photos.service.ts",
         "apps/api/src/modules/account-recovery/account-recovery.service.ts",
         "apps/api/src/modules/admin/admin-accounts.service.ts",
         "apps/api/src/modules/admin/admin-actor.service.ts",
@@ -10776,6 +10906,7 @@
       ],
       "dependedOnBy": [
         "apps/api/src/common/request-context/request-context.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.service.ts",
         "apps/api/src/modules/account-recovery/account-recovery.service.ts",
         "apps/api/src/modules/account-recovery/admin-account-recovery.controller.ts",
         "apps/api/src/modules/admin/admin-accounts.controller.ts",
@@ -13422,6 +13553,7 @@
         "apps/api/src/infra/geo/geocoding.module.ts",
         "apps/api/src/infra/queue/queue.module.ts",
         "apps/api/src/infra/storage/storage.module.ts",
+        "apps/api/src/modules/account-recovery/account-recovery.module.ts",
         "apps/api/src/modules/admin/admin.module.ts",
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/otp.module.ts",
@@ -13449,6 +13581,7 @@
         "apps/api/src/infra/queue/recurring-work.service.ts",
         "apps/api/src/infra/storage/storage.types.ts",
         "apps/api/src/infra/storage/storage.types.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.repository.ts",
         "apps/api/src/modules/admin/admin.repository.ts",
         "apps/api/src/modules/auth/otp.repository.ts",
         "apps/api/src/modules/auth/sessions.repository.ts",
@@ -13898,6 +14031,7 @@
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/account-recovery/account-recovery-photos.service.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/masters/master-verification.controller.ts",
         "apps/api/src/modules/masters/masters.module.ts"
@@ -17730,6 +17864,9 @@
         "apps/api/src/infra/rate-limit/rate-limit.config.ts",
         "apps/api/src/infra/rate-limit/rate-limit.tokens.ts",
         "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
+        "apps/api/src/infra/storage/storage.types.ts",
+        "apps/api/src/infra/storage/stub-storage.provider.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.repository.ts",
         "apps/api/src/modules/admin/admin-session.service.ts",
         "apps/api/src/modules/admin/admin.repository.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
@@ -32749,6 +32886,7 @@
         "apps/admin/src/features/recoveries/OpenRecoveryDialog.tsx",
         "apps/admin/src/features/recoveries/RecoveryDetailPage.tsx",
         "apps/admin/src/features/recoveries/RecoveryDialogs.tsx",
+        "apps/admin/src/features/recoveries/RecoveryPhotos.tsx",
         "apps/admin/src/features/recoveries/api.ts",
         "apps/admin/src/features/recoveries/copy.ts",
         "apps/admin/src/features/recoveries/recoveries.test.tsx",
@@ -32785,6 +32923,7 @@
         "apps/api/src/infra/database/schema/reviews.ts",
         "apps/api/src/infra/database/schema/subscriptions.ts",
         "apps/api/src/infra/push/push-sender.types.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.service.ts",
         "apps/api/src/modules/account-recovery/account-recovery.service.ts",
         "apps/api/src/modules/account-recovery/admin-account-recovery.controller.ts",
         "apps/api/src/modules/addresses/addresses.controller.ts",

@@ -304,6 +304,7 @@
         "apps/admin/src/features/recoveries/OpenRecoveryDialog.tsx",
         "apps/admin/src/features/recoveries/RecoveryDetailPage.tsx",
         "apps/admin/src/features/recoveries/RecoveryDialogs.tsx",
+        "apps/admin/src/features/recoveries/RecoveryPhotos.tsx",
         "apps/admin/src/features/recoveries/copy.ts",
         "apps/admin/src/features/reports/CloseReportDialog.tsx",
         "apps/admin/src/features/reports/ReportDetailPage.tsx",
@@ -919,6 +920,7 @@
         "apps/admin/src/features/recoveries/RecoveriesPage.tsx",
         "apps/admin/src/features/recoveries/RecoveryDetailPage.tsx",
         "apps/admin/src/features/recoveries/RecoveryDialogs.tsx",
+        "apps/admin/src/features/recoveries/RecoveryPhotos.tsx",
         "apps/admin/src/features/reports/CloseReportDialog.tsx",
         "apps/admin/src/features/reports/ReportDetailPage.tsx",
         "apps/admin/src/features/reports/ReportsPage.tsx",
@@ -969,6 +971,7 @@
         "apps/admin/src/features/recoveries/RecoveriesPage.tsx",
         "apps/admin/src/features/recoveries/RecoveryDetailPage.tsx",
         "apps/admin/src/features/recoveries/RecoveryDialogs.tsx",
+        "apps/admin/src/features/recoveries/RecoveryPhotos.tsx",
         "apps/admin/src/features/reports/CloseReportDialog.tsx",
         "apps/admin/src/features/reports/ReportDetailPage.tsx",
         "apps/admin/src/features/reports/ReportsPage.tsx",
@@ -1089,6 +1092,7 @@
         "apps/admin/src/features/orders/OrdersTable.tsx",
         "apps/admin/src/features/portfolio/PortfolioPage.tsx",
         "apps/admin/src/features/recoveries/RecoveriesPage.tsx",
+        "apps/admin/src/features/recoveries/RecoveryPhotos.tsx",
         "apps/admin/src/features/reports/ReportsPage.tsx",
         "apps/admin/src/features/reviews/ReviewsPage.tsx",
         "apps/admin/src/features/subscription/SubscriptionPage.tsx"
@@ -5501,7 +5505,8 @@
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/masters/MastersPage.tsx",
         "apps/admin/src/features/masters/actions.ts",
-        "apps/admin/src/features/masters/copy.ts"
+        "apps/admin/src/features/masters/copy.ts",
+        "apps/admin/src/features/recoveries/RecoveryPhotos.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -8074,6 +8079,23 @@
         },
         {
           "dynamic": false,
+          "module": "./RecoveryPhotos",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/recoveries/RecoveryPhotos.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./api",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -8364,6 +8386,238 @@
       "valid": true
     },
     {
+      "source": "apps/admin/src/features/recoveries/RecoveryPhotos.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../api/api-error",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/api/api-error.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/Banner",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Banner.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/Button",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Button.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/Table",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Table.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../masters/api",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/masters/api.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./api",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/recoveries/api.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/recoveries/copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./rules",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/recoveries/rules.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../format",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/format.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../hooks",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/hooks.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../open-in-new-tab",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/open-in-new-tab.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../shell/Shell",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/shell/Shell.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/admin/src/features/recoveries/RecoveryDetailPage.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/admin/src/features/recoveries/api.ts",
       "dependencies": [
         {
@@ -8406,7 +8660,8 @@
         "apps/admin/src/features/recoveries/OpenRecoveryDialog.tsx",
         "apps/admin/src/features/recoveries/RecoveriesPage.tsx",
         "apps/admin/src/features/recoveries/RecoveryDetailPage.tsx",
-        "apps/admin/src/features/recoveries/RecoveryDialogs.tsx"
+        "apps/admin/src/features/recoveries/RecoveryDialogs.tsx",
+        "apps/admin/src/features/recoveries/RecoveryPhotos.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -8458,6 +8713,7 @@
         "apps/admin/src/features/recoveries/RecoveriesPage.tsx",
         "apps/admin/src/features/recoveries/RecoveryDetailPage.tsx",
         "apps/admin/src/features/recoveries/RecoveryDialogs.tsx",
+        "apps/admin/src/features/recoveries/RecoveryPhotos.tsx",
         "apps/admin/src/features/recoveries/recoveries.test.tsx",
         "apps/admin/src/features/recoveries/rules.ts"
       ],
@@ -8599,7 +8855,8 @@
       ],
       "dependents": [
         "apps/admin/src/features/recoveries/RecoveriesPage.tsx",
-        "apps/admin/src/features/recoveries/RecoveryDetailPage.tsx"
+        "apps/admin/src/features/recoveries/RecoveryDetailPage.tsx",
+        "apps/admin/src/features/recoveries/RecoveryPhotos.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -10700,6 +10957,7 @@
         "apps/admin/src/features/recoveries/OpenRecoveryDialog.tsx",
         "apps/admin/src/features/recoveries/RecoveriesPage.tsx",
         "apps/admin/src/features/recoveries/RecoveryDetailPage.tsx",
+        "apps/admin/src/features/recoveries/RecoveryPhotos.tsx",
         "apps/admin/src/features/recoveries/rules.ts",
         "apps/admin/src/features/reports/ReportDetailPage.tsx",
         "apps/admin/src/features/reports/ReportsPage.tsx",
@@ -10741,6 +10999,7 @@
         "apps/admin/src/features/orders/RevealEmailDialog.tsx",
         "apps/admin/src/features/portfolio/PortfolioPostPage.tsx",
         "apps/admin/src/features/recoveries/RecoveryDialogs.tsx",
+        "apps/admin/src/features/recoveries/RecoveryPhotos.tsx",
         "apps/admin/src/shell/Shell.tsx"
       ],
       "orphan": false,
@@ -10818,7 +11077,8 @@
       "dependents": [
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/orders/OrderDetailPage.tsx",
-        "apps/admin/src/features/portfolio/PortfolioPostPage.tsx"
+        "apps/admin/src/features/portfolio/PortfolioPostPage.tsx",
+        "apps/admin/src/features/recoveries/RecoveryPhotos.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -11349,6 +11609,7 @@
         "apps/admin/src/features/orders/OrderDetailPage.tsx",
         "apps/admin/src/features/recoveries/RecoveriesPage.tsx",
         "apps/admin/src/features/recoveries/RecoveryDetailPage.tsx",
+        "apps/admin/src/features/recoveries/RecoveryPhotos.tsx",
         "apps/admin/src/features/reports/ReportDetailPage.tsx",
         "apps/admin/src/features/subscription/MasterSubscriptionPanel.tsx",
         "apps/admin/src/features/subscription/SubscriptionPage.tsx"
@@ -13095,6 +13356,7 @@
         "apps/api/src/common/filters/all-exceptions.filter.ts",
         "apps/api/src/common/pipes/zod-validation.pipe.test.ts",
         "apps/api/src/common/pipes/zod-validation.pipe.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.service.ts",
         "apps/api/src/modules/account-recovery/account-recovery.service.ts",
         "apps/api/src/modules/addresses/addresses.service.ts",
         "apps/api/src/modules/admin/admin-accounts.service.ts",
@@ -13159,6 +13421,7 @@
         "apps/api/src/common/errors/rate-limited.error.ts",
         "apps/api/src/common/filters/all-exceptions.filter.ts",
         "apps/api/src/common/pipes/zod-validation.pipe.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.service.ts",
         "apps/api/src/modules/account-recovery/account-recovery.service.ts",
         "apps/api/src/modules/addresses/addresses.service.ts",
         "apps/api/src/modules/admin/admin-accounts.service.ts",
@@ -13334,6 +13597,7 @@
       "dependents": [
         "apps/api/src/common/authorization/resource-visibility.test.ts",
         "apps/api/src/common/authorization/resource-visibility.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.service.ts",
         "apps/api/src/modules/account-recovery/account-recovery.service.ts",
         "apps/api/src/modules/addresses/addresses.service.ts",
         "apps/api/src/modules/admin/admin-accounts.service.ts",
@@ -13890,6 +14154,8 @@
       "dependents": [
         "apps/api/src/common/ids/uuid-v7.test.ts",
         "apps/api/src/infra/database/seed/seed-service-catalogue.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.repository.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.service.ts",
         "apps/api/src/modules/account-recovery/account-recovery.service.ts",
         "apps/api/src/modules/addresses/addresses.repository.ts",
         "apps/api/src/modules/admin/admin-calls.service.ts",
@@ -15832,6 +16098,7 @@
         "apps/api/src/infra/storage/storage.module.ts",
         "apps/api/src/main.ts",
         "apps/api/src/modules/account-recovery/account-recovery-emails.test.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.service.ts",
         "apps/api/src/modules/account-recovery/account-recovery.service.ts",
         "apps/api/src/modules/admin/admin-dashboard.service.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
@@ -16043,6 +16310,7 @@
         "apps/api/src/infra/storage/storage.module.test.ts",
         "apps/api/src/infra/storage/storage.module.ts",
         "apps/api/src/main.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.service.ts",
         "apps/api/src/modules/account-recovery/account-recovery.service.ts",
         "apps/api/src/modules/admin/admin-dashboard.service.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
@@ -16691,6 +16959,7 @@
       "dependents": [
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/infra/geo/geocode-cache.repository.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.repository.ts",
         "apps/api/src/modules/account-recovery/account-recovery.repository.ts",
         "apps/api/src/modules/account-recovery/account-recovery.service.ts",
         "apps/api/src/modules/addresses/addresses.repository.ts",
@@ -16770,6 +17039,7 @@
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/infra/database/seed/seed-service-catalogue.ts",
         "apps/api/src/infra/geo/geocode-cache.repository.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.repository.ts",
         "apps/api/src/modules/account-recovery/account-recovery.repository.ts",
         "apps/api/src/modules/account-recovery/account-recovery.service.ts",
         "apps/api/src/modules/addresses/addresses.repository.ts",
@@ -17022,6 +17292,8 @@
       ],
       "dependents": [
         "apps/api/src/infra/database/schema/index.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.repository.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.service.ts",
         "apps/api/src/modules/account-recovery/account-recovery.repository.ts",
         "apps/api/src/modules/account-recovery/account-recovery.service.ts",
         "apps/api/src/modules/auth/email-change.repository.ts"
@@ -17073,6 +17345,7 @@
         "apps/api/src/infra/database/schema/reports.ts",
         "apps/api/src/infra/database/schema/reviews.ts",
         "apps/api/src/infra/database/schema/subscriptions.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.repository.ts",
         "apps/api/src/modules/account-recovery/account-recovery.repository.ts",
         "apps/api/src/modules/admin/admin-accounts.service.ts",
         "apps/api/src/modules/admin/admin-customers.repository.ts",
@@ -24250,6 +24523,8 @@
       "dependents": [
         "apps/api/src/infra/media/image-renditions.ts",
         "apps/api/src/infra/storage/image-content-type.test.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.service.ts",
+        "apps/api/src/modules/account-recovery/account-recovery.schema.ts",
         "apps/api/src/modules/masters/master-avatar.schema.ts",
         "apps/api/src/modules/masters/master-verification.schema.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
@@ -24763,6 +25038,7 @@
       "dependents": [
         "apps/api/src/infra/media/media.module.ts",
         "apps/api/src/infra/storage/storage.module.test.ts",
+        "apps/api/src/modules/account-recovery/account-recovery.module.ts",
         "apps/api/src/modules/admin/admin.module.ts",
         "apps/api/src/modules/maintenance/maintenance.module.ts",
         "apps/api/src/modules/masters/masters.module.ts",
@@ -24783,6 +25059,7 @@
         "apps/api/src/infra/storage/storage.module.ts",
         "apps/api/src/infra/storage/stub-storage.provider.test.ts",
         "apps/api/src/infra/storage/stub-storage.provider.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.service.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/admin/admin-order-photos.service.ts",
         "apps/api/src/modules/maintenance/maintenance.service.ts",
@@ -24797,6 +25074,7 @@
         "apps/api/src/modules/portfolio/portfolio-moderation.service.ts",
         "apps/api/src/modules/portfolio/portfolio.service.ts",
         "apps/api/src/modules/portfolio/public-profile.service.ts",
+        "apps/api/test/account-recovery.e2e.test.ts",
         "apps/api/test/admin-portfolio.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
@@ -24933,6 +25211,7 @@
         "apps/api/src/infra/storage/storage.module.test.ts",
         "apps/api/src/infra/storage/storage.module.ts",
         "apps/api/src/infra/storage/stub-storage.provider.test.ts",
+        "apps/api/test/account-recovery.e2e.test.ts",
         "apps/api/test/admin-portfolio.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
@@ -25269,6 +25548,482 @@
       "valid": true
     },
     {
+      "source": "apps/api/src/modules/account-recovery/account-recovery-photos.repository.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../common/ids/uuid-v7",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/ids/uuid-v7.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/database/database.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/database.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/database/database.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/database.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/database/schema/account-recovery",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/account-recovery.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/database/schema/account-recovery",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/account-recovery.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/database/schema/admin",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/admin.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/account-recovery/account-recovery-photos.service.ts",
+        "apps/api/src/modules/account-recovery/account-recovery.module.ts",
+        "apps/api/src/modules/maintenance/maintenance.service.ts",
+        "apps/api/test/account-recovery.e2e.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/account-recovery/account-recovery-photos.service.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../common/errors/app-error",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/errors/app-error.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../common/errors/error-codes.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/errors/error-codes.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../common/errors/not-found.error",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/errors/not-found.error.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../common/ids/uuid-v7",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/ids/uuid-v7.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/config/app-config.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/app-config.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/config/config.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/config.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/database/schema/account-recovery",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/account-recovery.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/storage/image-content-type",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/storage/image-content-type.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/storage/storage.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/storage/storage.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/storage/storage.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/storage/storage.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./account-recovery-photos.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/account-recovery/account-recovery-photos.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./account-recovery-photos.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/account-recovery/account-recovery-photos.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./account-recovery.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/account-recovery/account-recovery.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./account-recovery.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/account-recovery/account-recovery.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./account-recovery.schema",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/account-recovery/account-recovery.schema.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./account-recovery.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/account-recovery/account-recovery.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../admin/admin.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/admin/admin.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../admin/admin.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/admin/admin.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../masters/master-verification.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/masters/master-verification.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/account-recovery/account-recovery.module.ts",
+        "apps/api/src/modules/account-recovery/admin-account-recovery.controller.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/src/modules/account-recovery/account-recovery.module.ts",
       "dependencies": [
         {
@@ -25324,6 +26079,23 @@
         },
         {
           "dynamic": false,
+          "module": "../../infra/storage/storage.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/storage/storage.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./account-recovery-cancel.controller",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -25332,6 +26104,40 @@
             "import"
           ],
           "resolved": "apps/api/src/modules/account-recovery/account-recovery-cancel.controller.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./account-recovery-photos.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/account-recovery/account-recovery-photos.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./account-recovery-photos.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/account-recovery/account-recovery-photos.service.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -25426,7 +26232,8 @@
         }
       ],
       "dependents": [
-        "apps/api/src/app.module.ts"
+        "apps/api/src/app.module.ts",
+        "apps/api/src/modules/maintenance/maintenance.module.ts"
       ],
       "orphan": false,
       "valid": true
@@ -25591,6 +26398,7 @@
         }
       ],
       "dependents": [
+        "apps/api/src/modules/account-recovery/account-recovery-photos.service.ts",
         "apps/api/src/modules/account-recovery/account-recovery.module.ts",
         "apps/api/src/modules/account-recovery/account-recovery.service.ts"
       ],
@@ -25633,10 +26441,28 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/storage/image-content-type",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/storage/image-content-type.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [
         "apps/api/src/modules/account-recovery/account-recovery-cancel.controller.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.service.ts",
         "apps/api/src/modules/account-recovery/admin-account-recovery.controller.ts"
       ],
       "orphan": false,
@@ -26134,6 +26960,7 @@
       "dependents": [
         "apps/api/src/modules/account-recovery/account-recovery-cancel.controller.ts",
         "apps/api/src/modules/account-recovery/account-recovery-emails.test.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.service.ts",
         "apps/api/src/modules/account-recovery/account-recovery.module.ts",
         "apps/api/src/modules/account-recovery/admin-account-recovery.controller.ts"
       ],
@@ -26143,6 +26970,23 @@
     {
       "source": "apps/api/src/modules/account-recovery/admin-account-recovery.controller.ts",
       "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./account-recovery-photos.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/account-recovery/account-recovery-photos.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
         {
           "dynamic": false,
           "module": "./account-recovery.schema",
@@ -34441,6 +35285,7 @@
         }
       ],
       "dependents": [
+        "apps/api/src/modules/account-recovery/account-recovery-photos.service.ts",
         "apps/api/src/modules/account-recovery/account-recovery.service.ts",
         "apps/api/src/modules/admin/admin-accounts.service.ts",
         "apps/api/src/modules/admin/admin-actor.service.ts",
@@ -34547,6 +35392,7 @@
       ],
       "dependents": [
         "apps/api/src/common/request-context/request-context.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.service.ts",
         "apps/api/src/modules/account-recovery/account-recovery.service.ts",
         "apps/api/src/modules/account-recovery/admin-account-recovery.controller.ts",
         "apps/api/src/modules/admin/admin-accounts.controller.ts",
@@ -45895,6 +46741,23 @@
         },
         {
           "dynamic": false,
+          "module": "../account-recovery/account-recovery.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/account-recovery/account-recovery.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../admin/admin.module",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -46153,6 +47016,23 @@
             "import"
           ],
           "resolved": "apps/api/src/infra/storage/storage.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../account-recovery/account-recovery-photos.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/account-recovery/account-recovery-photos.repository.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -48974,6 +49854,7 @@
         }
       ],
       "dependents": [
+        "apps/api/src/modules/account-recovery/account-recovery-photos.service.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/masters/master-verification.controller.ts",
         "apps/api/src/modules/masters/masters.module.ts"
@@ -69652,6 +70533,58 @@
             "import"
           ],
           "resolved": "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/storage/storage.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/storage/storage.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/storage/stub-storage.provider",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/storage/stub-storage.provider.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/account-recovery/account-recovery-photos.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/account-recovery/account-recovery-photos.repository.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -141796,6 +142729,7 @@
         "apps/admin/src/features/recoveries/OpenRecoveryDialog.tsx",
         "apps/admin/src/features/recoveries/RecoveryDetailPage.tsx",
         "apps/admin/src/features/recoveries/RecoveryDialogs.tsx",
+        "apps/admin/src/features/recoveries/RecoveryPhotos.tsx",
         "apps/admin/src/features/recoveries/api.ts",
         "apps/admin/src/features/recoveries/copy.ts",
         "apps/admin/src/features/recoveries/recoveries.test.tsx",
@@ -141832,6 +142766,7 @@
         "apps/api/src/infra/database/schema/reviews.ts",
         "apps/api/src/infra/database/schema/subscriptions.ts",
         "apps/api/src/infra/push/push-sender.types.ts",
+        "apps/api/src/modules/account-recovery/account-recovery-photos.service.ts",
         "apps/api/src/modules/account-recovery/account-recovery.service.ts",
         "apps/api/src/modules/account-recovery/admin-account-recovery.controller.ts",
         "apps/api/src/modules/addresses/addresses.controller.ts",
@@ -142721,8 +143656,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 1490,
-    "totalDependenciesCruised": 7150,
+    "totalCruised": 1493,
+    "totalDependenciesCruised": 7200,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,
