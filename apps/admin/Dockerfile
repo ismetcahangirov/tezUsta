@@ -37,5 +37,9 @@ RUN pnpm --filter admin build \
 FROM nginxinc/nginx-unprivileged:1.30.5-alpine
 COPY apps/admin/deploy/nginx/default.conf.template /etc/nginx/templates/default.conf.template
 COPY apps/admin/deploy/nginx/panel-headers.conf /etc/nginx/tezusta/panel-headers.conf
+# The private bucket's upload origin for the CSP (ADR-0075). Empty keeps
+# ADR-0052's policy; the start-up check refuses anything but one https origin.
+ENV PANEL_STORAGE_UPLOAD_ORIGIN=""
+COPY --chmod=0755 apps/admin/deploy/nginx/15-panel-storage-origin.sh /docker-entrypoint.d/15-panel-storage-origin.sh
 COPY --from=build /repo/apps/admin/dist /usr/share/nginx/html
 EXPOSE 8080

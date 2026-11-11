@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 import { createZodDto } from '../../common/pipes/zod-validation.pipe';
 import { EMAIL_MAX_LENGTH, normaliseEmail } from '../../infra/email/email-address';
+import { ALLOWED_IMAGE_CONTENT_TYPES } from '../../infra/storage/image-content-type';
 
 /**
  * Request bodies of support-mediated recovery (#515, ADR-0074 § 2).
@@ -48,8 +49,22 @@ export const recoveryReasonSchema = z.object({ reason }).strict();
  */
 export const cancelByLinkSchema = z.object({ token: z.string().min(1).max(200) }).strict();
 
+/** #524: one of the two evidence photos, as one of the image types the confirm can check. */
+export const presignRecoveryPhotoSchema = z
+  .object({
+    kind: z.enum(['selfie_with_id', 'id_card_front']),
+    contentType: z.enum(ALLOWED_IMAGE_CONTENT_TYPES),
+  })
+  .strict();
+
+export const recoveryPhotoParamsSchema = z.object({ id: z.uuid(), photoId: z.uuid() }).strict();
+
+export type PresignRecoveryPhotoRequest = z.infer<typeof presignRecoveryPhotoSchema>;
+
 export class RecoveryIdParamsDto extends createZodDto(recoveryIdParamsSchema) {}
 export class OpenRecoveryDto extends createZodDto(openRecoverySchema) {}
 export class VerifyRecoveryDto extends createZodDto(verifyRecoverySchema) {}
 export class RecoveryReasonDto extends createZodDto(recoveryReasonSchema) {}
 export class CancelByLinkDto extends createZodDto(cancelByLinkSchema) {}
+export class PresignRecoveryPhotoDto extends createZodDto(presignRecoveryPhotoSchema) {}
+export class RecoveryPhotoParamsDto extends createZodDto(recoveryPhotoParamsSchema) {}

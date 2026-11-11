@@ -421,6 +421,13 @@
       "when": 1794338708518,
       "tag": "0059_account_recovery",
       "breakpoints": true
+    },
+    {
+      "idx": 60,
+      "version": "7",
+      "when": 1794344714146,
+      "tag": "0060_recovery_photos",
+      "breakpoints": true
     }
   ]
 }

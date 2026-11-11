@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { GeocodingInfraModule } from '../../infra/geo/geocoding.module';
 import { QueueModule } from '../../infra/queue/queue.module';
 import { StorageModule } from '../../infra/storage/storage.module';
+import { AccountRecoveryModule } from '../account-recovery/account-recovery.module';
 import { AdminModule } from '../admin/admin.module';
 import { AuthModule } from '../auth/auth.module';
 import { OtpModule } from '../auth/otp.module';
@@ -39,6 +40,7 @@ import { MaintenanceService } from './maintenance.service';
     AuthModule,
     OtpModule,
     AdminModule,
+    AccountRecoveryModule,
     OrdersModule,
     MastersModule,
     GeocodingInfraModule,

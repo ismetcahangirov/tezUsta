@@ -2,6 +2,7 @@ import { sql } from 'drizzle-orm';
 import {
   check,
   index,
+  integer,
   pgEnum,
   pgTable,
   text,
@@ -146,3 +147,82 @@ export const accountRecoveryRequests = pgTable(
 export type AccountRecoveryRow = typeof accountRecoveryRequests.$inferSelect;
 export type AccountRecoveryCancelSourceName =
   (typeof accountRecoveryCancelSource.enumValues)[number];
+
+/**
+ * Which of the two photos ADR-0074 § 2 asks a master for (#524): a fresh
+ * selfie holding the same ID card, and the card's front.
+ */
+export const accountRecoveryPhotoKind = pgEnum('account_recovery_photo_kind', [
+  'selfie_with_id',
+  'id_card_front',
+]);
+
+/**
+ * `awaiting_upload` from presign until confirm; `stored` once the bytes were
+ * checked. Nothing else: a stored photo is never replaced or withdrawn, it is
+ * the record of what the request was opened on.
+ */
+export const accountRecoveryPhotoStatus = pgEnum('account_recovery_photo_status', [
+  'awaiting_upload',
+  'stored',
+]);
+
+/**
+ * The evidence photos of a master's recovery request (#524, ADR-0074 § 2).
+ *
+ * Identity documents, so they live where ADR-0023's do: the private bucket,
+ * written by the admin's browser through a presigned PUT (ADR-0024), checked
+ * at confirm against the real size and bytes, and read only through a
+ * short-lived link whose every issue is audited. The key is server-made and
+ * never leaves the API.
+ *
+ * Kept as long as the request row, which is kept as the record of a move or
+ * a refusal (`docs/product/admin-flow.md` § "No destructive deletes"), the
+ * same as a reviewed ADR-0023 document. An `awaiting_upload` row that was
+ * never confirmed is cleared by the maintenance sweep.
+ */
+export const accountRecoveryPhotos = pgTable(
+  'account_recovery_photos',
+  {
+    id: uuid('id').primaryKey(),
+    recoveryId: uuid('recovery_id')
+      .notNull()
+      // RESTRICT: requests are never deleted, so this never fires.
+      .references(() => accountRecoveryRequests.id, { onDelete: 'restrict' }),
+    kind: accountRecoveryPhotoKind('kind').notNull(),
+    status: accountRecoveryPhotoStatus('status').notNull().default('awaiting_upload'),
+    storageKey: text('storage_key').notNull(),
+    declaredContentType: text('declared_content_type').notNull(),
+    verifiedContentType: text('verified_content_type'),
+    sizeBytes: integer('size_bytes'),
+    uploadedByAdminId: uuid('uploaded_by_admin_id')
+      .notNull()
+      .references(() => adminUsers.id, { onDelete: 'restrict' }),
+    presignExpiresAt: timestamp('presign_expires_at', { withTimezone: true }).notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    storedAt: timestamp('stored_at', { withTimezone: true }),
+  },
+  (table) => [
+    /** One photo of each kind per request; a pending presign holds the slot. */
+    uniqueIndex('account_recovery_photos_kind_unique').on(table.recoveryId, table.kind),
+    uniqueIndex('account_recovery_photos_storage_key_unique').on(table.storageKey),
+    index('account_recovery_photos_uploaded_by_idx').on(table.uploadedByAdminId),
+    /** The sweep's lookup of presigns nobody confirmed. */
+    index('account_recovery_photos_awaiting_idx')
+      .on(table.presignExpiresAt)
+      .where(sql`${table.status} = 'awaiting_upload'`),
+    check(
+      'account_recovery_photos_stored_shape',
+      sql`(${table.status} = 'stored') = (${table.storedAt} is not null)
+          and (${table.status} = 'stored') = (${table.sizeBytes} is not null)
+          and (${table.status} = 'stored') = (${table.verifiedContentType} is not null)`,
+    ),
+    check(
+      'account_recovery_photos_size_positive',
+      sql`${table.sizeBytes} is null or ${table.sizeBytes} > 0`,
+    ),
+  ],
+);
+
+export type AccountRecoveryPhotoRow = typeof accountRecoveryPhotos.$inferSelect;
+export type AccountRecoveryPhotoKindName = (typeof accountRecoveryPhotoKind.enumValues)[number];

@@ -2,6 +2,10 @@ import type {
   AdminAccountRecovery,
   AdminAccountRecoveryEmails,
   AdminAccountRecoveryOpenRequest,
+  AdminAccountRecoveryPhoto,
+  AdminAccountRecoveryPhotoDownload,
+  AdminAccountRecoveryPhotoPresignRequest,
+  AdminAccountRecoveryPhotoUpload,
 } from '@tezusta/types';
 
 import { adminApi } from '../../api/admin-api';
@@ -14,6 +18,11 @@ export interface RecoveryReasonArg {
 export interface RecoveryCodeArg {
   readonly id: string;
   readonly code: string;
+}
+
+export interface RecoveryPhotoArg {
+  readonly id: string;
+  readonly photoId: string;
 }
 
 const LIST = { type: 'AccountRecovery', id: 'LIST' } as const;
@@ -30,7 +39,9 @@ function invalidates(_result: unknown, _error: unknown, arg: { readonly id: stri
  * and master files, which show the masked address.
  */
 export const recoveriesApi = adminApi
-  .enhanceEndpoints({ addTagTypes: ['AccountRecovery', 'Customer', 'Master'] })
+  .enhanceEndpoints({
+    addTagTypes: ['AccountRecovery', 'AccountRecoveryPhotos', 'Customer', 'Master'],
+  })
   .injectEndpoints({
     endpoints: (build) => ({
       listRecoveries: build.query<AdminAccountRecovery[], void>({
@@ -89,6 +100,41 @@ export const recoveriesApi = adminApi
           body: { reason: arg.reason },
         }),
       }),
+      /** The stored evidence photos of a master's request (#524): facts only, no links. */
+      recoveryPhotos: build.query<AdminAccountRecoveryPhoto[], string>({
+        query: (recoveryId) => `/admin/account-recoveries/${id(recoveryId)}/photos`,
+        providesTags: (_result, _error, recoveryId) => [
+          { type: 'AccountRecoveryPhotos', id: recoveryId },
+        ],
+      }),
+      presignRecoveryPhoto: build.mutation<
+        AdminAccountRecoveryPhotoUpload,
+        AdminAccountRecoveryPhotoPresignRequest & { readonly id: string }
+      >({
+        query: ({ id: recoveryId, ...body }) => ({
+          url: `/admin/account-recoveries/${id(recoveryId)}/photos`,
+          method: 'POST',
+          body,
+        }),
+      }),
+      confirmRecoveryPhoto: build.mutation<AdminAccountRecoveryPhoto, RecoveryPhotoArg>({
+        query: (arg) => ({
+          url: `/admin/account-recoveries/${id(arg.id)}/photos/${id(arg.photoId)}/confirm`,
+          method: 'POST',
+        }),
+        // A refusal deleted the bytes, so the list is read again either way.
+        invalidatesTags: (_result, _error, arg) => [{ type: 'AccountRecoveryPhotos', id: arg.id }],
+      }),
+      /**
+       * A mutation although it is a GET, as for master documents: each call is
+       * an audited read minting a fresh URL. Dispatched with `track: false`.
+       */
+      recoveryPhotoDownload: build.mutation<AdminAccountRecoveryPhotoDownload, RecoveryPhotoArg>({
+        query: (arg) => ({
+          url: `/admin/account-recoveries/${id(arg.id)}/photos/${id(arg.photoId)}/download`,
+          method: 'GET',
+        }),
+      }),
     }),
   });
 
@@ -100,4 +146,7 @@ export const {
   useVerifyRecoveryMutation,
   useCancelRecoveryMutation,
   useApproveRecoveryMutation,
+  useRecoveryPhotosQuery,
+  usePresignRecoveryPhotoMutation,
+  useConfirmRecoveryPhotoMutation,
 } = recoveriesApi;

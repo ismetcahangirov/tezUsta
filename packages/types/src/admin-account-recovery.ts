@@ -81,3 +81,40 @@ export interface AdminAccountRecoveryEmails {
 export interface AccountRecoveryCancelRequest {
   readonly token: string;
 }
+
+/** The two evidence photos of a master's request (#524, ADR-0074 § 2). */
+export type AccountRecoveryPhotoKind = 'selfie_with_id' | 'id_card_front';
+
+/** A stored evidence photo. The bytes are read through `…/photos/:photoId/download`, audited. */
+export interface AdminAccountRecoveryPhoto {
+  readonly id: string;
+  readonly kind: AccountRecoveryPhotoKind;
+  readonly sizeBytes: number;
+  readonly uploadedByAdminId: string;
+  readonly uploadedByName: string | null;
+  readonly storedAt: string;
+}
+
+/** `POST /admin/account-recoveries/:id/photos`. */
+export interface AdminAccountRecoveryPhotoPresignRequest {
+  readonly kind: AccountRecoveryPhotoKind;
+  readonly contentType: 'image/jpeg' | 'image/png' | 'image/webp';
+}
+
+/** A presigned PUT for one photo; confirm with `photoId` once it succeeds. */
+export interface AdminAccountRecoveryPhotoUpload {
+  readonly photoId: string;
+  readonly uploadUrl: string;
+  /** ISO 8601 UTC. The URL stops working here. */
+  readonly expiresAt: string;
+  /** The `Content-Type` the URL was signed for. Sending another one fails. */
+  readonly contentType: string;
+  /** The cap, so the panel can refuse a large file first. The server checks it again at confirm. */
+  readonly maxBytes: number;
+}
+
+/** A short-lived read link, issued per view and audited. */
+export interface AdminAccountRecoveryPhotoDownload {
+  readonly url: string;
+  readonly expiresAt: string;
+}

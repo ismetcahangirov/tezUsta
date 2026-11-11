@@ -1,12 +1,14 @@
 import type {
   AdminAccountRecovery,
+  AdminAccountRecoveryPhoto,
   AdminCustomerDetail,
   AdminMasterDetail,
+  AdminMasterDocument,
   AdminOrderSummary,
   AdminPermission,
   AdminRole,
 } from '@tezusta/types';
-import { screen, waitFor, within } from '@testing-library/react';
+import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { adminMe, apiError, installFakeServer } from '../../../test/fake-server';
@@ -118,7 +120,7 @@ function order(): AdminOrderSummary {
   };
 }
 
-function master(): AdminMasterDetail {
+function master(overrides: Partial<AdminMasterDetail> = {}): AdminMasterDetail {
   return {
     id: MASTER_ID,
     displayName: 'Rashad Aliyev',
@@ -134,6 +136,7 @@ function master(): AdminMasterDetail {
     documents: [],
     history: [],
     jobRecord: { handBacks: 0, lateArrivals: 0 },
+    ...overrides,
   };
 }
 
@@ -588,5 +591,193 @@ describe('the refusal messages', () => {
     expect(recoveryErrorMessage({ status: 'network', code: undefined })).toBe(
       recoveriesCopy.errors.unexpected,
     );
+  });
+});
+
+describe('the evidence photos of a master’s request (#524)', () => {
+  const PHOTOS = `${DETAIL}/photos`;
+  const PHOTO_ID = '0b9e7d1c-0000-4000-8000-0000000000e1';
+  const DOCUMENT_ID = '0b9e7d1c-0000-4000-8000-0000000000d1';
+  const UPLOAD_URL = 'https://storage.test/recovery-photo?sig=1';
+  const photos = recoveriesCopy.photos;
+  const selfie = photos.kind.selfie_with_id;
+  const cardFront = photos.kind.id_card_front;
+
+  function stored(): AdminAccountRecoveryPhoto {
+    return {
+      id: PHOTO_ID,
+      kind: 'selfie_with_id',
+      sizeBytes: 1024,
+      uploadedByAdminId: ME,
+      uploadedByName: 'Aysel Mammadova',
+      storedAt: '2026-11-11T09:30:00.000Z',
+    };
+  }
+
+  function onFile(): AdminMasterDocument {
+    return {
+      id: DOCUMENT_ID,
+      documentType: 'id_card_front',
+      status: 'accepted',
+      sizeBytes: 2048,
+      verifiedContentType: 'image/jpeg',
+      submittedAt: '2026-09-20T09:00:00.000Z',
+      reviewedAt: '2026-09-21T09:00:00.000Z',
+    };
+  }
+
+  function masterRecoveryServer(status: AdminAccountRecovery['status'] = 'awaiting_code') {
+    return installFakeServer()
+      .on('GET', '/api/admin/me', me(['support'], SUPPORT))
+      .on('GET', DETAIL, {
+        status: 200,
+        body: recovery({ status, customerId: null, masterId: MASTER_ID }),
+      })
+      .on('GET', MASTER, { status: 200, body: master({ documents: [onFile()] }) });
+  }
+
+  function image(name: string, type: string, bytes = 'photo-bytes'): File {
+    return new File([bytes], name, { type });
+  }
+
+  it('uploads a photo straight to storage, then confirms it', async () => {
+    const confirm = `${PHOTOS}/${PHOTO_ID}/confirm`;
+    const server = masterRecoveryServer()
+      .on('GET', PHOTOS, { status: 200, body: [] }, { status: 200, body: [stored()] })
+      .on('POST', PHOTOS, {
+        status: 201,
+        body: {
+          photoId: PHOTO_ID,
+          uploadUrl: UPLOAD_URL,
+          expiresAt: '2026-11-11T10:15:00.000Z',
+          contentType: 'image/jpeg',
+          maxBytes: 10 * 1024 * 1024,
+        },
+      })
+      .on('PUT', '/recovery-photo', { status: 200 })
+      .on('POST', confirm, { status: 200, body: stored() });
+    const { user } = renderApp(`/recoveries/${RECOVERY_ID}`);
+
+    await user.upload(
+      await screen.findByLabelText(photos.uploadLabel(selfie)),
+      image('selfie.jpg', 'image/jpeg'),
+    );
+
+    expect(
+      await screen.findByRole('button', { name: photos.openLabel(selfie) }),
+    ).toBeInTheDocument();
+    expect(server.calls('POST', PHOTOS)[0]?.body).toEqual({
+      kind: 'selfie_with_id',
+      contentType: 'image/jpeg',
+    });
+    const [put] = server.calls('PUT', '/recovery-photo');
+    expect(put?.origin).toBe('https://storage.test');
+    expect(put?.headers.get('content-type')).toBe('image/jpeg');
+    expect(put?.credentials).toBe('omit');
+    expect(server.calls('POST', confirm)).toHaveLength(1);
+    // The card front is still to add.
+    expect(screen.getByLabelText(photos.uploadLabel(cardFront))).toBeInTheDocument();
+  });
+
+  it('opens a new photo and the document on file, each through its own audited link', async () => {
+    const tab = { opener: {}, location: { href: '' }, close: vi.fn() };
+    vi.spyOn(window, 'open').mockReturnValue(tab as unknown as Window);
+    const photoDownload = `${PHOTOS}/${PHOTO_ID}/download`;
+    const documentDownload = `${MASTER}/documents/${DOCUMENT_ID}/download`;
+    const server = masterRecoveryServer()
+      .on('GET', PHOTOS, { status: 200, body: [stored()] })
+      .on('GET', photoDownload, {
+        status: 200,
+        body: { url: 'https://storage.test/photo?sig=1', expiresAt: '2026-11-11T10:05:00.000Z' },
+      })
+      .on('GET', documentDownload, {
+        status: 200,
+        body: { url: 'https://storage.test/doc?sig=1', expiresAt: '2026-11-11T10:05:00.000Z' },
+      });
+    const { user } = renderApp(`/recoveries/${RECOVERY_ID}`);
+
+    await user.click(await screen.findByRole('button', { name: photos.openLabel(selfie) }));
+    await waitFor(() => expect(tab.location.href).toBe('https://storage.test/photo?sig=1'));
+
+    await user.click(screen.getByRole('button', { name: photos.openFileLabel(cardFront) }));
+    await waitFor(() => expect(tab.location.href).toBe('https://storage.test/doc?sig=1'));
+
+    expect(server.calls('GET', photoDownload)).toHaveLength(1);
+    expect(server.calls('GET', documentDownload)).toHaveLength(1);
+    // No selfie on file in this master's documents.
+    expect(screen.getByText(photos.noneOnFile)).toBeInTheDocument();
+  });
+
+  it('refuses a file that is not a photo before anything is sent', async () => {
+    const server = masterRecoveryServer().on('GET', PHOTOS, { status: 200, body: [] });
+    renderApp(`/recoveries/${RECOVERY_ID}`);
+
+    // `accept` would hide it in the picker; a drop or "All files" still gets through.
+    fireEvent.change(await screen.findByLabelText(photos.uploadLabel(selfie)), {
+      target: { files: [image('notes.pdf', 'application/pdf')] },
+    });
+
+    expect(await screen.findByText(photos.notImage)).toBeInTheDocument();
+    expect(server.calls('POST', PHOTOS)).toHaveLength(0);
+  });
+
+  it('refuses a photo over the cap before the upload, and says what the server refused', async () => {
+    const server = masterRecoveryServer()
+      .on('GET', PHOTOS, { status: 200, body: [] })
+      .on(
+        'POST',
+        PHOTOS,
+        {
+          status: 201,
+          body: {
+            photoId: PHOTO_ID,
+            uploadUrl: UPLOAD_URL,
+            expiresAt: '2026-11-11T10:15:00.000Z',
+            contentType: 'image/png',
+            maxBytes: 4,
+          },
+        },
+        {
+          status: 201,
+          body: {
+            photoId: PHOTO_ID,
+            uploadUrl: UPLOAD_URL,
+            expiresAt: '2026-11-11T10:15:00.000Z',
+            contentType: 'image/png',
+            maxBytes: 1024,
+          },
+        },
+      )
+      .on('PUT', '/recovery-photo', { status: 200 })
+      .on('POST', `${PHOTOS}/${PHOTO_ID}/confirm`, apiError(422, 'VALIDATION_FAILED'));
+    const { user } = renderApp(`/recoveries/${RECOVERY_ID}`);
+    const input = await screen.findByLabelText(photos.uploadLabel(cardFront));
+
+    await user.upload(input, image('card.png', 'image/png', 'too many bytes'));
+    expect(await screen.findByText(photos.tooLarge('4 B'), { exact: false })).toBeInTheDocument();
+    expect(server.calls('PUT', '/recovery-photo')).toHaveLength(0);
+
+    await user.upload(input, image('card.png', 'image/png', 'ok'));
+    expect(await screen.findByText(photos.refused)).toBeInTheDocument();
+    expect(server.calls('PUT', '/recovery-photo')).toHaveLength(1);
+  });
+
+  it('offers no upload once the request is closed', async () => {
+    masterRecoveryServer('cancelled').on('GET', PHOTOS, { status: 200, body: [] });
+    renderApp(`/recoveries/${RECOVERY_ID}`);
+
+    expect(await screen.findAllByText(photos.notAdded)).toHaveLength(2);
+    expect(screen.queryByLabelText(photos.uploadLabel(selfie))).not.toBeInTheDocument();
+  });
+
+  it('is not shown for a customer’s request', async () => {
+    const server = installFakeServer()
+      .on('GET', '/api/admin/me', me(['support'], SUPPORT))
+      .on('GET', DETAIL, { status: 200, body: recovery() });
+    renderApp(`/recoveries/${RECOVERY_ID}`);
+
+    expect(await screen.findByText(recoveriesCopy.evidence)).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: photos.title })).not.toBeInTheDocument();
+    expect(server.calls('GET', `${DETAIL}/photos`)).toHaveLength(0);
   });
 });

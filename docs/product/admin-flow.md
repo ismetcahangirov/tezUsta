@@ -224,8 +224,13 @@ document match ticked; a customer's needs at least three facts ticked as
 matching, and the account's own answers appear only after the admin has
 written down what the user said. Approve stays disabled, with the reason
 shown, for the admin who opened the request and until the code is confirmed
-and the hold has run; support sees that only a super admin approves. Until
-#524, the new photos stay in the support mailbox and only the notes are kept.
+and the hold has run; support sees that only a super admin approves.
+
+On a master's request (#524, ADR-0075), support adds the two photos the user
+sent, the selfie with the ID card and the card's front, while the request is
+open. Each sits beside the matching document on file, and both open in a new
+tab through an audited, short-lived link. A photo is never replaced: a wrong
+one means cancelling the request and opening a new one.
 
 ### 9. Portfolio moderation
 

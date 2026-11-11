@@ -115,6 +115,7 @@ its provider interface lives.
 | [0072](ADR-0072-email-one-time-code-sign-in.md)                    | Sign-in is email + a one-time code; the phone number is removed                          | Accepted (email provider pending; recovery in ADR-0074)                  |
 | [0074](ADR-0074-account-recovery-and-email-change.md)              | Changing the sign-in email, and recovering an account whose address is lost              | Accepted (by delegation; copy and support address the owner's)           |
 | [0073](ADR-0073-becoming-a-master-in-the-app.md)                   | Becoming a master in the app: first-launch choice and "Usta ol" in Settings              | Accepted (entry points by delegation; copy the owner's)                  |
+| [0075](ADR-0075-admin-panel-uploads-to-the-private-bucket.md)      | The admin panel uploads to the private bucket, through one CSP origin                    | Accepted                                                                 |
 
 ## Template
 

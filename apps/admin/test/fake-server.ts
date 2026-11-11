@@ -50,7 +50,7 @@ export class FakeServer {
       origin: url.origin,
       headers: request.headers,
       credentials: request.credentials,
-      body: text === '' ? undefined : (JSON.parse(text) as unknown),
+      body: text === '' ? undefined : parseBody(text),
     };
     this.requests.push(recorded);
 
@@ -63,6 +63,15 @@ export class FakeServer {
     if (answer === undefined) throw new Error('FakeServer: empty answer');
     return jsonResponse(answer);
   };
+}
+
+/** JSON as the API is sent it; anything else, such as a photo PUT to storage, as the raw text. */
+function parseBody(text: string): unknown {
+  try {
+    return JSON.parse(text) as unknown;
+  } catch {
+    return text;
+  }
 }
 
 function jsonResponse({ status, body }: FakeResponse): Response {
